@@ -8,9 +8,20 @@ project, and on how to run the tests.
 
 CMSC 23320 - Foundations of Computer Networks
 https://uchicago-cs.github.io/cmsc23320/
+https://uchicago-cs.github.io/cmsc23320/projects/project1_tips.html
+
+
+
+http://chi.cs.uchicago.edu/chirc/
 
 Installing, Building, and Running chirc
 http://chi.cs.uchicago.edu/chirc/installing.html
+
+Assignment 1: Basic Message Processing
+http://chi.cs.uchicago.edu/chirc/assignment1.html
+
+
+#exec
 
 
 brew install cmake
@@ -23,6 +34,15 @@ make VERBOSE=1
 
 ./chirc -o foobar
 nc 127.0.0.1 6667 foobar
+
+
+http://chi.cs.uchicago.edu/chirc/testing.html
+
+pip3 install Click
+pip3 install pytest
+
+
+
 
 # check this out
 
