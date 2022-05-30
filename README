@@ -41,6 +41,12 @@ http://chi.cs.uchicago.edu/chirc/testing.html
 pip3 install Click
 pip3 install pytest
 
+cd build
+make assignment-1
+
+
+cd ../tests
+python3 -m pytest
 
 
 
