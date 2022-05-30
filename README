@@ -3,5 +3,15 @@ chirc project. It also includes several automated tests for students to verify
 the correctness of their implementation.
 
 Please see http://chi.cs.uchicago.edu/chirc/ for a specification of the chirc
-project, including specific assignments, instructions on how to build the 
+project, including specific assignments, instructions on how to build the
 project, and on how to run the tests.
+
+cd ~/5Circle/chirc
+cmake -B build/
+
+cd build
+make VERBOSE=1
+
+./chirc -o foobar
+nc 127.0.0.1 6667 foobar
+
