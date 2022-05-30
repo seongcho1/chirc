@@ -6,6 +6,15 @@ Please see http://chi.cs.uchicago.edu/chirc/ for a specification of the chirc
 project, including specific assignments, instructions on how to build the
 project, and on how to run the tests.
 
+CMSC 23320 - Foundations of Computer Networks
+https://uchicago-cs.github.io/cmsc23320/
+
+Installing, Building, and Running chirc
+http://chi.cs.uchicago.edu/chirc/installing.html
+
+
+brew install cmake
+
 cd ~/5Circle/chirc
 cmake -B build/
 
@@ -15,3 +24,13 @@ make VERBOSE=1
 ./chirc -o foobar
 nc 127.0.0.1 6667 foobar
 
+# check this out
+
+https://github.com/uchicago-cs/cmsc23320/blob/master/samples/chirc
+https://github.com/uchicago-cs/cmsc23320/tree/master/samples/sockets
+
+
+# Concepts that needs to consider
+
+• Only 1 poll() (or equivalent)
+• fcntl(fd, F_SETFL, O_NONBLOCK);
