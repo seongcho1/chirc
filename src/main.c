@@ -50,6 +50,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#include <errno.h>
 #include "log.h"
 
 
@@ -133,13 +134,16 @@ int main(int argc, char *argv[])
      * examples of this in client.c and in server-pthreads.c */
 
     int server_socket;
-    int client_socket;
-    struct sockaddr_in server_addr, client_addr;
+    int client_socket, nbytes;
+	struct addrinfo hints, *res, *p;
+	struct sockaddr_storage *client_addr;
+    //struct sockaddr_in server_addr, client_addr;
     int yes = 1;
     socklen_t sin_size = sizeof(struct sockaddr_in);
 
     char *msg = ":bar.example.com 001 user1 :Welcome to the Internet Relay Network user1!user1@foo.example.com\r\n";
 
+/*
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(atoi(port));
@@ -149,11 +153,87 @@ int main(int argc, char *argv[])
     setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     bind(server_socket, (struct sockaddr *) &server_addr, sizeof(server_addr));
     listen(server_socket, 5);
+*/
 
-    while(1)
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE; // Return my address, so I can bind() to it
+
+    /* Note how we call getaddrinfo with the host parameter set to NULL */
+    if (getaddrinfo(NULL, "23320", &hints, &res) != 0) {
+        perror("getaddrinfo() failed");
+        //pthread_exit(NULL);
+		return 1;
+    }
+
+    for(p = res;p != NULL; p = p->ai_next)
     {
-        client_socket = accept(server_socket, (struct sockaddr *) &client_addr, &sin_size);
-        send(client_socket, msg, strlen(msg), 0);
+        if ((server_socket = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+            perror("Could not open socket");
+            continue;
+        }
+
+        if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+            perror("Socket setsockopt() failed");
+            close(server_socket);
+            continue;
+        }
+
+		if (bind(server_socket, p->ai_addr, p->ai_addrlen) == -1) {
+            perror("Socket bind() failed");
+            close(server_socket);
+            continue;
+        }
+
+        if (listen(server_socket, 5) == -1) {
+            perror("Socket listen() failed");
+            close(server_socket);
+            continue;
+        }
+
+        break;
+    }
+
+    freeaddrinfo(res);
+
+    if (p == NULL)
+    {
+        fprintf(stderr, "Could not find a socket to bind to.\n");
+        //pthread_exit(NULL);
+		return 1;
+    }
+
+    while(1) {
+
+
+        //client_socket = accept(server_socket, (struct sockaddr *) &client_addr, &sin_size);
+        //send(client_socket, msg, strlen(msg), 0);
+
+        client_addr = calloc(1, sin_size);
+        if ((client_socket = accept(server_socket, (struct sockaddr *) client_addr, &sin_size)) == -1) {
+            /* If this particular connection fails, no need to kill the entire thread. */
+            free(client_addr);
+            perror("Could not accept() connection");
+            continue;
+        }
+
+        nbytes = send(client_socket, msg, strlen(msg), 0);
+
+        if (nbytes == -1 && (errno == ECONNRESET || errno == EPIPE))
+        {
+            fprintf(stderr, "Socket %d disconnected\n", client_socket);
+            close(client_socket);
+            return 1;
+        }
+        else if (nbytes == -1)
+        {
+            perror("Unexpected error in send()");
+            return 1;
+        }
+        sleep(5);
+
+
     }
 
     close(server_socket);

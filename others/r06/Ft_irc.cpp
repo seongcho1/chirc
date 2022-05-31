@@ -84,7 +84,7 @@ void	Ft_irc::loop() {
 					if (ret_recv <= 0) {
 						bzero(&msg_, sizeof(msg_));
 						sprintf(msg_, "server: client %d just left\n", delUser(fd));
-						//sendToAll(fd, msg_);
+						sendToAll(fd, msg_);
 						FD_CLR(fd, &curr_sock_);
 						close(fd);
 						break;
@@ -103,15 +103,19 @@ void	Ft_irc::loop() {
 
 void	Ft_irc::sendToAll(int fd, char *str_req) {
 
+	std::cout << "[ircid=" << ircfd_ << "]";
 	for (iterator it = userMap.begin(); it != userMap.end(); ++it) {
 		User *user = it->second;
 
+		std::cout << "[id=" << user->id() << ", fd=" << user->fd() << "]";
+
+		//except myself, send msg to the otehrs
 		if (user->fd() != fd && FD_ISSET(user->fd(), &cpy_write_)) {
 			if (send(user->fd(), str_req, strlen(str_req), 0) < 0)
 				fatal();
 		}
 	}
-
+	std::cout << str_req;
 }
 
 void	Ft_irc::exchangeMsg(int fd)
@@ -157,7 +161,7 @@ int		Ft_irc::getUserId(int const &userfd) {
 	for (iterator it = userMap.begin(); it != userMap.end(); ++it) {
 		User *user = it->second;
 		if (user->fd() == userfd)
-			return user->fd();
+			return user->id();
 	}
 	return -1;
 }
