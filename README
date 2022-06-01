@@ -57,8 +57,18 @@ https://github.com/uchicago-cs/cmsc23320/tree/master/samples/sockets
 
 # Concepts that needs to consider
 
-• use fd key instead of id key, then you can get max fd just with rbegin(), but keep id as a property
+## Dones
+
 • Only 1 poll() or select()
 • fcntl(fd, F_SETFL, O_NONBLOCK); <- use this just after setting socket options because it is just like fd setting
+• use fd key instead of id key, then you can get max fd just with rbegin(), but keep id as a property
+
+
+## Need to do
+
+
+
+
+
 • c++ sigint handling: sigint
 • string parsing: nick
