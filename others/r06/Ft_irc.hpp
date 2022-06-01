@@ -16,9 +16,6 @@
 //#include <sys/select.h>
 #include <netinet/in.h>
 
-//string parsing: nick
-//c++ sigint handling: sigint
-
 class Ft_irc {
 
   private:
