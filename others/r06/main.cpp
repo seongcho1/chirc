@@ -1,20 +1,22 @@
-#include "Ft_irc.hpp"
-#include <unistd.h>
-
-
+#include "Ircserv.hpp"
+#include <iostream>
+#include <csignal>
 
 int main(int ac, char **av)
 {
 
     if (ac != 2) {
-        write(2, "Wrong number of arguments\n", strlen("Wrong number of arguments\n"));
-        exit(1);
+		std::cout << "./ircserv <port>" << std::endl;
+  		return 1;
     }
 
-    Ft_irc irc;
-
+    Ircserv irc;
 
     irc.init(2130706433, atoi(av[1])); //127.0.0.1 6667
-    irc.loop();
+
+	while(42) {
+	    irc.doInTheLoop();
+	}
+
     return (0);
 }
