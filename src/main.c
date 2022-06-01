@@ -44,6 +44,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <fcntl.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -51,6 +53,8 @@
 #include <netdb.h>
 
 #include <errno.h>
+#include <assert.h>
+
 #include "log.h"
 
 
@@ -136,14 +140,13 @@ int main(int argc, char *argv[])
     int server_socket;
     int client_socket, nbytes;
 	struct addrinfo hints, *res, *p;
-	struct sockaddr_storage *client_addr;
-    //struct sockaddr_in server_addr, client_addr;
+	//struct sockaddr_storage *client_addr;
+    struct sockaddr_in server_addr, client_addr;
     int yes = 1;
     socklen_t sin_size = sizeof(struct sockaddr_in);
 
     char *msg = ":bar.example.com 001 user1 :Welcome to the Internet Relay Network user1!user1@foo.example.com\r\n";
 
-/*
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(atoi(port));
@@ -151,16 +154,17 @@ int main(int argc, char *argv[])
 
     server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+	//fcntl(server_socket, F_SETFL, O_NONBLOCK);
     bind(server_socket, (struct sockaddr *) &server_addr, sizeof(server_addr));
     listen(server_socket, 5);
-*/
 
+/*
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE; // Return my address, so I can bind() to it
 
-    /* Note how we call getaddrinfo with the host parameter set to NULL */
+    // Note how we call getaddrinfo with the host parameter set to NULL
     if (getaddrinfo(NULL, "23320", &hints, &res) != 0) {
         perror("getaddrinfo() failed");
         //pthread_exit(NULL);
@@ -203,16 +207,55 @@ int main(int argc, char *argv[])
         //pthread_exit(NULL);
 		return 1;
     }
+*/
+
+	char buf[500];
+	int bnick = 0, bname = 0, bwelcome = 0;
+	//do not set fcntl nonblocking yet
+	//https://uchicago-cs.github.io/cmsc23320/projects/project1_tips.html
+
+	char* token;
+    char* rest;
 
     while(1) {
+        client_socket = accept(server_socket, (struct sockaddr *) &client_addr, &sin_size);
+		//send(client_socket, msg, strlen(msg), 0);
 
+		while (2) {
+			bzero(&buf, strlen(buf));
+			nbytes = recv(client_socket, buf, 500, 0);
+			if (nbytes > 0) {
+				fprintf(stdout, "recv %d : %s", nbytes, buf);
+				if (bwelcome) {
+					send(client_socket, buf, strlen(buf), 0);
+					continue;
+				}
+				token = strtok_r(buf, " ", &rest);
+				if (token && strcmp(token, "nick") == 0) {
+					bnick = 1;
+					fprintf(stdout, "recv nick: %s", rest);
+				}
+				if (token && strcmp(token, "username") == 0) {
+					bname = 1;
+					fprintf(stdout, "recv username: %s", rest);
+				}
 
-        //client_socket = accept(server_socket, (struct sockaddr *) &client_addr, &sin_size);
-        //send(client_socket, msg, strlen(msg), 0);
+				if (token)
+					bzero(&token, strlen(token));
+				if (rest)
+					bzero(&rest, strlen(rest));
+				if (bnick && bname && bwelcome == 0) {
+					send(client_socket, msg, strlen(msg), 0);
+					bwelcome = 1;
+				}
 
+			}
+		}
+	}
+/*
         client_addr = calloc(1, sin_size);
         if ((client_socket = accept(server_socket, (struct sockaddr *) client_addr, &sin_size)) == -1) {
-            /* If this particular connection fails, no need to kill the entire thread. */
+            // If this particular connection fails, no need to kill the entire thread.
             free(client_addr);
             perror("Could not accept() connection");
             continue;
@@ -232,11 +275,10 @@ int main(int argc, char *argv[])
             return 1;
         }
         sleep(5);
+*/
 
-
-    }
-
-    close(server_socket);
+	close(client_socket);
+	close(server_socket);
 
     return 0;
 }
