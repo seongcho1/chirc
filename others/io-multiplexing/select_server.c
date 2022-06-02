@@ -16,6 +16,8 @@
 #define FALSE  0
 #define PORT 6667
 
+#define BUFFSIZE    1024
+
 int main(int argc , char *argv[])
 {
     int opt = TRUE;
@@ -24,7 +26,7 @@ int main(int argc , char *argv[])
     int max_sd;
     struct sockaddr_in address;
 
-    char buffer[1025];  //data buffer of 1K
+    char buffer[BUFFSIZE + 1];  //data buffer of 1K
 
     //set of socket descriptors
     fd_set readfds;
@@ -157,7 +159,7 @@ int main(int argc , char *argv[])
             {
                 //Check if it was for closing , and also read the
                 //incoming message
-                if ((valread = recv( sd , buffer, 1024, 0)) == 0)
+                if ((valread = recv( sd , buffer, BUFFSIZE, 0)) == 0)
                 {
                     //Somebody disconnected , get his details and print
                     getpeername(sd , (struct sockaddr*)&address , \
