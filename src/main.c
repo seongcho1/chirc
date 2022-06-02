@@ -222,21 +222,18 @@ int main(int argc, char *argv[])
 		//send(client_socket, msg, strlen(msg), 0);
 
 		while (2) {
-
-            bzero(&buf, strlen(buf));
-			nbytes = recv(client_socket, buf, 500, 0);
-
+			nbytes = recv(client_socket, buf, 500 - 1, 0);
             if (nbytes <= 0) {
-                bzero(&buf, sizeof(buf));
                 close(client_socket);
                 break;
             } else if (nbytes > 0) {
+                buf[nbytes] = 0;
 				fprintf(stdout, "recv %d : %s", nbytes, buf);
 				if (bwelcome) {
 					send(client_socket, buf, strlen(buf), 0);
 					continue;
 				}
-/*
+
 				token = strtok_r(buf, " ", &rest);
 				if (token && strcmp(token, "nick") == 0) {
 					bnick = 1;
@@ -247,15 +244,11 @@ int main(int argc, char *argv[])
 					fprintf(stdout, "recv username: %s", rest);
 				}
 
-				if (token)
-					bzero(&token, strlen(token));
-				if (rest)
-					bzero(&rest, strlen(rest));
 				if (bnick && bname && bwelcome == 0) {
 					send(client_socket, msg, strlen(msg), 0);
 					bwelcome = 1;
 				}
-*/
+
 			}
 		}
 	}
