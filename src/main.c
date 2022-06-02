@@ -57,6 +57,7 @@
 
 #include "log.h"
 
+#define BUFFSIZE    500
 
 int main(int argc, char *argv[])
 {
@@ -209,7 +210,7 @@ int main(int argc, char *argv[])
     }
 */
 
-	char buf[500];
+	char buf[BUFFSIZE+1];
 	int bnick = 0, bname = 0, bwelcome = 0;
 	//do not set fcntl nonblocking yet
 	//https://uchicago-cs.github.io/cmsc23320/projects/project1_tips.html
@@ -222,7 +223,7 @@ int main(int argc, char *argv[])
 		//send(client_socket, msg, strlen(msg), 0);
 
 		while (2) {
-			nbytes = recv(client_socket, buf, 500 - 1, 0);
+			nbytes = recv(client_socket, buf, BUFFSIZE, 0);
             if (nbytes <= 0) {
                 close(client_socket);
                 break;
