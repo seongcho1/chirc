@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 */
 
 	char buf[BUFFSIZE+1];
-	int bnick = 0, bname = 0, bwelcome = 0;
+	int bnick = 0, busername = 0, bwelcome = 0;
     char *nick, *username;
 	//do not set fcntl nonblocking yet
 	//https://uchicago-cs.github.io/cmsc23320/projects/project1_tips.html
@@ -227,6 +227,11 @@ int main(int argc, char *argv[])
 			nbytes = recv(client_socket, buf, BUFFSIZE, 0);
             if (nbytes <= 0) {
                 close(client_socket);
+                if (bnick) free(nick);
+                if (busername) free(username);
+                bnick = 0;
+                busername = 0;
+                bwelcome = 0;
                 break;
             } else if (nbytes > 0) {
                 buf[nbytes] = 0;
@@ -244,13 +249,13 @@ int main(int argc, char *argv[])
 					fprintf(stdout, "recv nick: %s", nick);
 				}
 				if (token && strcmp(token, "username") == 0) {
-					bname = 1;
+					busername = 1;
 				    token = strtok_r(rest, "\n", &rest);
                     username = strdup(token);
 					fprintf(stdout, "recv username: %s", username);
 				}
 
-				if (bnick && bname && bwelcome == 0) {
+				if (bnick && busername && bwelcome == 0) {
                     ////char *msg = ":bar.example.com 001 user1 :Welcome to the Internet Relay Network user1!user1@foo.example.com\r\n";
                     sprintf(buf, ":bar.example.com 001 %s: Welcome to the Internet Relay Network %s!%s\r\n", nick, nick, username);
                     send(client_socket, buf, strlen(buf), 0);
@@ -285,6 +290,8 @@ int main(int argc, char *argv[])
         sleep(5);
 */
 
+    if (bnick) free(nick);
+    if (busername) free(username);
 	close(client_socket);
 	close(server_socket);
 
