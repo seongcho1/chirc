@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     int yes = 1;
     socklen_t sin_size = sizeof(struct sockaddr_in);
 
-    char *msg = ":bar.example.com 001 user1 :Welcome to the Internet Relay Network user1!user1@foo.example.com\r\n";
+    //char *msg = ":bar.example.com 001 user1 :Welcome to the Internet Relay Network user1!user1@foo.example.com\r\n";
 
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
@@ -212,6 +212,7 @@ int main(int argc, char *argv[])
 
 	char buf[BUFFSIZE+1];
 	int bnick = 0, bname = 0, bwelcome = 0;
+    char *nick, *username;
 	//do not set fcntl nonblocking yet
 	//https://uchicago-cs.github.io/cmsc23320/projects/project1_tips.html
 
@@ -220,7 +221,7 @@ int main(int argc, char *argv[])
 
     while(1) {
         client_socket = accept(server_socket, (struct sockaddr *) &client_addr, &sin_size);
-		//send(client_socket, msg, strlen(msg), 0);
+		////send(client_socket, msg, strlen(msg), 0);
 
 		while (2) {
 			nbytes = recv(client_socket, buf, BUFFSIZE, 0);
@@ -238,15 +239,21 @@ int main(int argc, char *argv[])
 				token = strtok_r(buf, " ", &rest);
 				if (token && strcmp(token, "nick") == 0) {
 					bnick = 1;
-					fprintf(stdout, "recv nick: %s", rest);
+				    token = strtok_r(rest, "\n", &rest);
+                    nick = strdup(token);
+					fprintf(stdout, "recv nick: %s", nick);
 				}
 				if (token && strcmp(token, "username") == 0) {
 					bname = 1;
-					fprintf(stdout, "recv username: %s", rest);
+				    token = strtok_r(rest, "\n", &rest);
+                    username = strdup(token);
+					fprintf(stdout, "recv username: %s", username);
 				}
 
 				if (bnick && bname && bwelcome == 0) {
-					send(client_socket, msg, strlen(msg), 0);
+                    ////char *msg = ":bar.example.com 001 user1 :Welcome to the Internet Relay Network user1!user1@foo.example.com\r\n";
+                    sprintf(buf, ":bar.example.com 001 %s: Welcome to the Internet Relay Network %s!%s\r\n", nick, nick, username);
+                    send(client_socket, buf, strlen(buf), 0);
 					bwelcome = 1;
 				}
 
