@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
 
 				if (bnick && buser && bwelcome == 0) {
                     ////char *msg = ":bar.example.com 001 user1 :Welcome to the Internet Relay Network user1!user1@foo.example.com\r\n";
-                    sprintf(buf, ":bar.example.com 001 %s: Welcome to the Internet Relay Network %s!%s\r\n", nick, nick, user);
+                    sprintf(buf, ":bar.example.com 001 %s: Welcome to the Internet Relay Network %s!%s@foo.example.com\r\n", nick, nick, user);
                     send(client_socket, buf, strlen(buf), 0);
 					bwelcome = 1;
 				}
