@@ -2,15 +2,16 @@
 //Example code: A simple server side code, which echos back the received message.
 //Handle multiple socket connections with select and fd_set on Linux
 #include <stdio.h>
-#include <string.h>   //strlen
+#include <string.h>     //strlen
 #include <stdlib.h>
 #include <errno.h>
-#include <unistd.h>   //close
-#include <arpa/inet.h>    //close
+#include <unistd.h>     //close
+#include <arpa/inet.h>  //close
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
+#include <sys/time.h>   //FD_SET, FD_ISSET, FD_ZERO macros
+#include <fcntl.h>
 
 #define TRUE   1
 #define FALSE  0
@@ -22,7 +23,7 @@ int main(int argc , char *argv[])
 {
     int opt = TRUE;
     int master_socket , addrlen , new_socket , client_socket[30] ,
-          max_clients = 30 , activity, i , valread , sd;
+          max_clients = 30 , activity, i , valread , sd, other_sd;
     int max_sd;
     struct sockaddr_in address;
 
@@ -53,6 +54,11 @@ int main(int argc , char *argv[])
           sizeof(opt)) < 0 )
     {
         perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
+
+	if (fcntl(master_socket, F_SETFL, O_NONBLOCK) < 0) {
+        perror("fcntl");
         exit(EXIT_FAILURE);
     }
 
@@ -178,7 +184,17 @@ int main(int argc , char *argv[])
                     //set the string terminating NULL byte on the end
                     //of the data read
                     buffer[valread] = '\0';
-                    send(sd , buffer , strlen(buffer) , 0 );
+
+                    //send it to me back
+                    //send(sd , buffer , strlen(buffer) , 0 );
+
+                    //or send it to others
+                    for ( i = 0 ; i < max_clients ; i++) {
+                        other_sd = client_socket[i];
+                        if(other_sd > 0 && other_sd != sd)
+                           send(other_sd , buffer , strlen(buffer) , 0 );
+                    }
+
                 }
             }
         }
