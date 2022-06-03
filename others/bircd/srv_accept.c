@@ -13,7 +13,7 @@ void			srv_accept(t_env *e, int s)
   csin_len = sizeof(csin);
   cs = X(-1, accept(s, (struct sockaddr*)&csin, &csin_len), "accept");
   printf("New client #%d from %s:%d\n", cs,
-	 inet_ntoa(csin.sin_addr), ntohs(csin.sin_port));
+	      inet_ntoa(csin.sin_addr), ntohs(csin.sin_port));
   clean_fd(&e->fds[cs]);
   e->fds[cs].type = FD_CLIENT;
   e->fds[cs].fct_read = client_read;
