@@ -130,6 +130,11 @@ int main(int argc , char *argv[])
                 exit(EXIT_FAILURE);
             }
 
+            if (fcntl(new_socket, F_SETFL, O_NONBLOCK) < 0) {
+                perror("fcntl");
+                exit(EXIT_FAILURE);
+            }
+
             //inform user of socket number - used in send and receive commands
             printf("New connection , socket fd is %d , ip is : %s , port : %d\n" ,
 				new_socket , inet_ntoa(address.sin_addr) , ntohs(address.sin_port));
