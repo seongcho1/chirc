@@ -18,12 +18,15 @@ void	client_read(t_env *e, int cs)
   }
   else
   {
-    i = 0;
+ 	e->fds[cs].buf_read[r] = 0;
+	i = 0;
     while (i < e->maxfd)
     {
       if ((e->fds[i].type == FD_CLIENT) && (i != cs))
-        send(i, e->fds[cs].buf_read, r, 0);
+		sprintf(e->fds[i].buf_write, "[from %d] %s", cs, e->fds[cs].buf_read);
+        //send(i, e->fds[cs].buf_read, r, 0);
       i++;
     }
+	//sprintf(e->fds[cs].buf_write, "%s", e->fds[cs].buf_read);
   }
 }
