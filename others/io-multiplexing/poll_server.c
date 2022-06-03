@@ -22,6 +22,15 @@
 #define BUFFSIZE    1024
 #define MAX_CLIENTS 30
 
+/*
+struct pollfd {
+      int fd;
+      short events;
+      short revents;
+};
+*/
+
+
 int main(int argc , char *argv[])
 {
     int opt = TRUE;
