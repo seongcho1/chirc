@@ -7,6 +7,11 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 
+#include <fcntl.h>
+
+#define TRUE   1
+#define FALSE  0
+
 typedef struct		s_client
 {
 	int				fd;
@@ -101,6 +106,9 @@ void add_client()
 
     if ((client_fd = accept(sock_fd, (struct sockaddr *)&clientaddr, &len)) < 0)
         fatal();
+    if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0)
+        fatal();
+
     sprintf(msg, "server: client %d just arrived\n", add_client_to_list(client_fd));
     send_all(client_fd, msg);
     FD_SET(client_fd, &curr_sock);
@@ -167,6 +175,13 @@ int main(int ac, char **av)
 
     if ((sock_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         fatal();
+    int opt = TRUE;
+    if( setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 )
+        fatal();
+
+    if (fcntl(sock_fd, F_SETFL, O_NONBLOCK) < 0)
+        fatal();
+
     if (bind(sock_fd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
         fatal();
     if (listen(sock_fd, 0) < 0)
