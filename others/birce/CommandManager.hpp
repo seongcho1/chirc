@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
+#include <deque>
+#include <list>
 #include <map>
 #include <queue>
 
@@ -44,29 +47,36 @@ class CommandManager {
 
 	void						executeCommands(int cs) {
 
-		std::queue<std::string> commandLines = splitCommands(cs);
+		std::vector<std::string> commandLines = splitCommands(cs);
 		std::string command;
 
 		while(commandLines.size()) {
 			command = commandLines.front();
 			executeCommand(cs, command);
-			commandLines.pop();
+			commandLines.erase(commandLines.begin()); //in case of vector
+			//commandLines.pop(); 					  //in case of queue
 		}
 	}
 
-	std::queue<std::string>		splitCommands(int cs) {
-		std::queue<std::string> commandLines;
-		std::string delimiter = NEWLINE;
-		std::string token;
-		size_t pos = 0;
+	std::vector<std::string>		splitCommands(int cs, bool bClearCommands = true) {
+		return splitString(commands_[cs], NEWLINE, bClearCommands);
+	}
 
-		while ((pos = commands_[cs].find(delimiter)) != std::string::npos) {
-			std::string &command = commands_[cs];
-			token = command.substr(0, pos);// + delimiter.length());
-			commandLines.push(token);
-			command.erase(0, pos + delimiter.length());
+	std::vector<std::string>		splitString(std::string &s, std::string delimiter, bool bClearCommands = false) {
+		size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+		std::string token;
+		std::vector<std::string> result;
+
+		while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+			token = s.substr(pos_start, pos_end - pos_start); //+ delimiter.length());
+			pos_start = pos_end + delim_len;
+			result.push_back(token);  //in case of vector
 		}
-		return commandLines;
+		if (pos_start > 0 && pos_start < s.length())
+			result.push_back(s.substr(pos_start));
+		if (result.size() > 0 && bClearCommands == true)
+			s.clear();
+		return result;
 	}
 
 	void						executeCommand(int cs, std::string command) {

@@ -1,8 +1,8 @@
-
-#include <stdio.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include "bircd.hpp"
+#include <stdio.h>
+//#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
 
 void			srv_accept(t_env *e, int s)
 {
@@ -12,6 +12,9 @@ void			srv_accept(t_env *e, int s)
 
   csin_len = sizeof(csin);
   cs = X(-1, accept(s, (struct sockaddr*)&csin, &csin_len), (char *)"accept");
+
+	X(-1, fcntl(cs, F_SETFL, O_NONBLOCK), (char *)"fcntl");
+
   printf("New client #%d from %s:%d\n", cs,
 	      inet_ntoa(csin.sin_addr), ntohs(csin.sin_port));
   clean_fd(&e->fds[cs]);

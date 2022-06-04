@@ -2,8 +2,6 @@
 #define FD_HPP
 
 #include <iostream>
-#include <sstream>
-#include <map>
 #include <queue>
 
 #define FD_FREE		0

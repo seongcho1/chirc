@@ -1,5 +1,5 @@
 
-#include <stdlib.h>
+//#include <stdlib.h>
 #include "bircd.hpp"
 
 void	do_select(t_env *e)
