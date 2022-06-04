@@ -1,18 +1,9 @@
-#ifndef BIRCD_H_
-# define BIRCD_H_
+#ifndef BIRCD_HPP
+# define BIRCD_HPP
 
+# include "fd.hpp"
+# include "CommandManager.hpp"
 # include <sys/select.h>
-# include <iostream>
-#include <sstream>
-# include <queue>
-# include <map>
-
-# define FD_FREE	0
-# define FD_SERV	1
-# define FD_CLIENT	2
-
-# define BUF_SIZE	4096
-# define DELIMITER "\n"
 
 # define Xv(err,res,str)	(x_void(err,res,str,(char *)__FILE__,__LINE__))
 # define X(err,res,str)		(x_int(err,res,str,(char *)__FILE__,__LINE__))
@@ -20,42 +11,18 @@
 
 # define USAGE		"Usage: %s port\n"
 
+typedef struct	s_env {
+	t_fd			*fds;
+	int				port;
+	int				maxfd;
+	int				max;
+	int				r;
+	fd_set			fd_read;
+	fd_set			fd_write;
 
+	CommandManager	commander;
 
-
-template <typename T>
-std::string NumberToString ( T number ) {
-	std::ostringstream ss;
-	ss << number;
-	return ss.str();
-}
-
-
-typedef struct	s_fd
-{
-  int	type;
-  void	(*fct_read)(struct s_env *, int);
-  void	(*fct_write)(struct s_env *, int);
-  char	buf_read[BUF_SIZE + 1];
-  std::queue<std::string> write_queue;
-//  std::string write_string;
-
-}		t_fd;
-
-typedef struct	s_env
-{
-  t_fd		*fds;
-  int		port;
-  int		maxfd;
-  int		max;
-  int		r;
-  fd_set	fd_read;
-  fd_set	fd_write;
-
-  std::map<int, std::string> command;
-
-
-}		t_env;
+}				t_env;
 
 void	init_env(t_env *e);
 void	get_opt(t_env *e, int ac, char **av);

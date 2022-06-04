@@ -17,4 +17,5 @@ void		init_env(t_env *e)
     clean_fd(&e->fds[i]);
     i++;
   }
+  e->commander.link2fds(e->fds, e->maxfd);
 }
