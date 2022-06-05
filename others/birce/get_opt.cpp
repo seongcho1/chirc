@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "bircd.hpp"
+#include "birce.hpp"
 
 void	get_opt(t_env *e, int ac, char **av)
 {

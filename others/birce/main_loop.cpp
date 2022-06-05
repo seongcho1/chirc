@@ -1,5 +1,5 @@
 
-#include "bircd.hpp"
+#include "birce.hpp"
 
 void	main_loop(t_env *e)
 {

@@ -10,14 +10,14 @@
 
 #define BUF_SIZE	4096
 
-typedef struct	s_fd
+typedef struct		s_fd
 {
-  int	type;
-  void	(*fct_read)(struct s_env *, int);
-  void	(*fct_write)(struct s_env *, int);
-  char	buf_read[BUF_SIZE + 1];
-  std::queue<std::string> write_queue;
+	int							type;
+	void						(*fct_read)(struct s_env *, int);
+	void						(*fct_write)(struct s_env *, int);
+	char						buf_read[BUF_SIZE + 1];
+	std::queue<std::string>		write_queue;
 
-}		t_fd;
+}					t_fd;
 
 #endif

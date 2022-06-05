@@ -1,7 +1,7 @@
 
 #include <string.h>
 # include <sys/select.h>
-#include "bircd.hpp"
+#include "birce.hpp"
 
 void	init_fd(t_env *e)
 {

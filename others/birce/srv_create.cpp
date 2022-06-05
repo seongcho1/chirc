@@ -1,4 +1,4 @@
-#include "bircd.hpp"
+#include "birce.hpp"
 #include <fcntl.h>
 //#include <sys/socket.h>
 #include <netdb.h>

@@ -1,5 +1,5 @@
 
-#include "bircd.hpp"
+#include "birce.hpp"
 
 int	main(int ac, char **av)
 {

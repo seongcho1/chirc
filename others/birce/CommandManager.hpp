@@ -13,10 +13,16 @@ class CommandManager {
 	std::map<int, std::string>	commands_;
 	t_fd						*fds_;
 	int							maxfd_;
+
+	CommandManager(CommandManager const &other);
+	CommandManager &operator=(CommandManager const &other);
+
   public:
 
-	int							hello() {
-		return 42;
+	CommandManager() {}
+	CommandManager(t_fd *fds, int maxfd) { link2fds(fds, maxfd); }
+	~CommandManager() {
+		commands_.clear();
 	}
 
 	void						link2fds(t_fd *fds, int maxfd) {
@@ -26,9 +32,15 @@ class CommandManager {
 	std::map<int, std::string>	commands() { return commands_; }
 	std::size_t					size() const { return commands_.size(); }
 
-	void						push_and_execute(int cs, std::string command) {
-		push(cs, command);
-		executeCommands(cs);
+	int							push_and_execute(int cs, std::string commandstr) {
+		try {
+			push(cs, commandstr);
+			executeCommands(cs);
+			return 0;
+		} catch (const std::exception &e) {
+			//std::cerr << *this << " could not push and execute  " << cs << "'s command:" << commandstr << " because " << e.what() << std::endl;
+			return -1;
+		}
 	}
 
 	void						push(int cs, std::string command) {
@@ -53,8 +65,6 @@ class CommandManager {
 	std::vector<std::string>		splitCommands(int cs, bool bSkipLast = true, bool bClearCommands = true) {
 		return SS::splitString(commands_[cs], NEWLINE, bSkipLast, bClearCommands);
 	}
-
-
 
 	void						executeCommand(int cs, std::string command) {
 
@@ -105,5 +115,10 @@ class CommandManager {
 
 };
 
+/*
+std::ostream& operator<<(std::ostream& out, const CommandManager& c) {
+	return out << "CommandManager (map size=" << c.size() << ")";
+}
+*/
 
 #endif
