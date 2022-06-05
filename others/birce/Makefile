@@ -8,7 +8,7 @@ OBJS = ${SRCS:.cpp=.o}
 
 NAME = birce
 
-CXXFLAGS = -I. -g3 -Wall -Wextra -Werror
+CXXFLAGS = -I. -g3 -Wall -Wextra -Werror #-fsanitize=address
 LDFLAGS =
 
 CXX = c++

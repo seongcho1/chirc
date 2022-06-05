@@ -1,5 +1,5 @@
 #ifndef BIRCD_HPP
-# define BIRCD_HPP
+#define BIRCD_HPP
 
 # include "fd.hpp"
 # include "CommandManager.hpp"
@@ -38,4 +38,4 @@ void	init_fd(t_env *e);
 void	do_select(t_env *e);
 void	check_fd(t_env *e);
 
-#endif /* !BIRCD_H_ */
+#endif
