@@ -27,7 +27,7 @@ class CommandManager {
 		functionCallMap["SELFMSG"] =	&CommandManager::SELFMSG;
 		functionCallMap["PUBLICMSG"] =	&CommandManager::PUBLICMSG;
 	}
-	void							PRIVMSG(int cs, std::string command) {
+	void						PRIVMSG(int cs, std::string command) {
 		std::vector<std::string> commandVec = SS::splitString(command, SPACE);
 		if (commandVec.size() != 3) {
 			//do something with errcode errcode:errstr map
@@ -51,13 +51,13 @@ class CommandManager {
 		if (fds_[toFd].type == FD_CLIENT)
 			out_commands_[toFd].append(msg);
 	}
-	void							SELFMSG(int cs, std::string command) {
+	void						SELFMSG(int cs, std::string command) {
 		std::string msg;
 		msg = std::string("[from myself, " + SS::toString(cs) + "]").append(command).append(NEWLINE);
 		if (fds_[cs].type == FD_CLIENT)
 			out_commands_[cs].append(msg);
 	}
-	void							PUBLICMSG(int cs, std::string command) {
+	void						PUBLICMSG(int cs, std::string command) {
 		std::string msg;
 		msg = std::string("[from" + SS::toString(cs) + "]").append(command).append(NEWLINE);
 		int i = 0;
@@ -74,9 +74,13 @@ class CommandManager {
 
   public:
 
-	CommandManager() { registerFunctions(); }
-
-	CommandManager(t_fd *fds, int maxfd) { link2fds(fds, maxfd); }
+	CommandManager() {
+		registerFunctions();
+	}
+	CommandManager(t_fd *fds, int maxfd) {
+		registerFunctions();
+		link2fds(fds, maxfd);
+	}
 	~CommandManager() {
 		in_commands_.clear();
 		out_commands_.clear();
