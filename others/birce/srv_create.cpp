@@ -23,5 +23,5 @@ void			srv_create(t_env *e, int port)
   X(-1, bind(s, (struct sockaddr*)&sin, sizeof(sin)), (char *)"bind");
   X(-1, listen(s, 42), (char *)"listen");
   e->fds[s].type = FD_SERV;
-  e->fds[s].fct_read = srv_accept;
+  //e->fds[s].fct_read = srv_accept;
 }

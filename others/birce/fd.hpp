@@ -13,8 +13,8 @@
 typedef struct		s_fd
 {
 	int							type;
-	void						(*fct_read)(struct s_env *, int);
-	void						(*fct_write)(struct s_env *, int);
+//	void						(*fct_read)(struct s_env *, int);
+//	void						(*fct_write)(struct s_env *, int);
 }					t_fd;
 
 #endif

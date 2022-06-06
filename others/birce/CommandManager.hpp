@@ -39,8 +39,8 @@ class CommandManager {
 
 	void	clean_fd(int cs) {
 		fds_[cs].type = FD_FREE;
-		fds_[cs].fct_read = NULL;
-		fds_[cs].fct_write = NULL;
+		//fds_[cs].fct_read = NULL;
+		//fds_[cs].fct_write = NULL;
 	}
 
 	std::map<int, std::string>	&in_commands() { return in_commands_; }
@@ -138,7 +138,9 @@ class CommandManager {
 
 		fcntl(cs, F_SETFL, O_NONBLOCK);
 
-		std::cout << "New client #" << cs << " from " << inet_ntoa(csin.sin_addr) << ":" << ntohs(csin.sin_port) << std::endl;
+		std::cout << "New client #" << cs << " from "
+					<< inet_ntoa(csin.sin_addr) << ":"
+					<< ntohs(csin.sin_port) << std::endl;
 		clean_fd(cs);
 		fds_[cs].type = FD_CLIENT;
 		//fds_[cs].fct_read = client_read;
