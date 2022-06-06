@@ -45,11 +45,12 @@ class CommandManager {
 
 	std::map<int, std::string>	&in_commands() { return in_commands_; }
 	std::map<int, std::string>	&out_commands() { return out_commands_; }
-	std::size_t					size() const { return in_commands_.size(); }
+	std::size_t					in_size() const { return in_commands_.size(); }
+	std::size_t					out_size() const { return out_commands_.size(); }
 
-	int							push_and_execute(int cs, std::string commandstr) {
+	int							append_and_execute(int cs, std::string commandstr) {
 		try {
-			push(cs, commandstr);
+			append(cs, commandstr);
 			executeCommands(cs);
 			return 0;
 		} catch (const std::exception &e) {
@@ -58,7 +59,7 @@ class CommandManager {
 		}
 	}
 
-	void						push(int cs, std::string command) {
+	void						append(int cs, std::string command) {
 		if (command.empty())
 			return;
 		in_commands_[cs].append(command);
@@ -155,12 +156,12 @@ class CommandManager {
 		if (r <= 0) {
 			close(cs);
 			clean_fd(cs);
-			printf("client #%d gone away\n", cs);
+			std::cout << "client #" << cs << " gone away" << std::endl;
 		} else {
 			if (r == BUF_SIZE)
 				buf_read[r-1] = NEWLINE[0];
 			buf_read[r] = 0;
-			push_and_execute(cs, std::string(buf_read));
+			append_and_execute(cs, std::string(buf_read));
 		}
 	}
 
