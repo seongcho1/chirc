@@ -1,29 +1,19 @@
-
-#include <string.h>
-# include <sys/select.h>
 #include "birce.hpp"
+#include <string.h>
+#include <sys/select.h>
 
-void	init_fd(t_env *e)
-{
-	int	i;
+void	init_fd(t_env *e) {
 
-	i = 0;
-	e->max = 0;
 	FD_ZERO(&e->fd_read);
 	FD_ZERO(&e->fd_write);
-	while (i < e->maxfd) {
-		if (e->fds[i].type != FD_FREE) {
-			FD_SET(i, &e->fd_read);
 
-			//if (strlen(e->fds[i].buf_write) > 0)
-			//if (e->fds[i].write_queue.size() > 0)
-			//if (e->fds[i].write_string.length() > 0)
-			if (e->commander.out_commands()[i].length() > 0) {
-				FD_SET(i, &e->fd_write);
-			}
+	std::map<int, User *>::iterator uit;
+	for (uit = e->commander.userMap().begin(); uit != e->commander.userMap().end(); ++uit) {
 
-			e->max = MAX(e->max, i);
+		FD_SET(uit->first, &e->fd_read);
+
+		if (e->commander.out_commands()[uit->first].length() > 0) {
+			FD_SET(uit->first, &e->fd_write);
 		}
-		i++;
 	}
 }

@@ -3,26 +3,22 @@
 
 void	check_fd(t_env *e)
 {
-	int	i;
+	std::map<int, User *>::iterator uit;
+	for (uit = e->commander.userMap().begin(); uit != e->commander.userMap().end(); ++uit) {
+		if (FD_ISSET(uit->first, &e->fd_read)) {
+			if (uit->second->type() == FD_SERV)
+				e->commander.srv_accept(uit->first);
+			else if (uit->second->type() == FD_CLIENT)
+				e->commander.client_read(uit->first);
+		}
 
-	i = 0;
-	while ((i < e->maxfd) && (e->r > 0)) {
-		if (FD_ISSET(i, &e->fd_read)) {
-			//e->fds[i].fct_read(e, i);
-			if (e->fds[i].type == FD_SERV)
-				srv_accept(e, i);
-			else if (e->fds[i].type == FD_CLIENT)
-				client_read(e, i);
-		}
-		if (FD_ISSET(i, &e->fd_write)) {
-			//e->fds[i].fct_write(e, i);
-			//if (e->fds[i].type == FD_SERV)
+		if (FD_ISSET(uit->first, &e->fd_write)) {
+			//if (uit->second->type() == FD_SERV)
 			//	server-to-server
-			if (e->fds[i].type == FD_CLIENT)
-				client_write(e, i);
+			if (uit->second->type() == FD_CLIENT)
+				e->commander.client_write(uit->first);
 		}
-		if (FD_ISSET(i, &e->fd_read) || FD_ISSET(i, &e->fd_write))
+		if (FD_ISSET(uit->first, &e->fd_read) || FD_ISSET(uit->first, &e->fd_write))
 			e->r--;
-		i++;
 	}
 }

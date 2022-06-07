@@ -14,10 +14,11 @@
 class CommandManager {
 
   private:
+	std::map<int, User *>		userMap_;
 
 	std::map<int, std::string>	in_commands_;
 	std::map<int, std::string>	out_commands_;
-	t_fd						*fds_;
+	//t_fd						*fds_;
 	int							maxfd_;
 
 	typedef void(CommandManager::*FuncPtr)(int cs, std::vector<std::string> paramsVec, std::string trailing);
@@ -45,13 +46,14 @@ class CommandManager {
 			return;
 		}
 
-		if (fds_[toFd].type != FD_CLIENT) {
+		std::map<int, User *>::iterator uit = userMap_.find(toFd);
+		if (uit == userMap_.end()) {
 			//do something with errcode errcode:errstr map
 			return;
 		}
+
 		trailing = std::string("[from " + SS::toString(cs) + ", to " + paramsVec[0] + "]").append(trailing).append(NEWLINE);
-		if (fds_[toFd].type == FD_CLIENT)
-			out_commands_[toFd].append(trailing);
+		out_commands_[toFd].append(trailing);
 	}
 	void						SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 		if (paramsVec.size() != 0) {
@@ -62,10 +64,14 @@ class CommandManager {
 			//do something with errcode errcode:errstr map
 			return;
 		}
+		std::map<int, User *>::iterator uit = userMap_.find(cs);
+		if (uit == userMap_.end()) {
+			//do something with errcode errcode:errstr map
+			return;
+		}
 
 		trailing = std::string("[from myself, " + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
-		if (fds_[cs].type == FD_CLIENT)
-			out_commands_[cs].append(trailing);
+		out_commands_[cs].append(trailing);
 	}
 	void						PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 		if (paramsVec.size() != 0) {
@@ -76,14 +82,16 @@ class CommandManager {
 			//do something with errcode errcode:errstr map
 			return;
 		}
+		std::map<int, User *>::iterator uit = userMap_.find(cs);
+		if (uit == userMap_.end()) {
+			//do something with errcode errcode:errstr map
+			return;
+		}
 
 		trailing = std::string("[from" + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
-		int i = 0;
-		while (i < maxfd_) {
-			if ((fds_[i].type == FD_CLIENT) && (i != cs)) {
-				out_commands_[i].append(trailing);
-			}
-			i++;
+		for (uit = userMap_.begin(); uit != userMap_.end(); ++uit) {
+			if (uit->first != cs)
+				out_commands_[uit->first].append(trailing);
 		}
 	}
 
@@ -95,26 +103,51 @@ class CommandManager {
 	CommandManager() {
 		registerFunctions();
 	}
+/*
 	CommandManager(t_fd *fds, int maxfd) {
 		registerFunctions();
 		link2fds(fds, maxfd);
 	}
+*/
 	~CommandManager() {
+
+		std::map<int, User *>::iterator uit;
+		for (uit = userMap_.begin(); uit != userMap_.end(); ++uit)
+			delete uit->second;
+		userMap_.clear();
+
 		in_commands_.clear();
 		out_commands_.clear();
 	}
-
+/*
 	void						link2fds(t_fd *fds, int maxfd) {
-		fds_ = fds;
+		//fds_ = fds;
 		maxfd_ = maxfd;
 	}
-
+*/
 	void	clean_fd(int cs) {
-		fds_[cs].type = FD_FREE;
-		//fds_[cs].fct_read = NULL;
-		//fds_[cs].fct_write = NULL;
+		// fds_[cs].type = FD_FREE;
+		// //fds_[cs].fct_read = NULL;
+		// //fds_[cs].fct_write = NULL;
+
+		//delete User * from userMap_
+		std::map<int, User *>::iterator uit = userMap_.find(cs);
+		if (uit != userMap_.end()) {
+			delete uit->second;
+			userMap_.erase(cs);
+		}
+		//delete from in_commands_
+		std::map<int, std::string>::iterator cit = in_commands_.find(cs);
+		if (cit != in_commands_.end())
+			in_commands_.erase(cs);
+
+		//delete from out_commands_
+		cit = out_commands_.find(cs);
+		if (cit != out_commands_.end())
+			out_commands_.erase(cs);
 	}
 
+	std::map<int, User *>		&userMap() { return userMap_; }
 	std::map<int, std::string>	&in_commands() { return in_commands_; }
 	std::map<int, std::string>	&out_commands() { return out_commands_; }
 	std::size_t					in_size() const { return in_commands_.size(); }
@@ -210,10 +243,13 @@ class CommandManager {
 		std::cout << "New client #" << cs << " from "
 					<< inet_ntoa(csin.sin_addr) << ":"
 					<< ntohs(csin.sin_port) << std::endl;
-		clean_fd(cs);
-		fds_[cs].type = FD_CLIENT;
-		//fds_[cs].fct_read = client_read;
-		//fds_[cs].fct_write = client_write;
+
+		// clean_fd(cs);
+		// fds_[cs].type = FD_CLIENT;
+		// //fds_[cs].fct_read = client_read;
+		// //fds_[cs].fct_write = client_write;
+		User *user = new User(FD_CLIENT);
+		userMap_.insert(std::pair<int, User *>(cs, user));
 	}
 
 	void	client_read(int cs) {
@@ -223,7 +259,8 @@ class CommandManager {
 		r = recv(cs, buf_read, BUF_SIZE, 0);
 		if (r <= 0) {
 			close(cs);
-			clean_fd(cs);
+			clean_fd(cs); //del User *, in_commands_, out_commands
+
 			std::cout << "client #" << cs << " gone away" << std::endl;
 		} else {
 			if (r == BUF_SIZE)
