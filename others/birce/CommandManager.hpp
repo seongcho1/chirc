@@ -8,8 +8,8 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
+#include <vector>
 #include <map>
-#include <queue>
 
 class CommandManager {
 
@@ -20,23 +20,22 @@ class CommandManager {
 	t_fd						*fds_;
 	int							maxfd_;
 
-	typedef void(CommandManager::*FuncPtr)(int cs, std::string command);
+	typedef void(CommandManager::*FuncPtr)(int cs, std::vector<std::string> argsVec, std::string msg);
 	std::map<std::string, FuncPtr>	functionCallMap_;
 	void							registerFunctions() {
 		functionCallMap_["PRIVMSG"] =	&CommandManager::PRIVMSG;
 		functionCallMap_["SELFMSG"] =	&CommandManager::SELFMSG;
 		functionCallMap_["PUBLICMSG"] =	&CommandManager::PUBLICMSG;
 	}
-	void						PRIVMSG(int cs, std::string command) {
-		std::vector<std::string> commandVec = SS::splitString(command, SPACE);
-		if (commandVec.size() != 3) {
+	void						PRIVMSG(int cs, std::vector<std::string> argsVec, std::string msg) {
+		if (argsVec.size() != 1) {
 			//do something with errcode errcode:errstr map
 			return;
 		}
 
 		int toFd;
 		try {
-			toFd = std::stoi(commandVec[1]);
+			toFd = std::stoi(argsVec[0]);
 		} catch (const std::exception &e) {
 			//do something with errcode errcode:errstr map
 			return;
@@ -46,20 +45,25 @@ class CommandManager {
 			//do something with errcode errcode:errstr map
 			return;
 		}
-		std::string msg;
-		msg = std::string("[from " + SS::toString(cs) + ", to " + commandVec[1] + "]").append(commandVec[2]).append(NEWLINE);
+		msg = std::string("[from " + SS::toString(cs) + ", to " + argsVec[0] + "]").append(msg).append(NEWLINE);
 		if (fds_[toFd].type == FD_CLIENT)
 			out_commands_[toFd].append(msg);
 	}
-	void						SELFMSG(int cs, std::string command) {
-		std::string msg;
-		msg = std::string("[from myself, " + SS::toString(cs) + "]").append(command).append(NEWLINE);
+	void						SELFMSG(int cs, std::vector<std::string> argsVec, std::string msg) {
+		if (argsVec.size() != 0) {
+			//do something with errcode errcode:errstr map
+			return;
+		}
+		msg = std::string("[from myself, " + SS::toString(cs) + "]").append(msg).append(NEWLINE);
 		if (fds_[cs].type == FD_CLIENT)
 			out_commands_[cs].append(msg);
 	}
-	void						PUBLICMSG(int cs, std::string command) {
-		std::string msg;
-		msg = std::string("[from" + SS::toString(cs) + "]").append(command).append(NEWLINE);
+	void						PUBLICMSG(int cs, std::vector<std::string> argsVec, std::string msg) {
+		if (argsVec.size() != 0) {
+			//do something with errcode errcode:errstr map
+			return;
+		}
+		msg = std::string("[from" + SS::toString(cs) + "]").append(msg).append(NEWLINE);
 		int i = 0;
 		while (i < maxfd_) {
 			if ((fds_[i].type == FD_CLIENT) && (i != cs)) {
@@ -136,14 +140,32 @@ class CommandManager {
 		return SS::splitString(in_commands_[cs], NEWLINE, bSkipLast, bClearCommands);
 	}
 
-	void						executeCommand(int cs, std::string command) {
+	void						executeCommand(int cs, std::string commandstr) {
 
-		std::vector<std::string> commandVec = SS::splitString(command, SPACE);
-
-		if (commandVec.empty())
+		std::string command, msg;
+		std::vector<std::string> command_msg = SS::splitString(commandstr, COLON, false, false, true);
+		if (command_msg.empty())
 			return;
-		//get the first word from the command string: commandName
-		std::string commandName = SS::toUpper(commandVec.front());
+		switch (command_msg.size()) {
+			case 1: command = command_msg[0];
+					msg = "";
+					break;
+			case 2: command = command_msg[0];
+					msg = command_msg[1];
+					break;
+			default:
+					return;
+					break;
+		}
+
+		std::string commandName;
+		std::vector<std::string> argsVec = SS::splitString(command, SPACE);
+		if (argsVec.empty())
+			return;
+		//get the commandName which is the first element in the argsVec
+		commandName = SS::toUpper(argsVec.front());
+		//then remove the first element and the rest should be args
+		argsVec.erase(argsVec.begin());
 
 		//change this pattern to using a map<commandName, commandFunc>
 		//execute commandMap[command](cs, command)
@@ -157,7 +179,7 @@ class CommandManager {
 		*/
 		std::map<std::string, FuncPtr>::iterator it = functionCallMap_.find(commandName);
 		if (it != functionCallMap_.end())
-			(this->*functionCallMap_[commandName])(cs, command);
+			(this->*functionCallMap_[commandName])(cs, argsVec, msg);
 	}
 
 	void			srv_accept(int s) {
