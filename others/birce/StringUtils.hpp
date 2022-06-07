@@ -10,7 +10,7 @@
 
 #define NEWLINE		"\n"
 #define SPACE		" "
-#define COLON		":"
+#define SPACE_COLON	" :"
 
 
 class SS {

@@ -20,22 +20,26 @@ class CommandManager {
 	t_fd						*fds_;
 	int							maxfd_;
 
-	typedef void(CommandManager::*FuncPtr)(int cs, std::vector<std::string> argsVec, std::string msg);
+	typedef void(CommandManager::*FuncPtr)(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	std::map<std::string, FuncPtr>	functionCallMap_;
 	void							registerFunctions() {
 		functionCallMap_["PRIVMSG"] =	&CommandManager::PRIVMSG;
 		functionCallMap_["SELFMSG"] =	&CommandManager::SELFMSG;
 		functionCallMap_["PUBLICMSG"] =	&CommandManager::PUBLICMSG;
 	}
-	void						PRIVMSG(int cs, std::vector<std::string> argsVec, std::string msg) {
-		if (argsVec.size() != 1) {
+	void						PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+		if (paramsVec.size() != 1) {
+			//do something with errcode errcode:errstr map
+			return;
+		}
+		if (trailing.length() == 0) {
 			//do something with errcode errcode:errstr map
 			return;
 		}
 
 		int toFd;
 		try {
-			toFd = std::stoi(argsVec[0]);
+			toFd = std::stoi(paramsVec[0]);
 		} catch (const std::exception &e) {
 			//do something with errcode errcode:errstr map
 			return;
@@ -45,29 +49,39 @@ class CommandManager {
 			//do something with errcode errcode:errstr map
 			return;
 		}
-		msg = std::string("[from " + SS::toString(cs) + ", to " + argsVec[0] + "]").append(msg).append(NEWLINE);
+		trailing = std::string("[from " + SS::toString(cs) + ", to " + paramsVec[0] + "]").append(trailing).append(NEWLINE);
 		if (fds_[toFd].type == FD_CLIENT)
-			out_commands_[toFd].append(msg);
+			out_commands_[toFd].append(trailing);
 	}
-	void						SELFMSG(int cs, std::vector<std::string> argsVec, std::string msg) {
-		if (argsVec.size() != 0) {
+	void						SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+		if (paramsVec.size() != 0) {
 			//do something with errcode errcode:errstr map
 			return;
 		}
-		msg = std::string("[from myself, " + SS::toString(cs) + "]").append(msg).append(NEWLINE);
+		if (trailing.length() == 0) {
+			//do something with errcode errcode:errstr map
+			return;
+		}
+
+		trailing = std::string("[from myself, " + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
 		if (fds_[cs].type == FD_CLIENT)
-			out_commands_[cs].append(msg);
+			out_commands_[cs].append(trailing);
 	}
-	void						PUBLICMSG(int cs, std::vector<std::string> argsVec, std::string msg) {
-		if (argsVec.size() != 0) {
+	void						PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+		if (paramsVec.size() != 0) {
 			//do something with errcode errcode:errstr map
 			return;
 		}
-		msg = std::string("[from" + SS::toString(cs) + "]").append(msg).append(NEWLINE);
+		if (trailing.length() == 0) {
+			//do something with errcode errcode:errstr map
+			return;
+		}
+
+		trailing = std::string("[from" + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
 		int i = 0;
 		while (i < maxfd_) {
 			if ((fds_[i].type == FD_CLIENT) && (i != cs)) {
-				out_commands_[i].append(msg);
+				out_commands_[i].append(trailing);
 			}
 			i++;
 		}
@@ -126,11 +140,11 @@ class CommandManager {
 	void						executeCommands(int cs) {
 
 		std::vector<std::string> commandLines = splitCommands(cs);
-		std::string command;
+		std::string message;
 
 		while(commandLines.size()) {
-			command = commandLines.front();
-			executeCommand(cs, command);
+			message = commandLines.front();
+			executeCommand(cs, message);
 			commandLines.erase(commandLines.begin()); //in case of vector
 			//commandLines.pop(); 					  //in case of queue
 		}
@@ -140,32 +154,33 @@ class CommandManager {
 		return SS::splitString(in_commands_[cs], NEWLINE, bSkipLast, bClearCommands);
 	}
 
-	void						executeCommand(int cs, std::string commandstr) {
+	//tried to use terms in https://datatracker.ietf.org/doc/html/rfc2812#section-2.3.1
+	void						executeCommand(int cs, std::string message) {
 
-		std::string command, msg;
-		std::vector<std::string> command_msg = SS::splitString(commandstr, COLON, false, false, true);
-		if (command_msg.empty())
+		std::string command_params, trailing;
+		std::vector<std::string> command_params_trailing = SS::splitString(message, SPACE_COLON, false, false, true);
+		if (command_params_trailing.empty())
 			return;
-		switch (command_msg.size()) {
-			case 1: command = command_msg[0];
-					msg = "";
+		switch (command_params_trailing.size()) {
+			case 1: command_params = command_params_trailing[0];
+					trailing = "";
 					break;
-			case 2: command = command_msg[0];
-					msg = command_msg[1];
+			case 2: command_params = command_params_trailing[0];
+					trailing = command_params_trailing[1];
 					break;
 			default:
 					return;
 					break;
 		}
 
-		std::string commandName;
-		std::vector<std::string> argsVec = SS::splitString(command, SPACE);
-		if (argsVec.empty())
+		std::string command;
+		std::vector<std::string> paramsVec = SS::splitString(command_params, SPACE);
+		if (paramsVec.empty())
 			return;
 		//get the commandName which is the first element in the argsVec
-		commandName = SS::toUpper(argsVec.front());
+		command = SS::toUpper(paramsVec.front());
 		//then remove the first element and the rest should be args
-		argsVec.erase(argsVec.begin());
+		paramsVec.erase(paramsVec.begin());
 
 		//change this pattern to using a map<commandName, commandFunc>
 		//execute commandMap[command](cs, command)
@@ -177,9 +192,9 @@ class CommandManager {
 		else if (commandName.compare("PUBLICMSG") == 0)
 			PUBLICMSG(cs, command);
 		*/
-		std::map<std::string, FuncPtr>::iterator it = functionCallMap_.find(commandName);
+		std::map<std::string, FuncPtr>::iterator it = functionCallMap_.find(command);
 		if (it != functionCallMap_.end())
-			(this->*functionCallMap_[commandName])(cs, argsVec, msg);
+			(this->*functionCallMap_[command])(cs, paramsVec, trailing);
 	}
 
 	void			srv_accept(int s) {
