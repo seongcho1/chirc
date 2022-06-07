@@ -21,11 +21,11 @@ class CommandManager {
 	int							maxfd_;
 
 	typedef void(CommandManager::*FuncPtr)(int cs, std::string command);
-	std::map<std::string, FuncPtr>	functionCallMap;
+	std::map<std::string, FuncPtr>	functionCallMap_;
 	void							registerFunctions() {
-		functionCallMap["PRIVMSG"] =	&CommandManager::PRIVMSG;
-		functionCallMap["SELFMSG"] =	&CommandManager::SELFMSG;
-		functionCallMap["PUBLICMSG"] =	&CommandManager::PUBLICMSG;
+		functionCallMap_["PRIVMSG"] =	&CommandManager::PRIVMSG;
+		functionCallMap_["SELFMSG"] =	&CommandManager::SELFMSG;
+		functionCallMap_["PUBLICMSG"] =	&CommandManager::PUBLICMSG;
 	}
 	void						PRIVMSG(int cs, std::string command) {
 		std::vector<std::string> commandVec = SS::splitString(command, SPACE);
@@ -155,9 +155,9 @@ class CommandManager {
 		else if (commandName.compare("PUBLICMSG") == 0)
 			PUBLICMSG(cs, command);
 		*/
-		std::map<std::string, FuncPtr>::iterator it = functionCallMap.find(commandName);
-		if (it != functionCallMap.end())
-			(this->*functionCallMap[commandName])(cs, command);
+		std::map<std::string, FuncPtr>::iterator it = functionCallMap_.find(commandName);
+		if (it != functionCallMap_.end())
+			(this->*functionCallMap_[commandName])(cs, command);
 	}
 
 	void			srv_accept(int s) {
