@@ -32,7 +32,7 @@ void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::st
   }
 
   trailing = std::string("[from " + SS::toString(cs) + ", to " + paramsVec[0] + "]").append(trailing).append(NEWLINE);
-  out_messages_[toFd].append(trailing);
+  outMessages_[toFd].append(trailing);
 }
 
 void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
@@ -51,7 +51,7 @@ void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec, std::st
   }
 
   trailing = std::string("[from myself, " + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
-  out_messages_[cs].append(trailing);
+  outMessages_[cs].append(trailing);
 }
 
 void MessageManager::PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
@@ -72,50 +72,31 @@ void MessageManager::PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::
   trailing = std::string("[from" + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
   for (uit = users_.begin(); uit != users_.end(); ++uit) {
     if (uit->first != cs)
-      out_messages_[uit->first].append(trailing);
+      outMessages_[uit->first].append(trailing);
   }
 }
 
 MessageManager::~MessageManager() {
-
   users_.clear();
-  in_messages_.clear();
-  out_messages_.clear();
+  inMessages_.clear();
+  outMessages_.clear();
 }
 
-void MessageManager::clean_fd(int cs) {
+void MessageManager::fdClean(int cs) {
   std::map<int, User>::iterator uit = users_.find(cs);
   if (uit != users_.end())
     users_.erase(cs);
 
-  // delete from in_messages_
-  std::map<int, std::string>::iterator cit = in_messages_.find(cs);
-  if (cit != in_messages_.end())
-    in_messages_.erase(cs);
+  // delete from inMessages_
+  std::map<int, std::string>::iterator cit = inMessages_.find(cs);
+  if (cit != inMessages_.end())
+    inMessages_.erase(cs);
 
-  // delete from out_messages_
-  cit = out_messages_.find(cs);
-  if (cit != out_messages_.end())
-    out_messages_.erase(cs);
+  // delete from outMessages_
+  cit = outMessages_.find(cs);
+  if (cit != outMessages_.end())
+    outMessages_.erase(cs);
 }
-
-  // int MessageManager::append_and_execute(int cs, std::string message) {
-	// 	try {
-	// 		append(cs, message);
-	// 		executeMessages(cs);
-	// 		return 0;
-	// 	} catch (const std::exception &e) {
-	// 		std::cerr << "append_and_execute() failed on " << cs << "'s message:" << message << " because " << e.what() << std::endl;
-	// 		return -1;
-	// 	}
-	// }
-
-// 	void MessageManager::append(int cs, std::string message) {
-// 		if (message.empty())
-// 			return;
-// 		in_messages_[cs].append(message);
-// std::cout << "(" << cs << ") " << "check in buff\n" << in_messages_[cs] << ":" << in_messages_[cs].length() << std::endl;
-// 	}
 
 void MessageManager::executeMessages(int cs) {
   std::vector<std::string> messageVec = splitMessages(cs);
@@ -127,11 +108,11 @@ void MessageManager::executeMessages(int cs) {
     messageVec.erase(messageVec.begin()); // in case of vector
     // messageVec.pop(); 					//in case of queue
   }
-  // in_messages_[cs].clear();
+  // inMessages_[cs].clear();
 }
 
 std::vector<std::string> MessageManager::splitMessages(int cs, bool bSkipLast, bool bClearMessages) {
-  return SS::splitString(in_messages_[cs], NEWLINE, bSkipLast, bClearMessages);
+  return SS::splitString(inMessages_[cs], NEWLINE, bSkipLast, bClearMessages);
 }
 
 void MessageManager::executeMessage(int cs, std::string message) {
@@ -163,7 +144,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
   // then remove the first element and the rest should be args
   paramsVec.erase(paramsVec.begin());
 
-  // change this pattern to using a map<commandName, commandFunc>
+  // change this pattern tcsin_leno using a map<commandName, commandFunc>
   // execute commandMap[command](cs, command)
   /*
   if (commandName.compare("PRIVMSG") == 0)
@@ -181,10 +162,10 @@ void MessageManager::executeMessage(int cs, std::string message) {
 void MessageManager::srvAccept(int s) {
   int cs;
   struct sockaddr_in csin;
-  socklen_t csin_len;
+  socklen_t csinLen;
 
-  csin_len = sizeof(csin);
-  cs = accept(s, (struct sockaddr *)&csin, &csin_len);
+  csinLen = sizeof(csin);
+  cs = accept(s, (struct sockaddr *)&csin, &csinLen);
 
   fcntl(cs, F_SETFL, O_NONBLOCK);
 
@@ -196,17 +177,20 @@ void MessageManager::srvAccept(int s) {
   // fds_[cs].type = FD_CLIENT;
   // //fds_[cs].fct_read = client_read;
   // //fds_[cs].fct_write = client_write;
-  users_.insert(std::pair<int, User>(cs, User(cs)));
+  reqAuthenticates_.insert(std::pair<int, User>(cs, User(cs, inet_ntoa(csin.sin_addr))));
+  // users_.insert(std::pair<int, User>(cs, User(cs)));
 }
 
 void MessageManager::clientRead(int cs) {
-  if (users_[cs].clientRead(in_messages_[cs]))
-  {
+std::cout << "Debug begin\n* " << inMessages_[cs] << "before len = " << inMessages_[cs].length() << std::endl;
+std::cout << "Debug end\n";
+  if (users_[cs].clientRead(inMessages_[cs])) {
+std::cout << "Debug begin\n* " << inMessages_[cs] << "after len = " << inMessages_[cs].length() << std::endl;
+std::cout << "Debug end\n";
     executeMessages(cs);
   }
-  else
-  {
-    clean_fd(cs); // del User *, in_messages_, out_commands
+  else {
+    fdClean(cs); // del User *, inMessages_, out_commands
     close(cs);    // cleaning the table first, and then the table will be ready for another client
     std::cout << "client #" << cs << " gone away" << std::endl;
   }

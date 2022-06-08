@@ -3,9 +3,9 @@
 int	main(int ac, char **av) {
 	Ircserv		ircserv;
 
-	ircserv.get_opt(ac, av);
-	ircserv.srv_create(ircserv.port);
-	ircserv.main_loop();
+	ircserv.getOpt(ac, av);
+	ircserv.srvCreate(ircserv.port);
+	ircserv.mainLoop();
 
 	return 0;
 }
