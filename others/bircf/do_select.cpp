@@ -10,8 +10,8 @@ void	do_select(t_env *e) {
 	*/
 
 	int		max = e->irc_fd;
-	if (!e->messenger.userMap().empty()) {
-		std::map<int, User>::reverse_iterator urit = e->messenger.userMap().rbegin();
+	if (!e->messenger.users().empty()) {
+		std::map<int, User>::reverse_iterator urit = e->messenger.users().rbegin();
 		max = urit->first;
 	}
 

@@ -15,7 +15,7 @@ void	check_fd(t_env *e)
 
 	//clients
 	std::map<int, User>::iterator uit;
-	for (uit = e->messenger.userMap().begin(); uit != e->messenger.userMap().end(); ++uit) {
+	for (uit = e->messenger.users().begin(); uit != e->messenger.users().end(); ++uit) {
 		if (FD_ISSET(uit->first, &e->fd_read))
 			e->messenger.client_read(uit->first);
 

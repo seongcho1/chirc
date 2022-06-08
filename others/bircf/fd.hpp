@@ -16,13 +16,13 @@
 // //	void						(*fct_write)(struct s_env *, int);
 // }					t_fd;
 
-class User {
-//  	int		type_;
+// class User {
+// //  	int		type_;
 
-//   public:
-// 	User() {}
-// 	User(int type) : type_(type) {}
-// 	int	const &type() const { return type_; }
-};
+// //   public:
+// // 	User() {}
+// // 	User(int type) : type_(type) {}
+// // 	int	const &type() const { return type_; }
+// };
 
 #endif

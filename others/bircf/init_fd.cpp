@@ -12,7 +12,7 @@ void	init_fd(t_env *e) {
 
 	//clients
 	std::map<int, User>::iterator uit;
-	for (uit = e->messenger.userMap().begin(); uit != e->messenger.userMap().end(); ++uit) {
+	for (uit = e->messenger.users().begin(); uit != e->messenger.users().end(); ++uit) {
 
 		FD_SET(uit->first, &e->fd_read);
 
