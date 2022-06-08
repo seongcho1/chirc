@@ -77,6 +77,7 @@ public:
     if (r <= 0 || 0 < o)
       return false;
     
+    read[r] = 0;
     buffer.append(read);
     return true;
   }
