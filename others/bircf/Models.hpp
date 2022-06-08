@@ -69,14 +69,16 @@ public:
   void KeepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
   bool clientRead(std::string &buffer)    {
-    // int r = recv(fd, read, BUF_SIZE, 0);
-    // char read[BUF_SIZE + 1];
+    char read[BUF_SIZE + 1];
+    char oob[1];
+    int r = recv(fd, read, BUF_SIZE, 0);
+    int o = recv(fd, oob, 1, 0);
 
-    // read[BUF_SIZE] = 0;
-    // if (0 < r && r < BUF_SIZE)
-    //   buffer.append(read);
-    (void)buffer;
-    return false;
+    if (r <= 0 || 0 < o)
+      return false;
+    
+    buffer.append(read);
+    return true;
   }
 
   void clientWrite(std::string &message)  {
