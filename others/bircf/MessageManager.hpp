@@ -50,7 +50,7 @@ public:
 	void											executeMessage(int cs, std::string message);
 	void											srvAccept(int s);
 	void											clientRead(int cs);
-	void											clientWrite(int cs)	{ users_[cs].fdWriteBy(out_messages_[cs]); }
+	void											clientWrite(int cs)	{ users_[cs].clientWrite(out_messages_[cs]); }
 };
 
 /*

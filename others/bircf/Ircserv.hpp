@@ -81,11 +81,11 @@ void	Ircserv::init_fd() {
 
 	//clients
 	std::map<int, User>::iterator uit;
-	for (uit = messenger.userMap().begin(); uit != messenger.userMap().end(); ++uit) {
+	for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
 
 		FD_SET(uit->first, &fd_read);
 
-		if (messenger.out_messages()[uit->first].length() > 0) {
+		if (messenger.outMessages()[uit->first].length() > 0) {
 			FD_SET(uit->first, &fd_write);
 		}
 	}
@@ -99,8 +99,8 @@ void	Ircserv::do_select() {
 	*/
 
 	int		max = irc_fd;
-	if (!messenger.userMap().empty()) {
-		std::map<int, User>::reverse_iterator urit = messenger.userMap().rbegin();
+	if (!messenger.users().empty()) {
+		std::map<int, User>::reverse_iterator urit = messenger.users().rbegin();
 		max = urit->first;
 	}
 
@@ -114,7 +114,7 @@ void	Ircserv::check_fd() {
 
 	//server
 	if (FD_ISSET(irc_fd, &fd_read)) {
-		messenger.srv_accept(irc_fd);
+		messenger.srvAccept(irc_fd);
 		r--;
 	}
 	//else if (FD_ISSET(e->irc_fd, &e->fd_write))
@@ -122,12 +122,12 @@ void	Ircserv::check_fd() {
 
 	//clients
 	std::map<int, User>::iterator uit;
-	for (uit = messenger.userMap().begin(); uit != messenger.userMap().end(); ++uit) {
+	for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
 		if (FD_ISSET(uit->first, &fd_read))
-			messenger.client_read(uit->first);
+			messenger.clientRead(uit->first);
 
 		if (FD_ISSET(uit->first, &fd_write))
-			messenger.client_write(uit->first);
+			messenger.clientWrite(uit->first);
 
 		if (FD_ISSET(uit->first, &fd_read) || FD_ISSET(uit->first, &fd_write))
 			r--;

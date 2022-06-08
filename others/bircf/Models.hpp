@@ -68,16 +68,18 @@ public:
   bool IsDead(void)                 { return dead < time(NULL); }
   void KeepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
-  bool readFromFd(std::string &buffer)    {
-    int r = recv(fd, read, BUF_SIZE, 0);
-    char read[BUF_SIZE + 1];
+  bool clientRead(std::string &buffer)    {
+    // int r = recv(fd, read, BUF_SIZE, 0);
+    // char read[BUF_SIZE + 1];
 
-    read[BUF_SIZE] = 0;
-    if (0 < r && r < BUF_SIZE)
-      buffer.append(read);
+    // read[BUF_SIZE] = 0;
+    // if (0 < r && r < BUF_SIZE)
+    //   buffer.append(read);
+    (void)buffer;
+    return false;
   }
 
-  void fdWriteBy(std::string &message)  {
+  void clientWrite(std::string &message)  {
     if (message.empty())
       return;
 
