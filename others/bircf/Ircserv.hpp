@@ -1,5 +1,5 @@
-#ifndef BIRCE_HPP
-#define BIRCE_HPP
+#ifndef __IRCSERV_HPP__
+#define __IRCSERV_HPP__
 
 #include "MessageManager.hpp"
 #include <sys/select.h>

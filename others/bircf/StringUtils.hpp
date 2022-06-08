@@ -1,5 +1,5 @@
-#ifndef STRINGUTILS_HPP
-#define STRINGUTILS_HPP
+#ifndef __STRING_UTILS_HPP__
+#define __STRING_UTILS_HPP__
 
 #include <cerrno>
 #include <iostream>

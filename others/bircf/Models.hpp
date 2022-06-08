@@ -5,7 +5,6 @@
 #include <iostream>
 #include <cstring>
 #include <set>
-#include "fd.hpp"
 
 //#define BUFF_SIZE 4096
 // #define R 13
