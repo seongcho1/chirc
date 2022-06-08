@@ -100,7 +100,8 @@ class SS {
 	static int		x_int(int err, int res, char *str, char *file, int line) {
 		if (res == err) {
 			fprintf(stderr, "%s error (%s, %d): %s\n",
-			str, file, line, strerror(errno));
+			// str, file, line, strerror(errno));
+			str, file, line, "[windows] can not use strerror :(");
 			exit (1);
 		}
 		return (res);
@@ -110,7 +111,8 @@ class SS {
 	{
 		if (res == err) {
 			fprintf(stderr, "%s error (%s, %d): %s\n",
-			str, file, line, strerror(errno));
+			// str, file, line, strerror(errno));
+			str, file, line, "[windows] can not use strerror :(");
 			exit (1);
 		}
 		return (res);
