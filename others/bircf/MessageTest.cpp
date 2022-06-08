@@ -22,10 +22,7 @@ class MessageManager {
 	void executeCommand (std::string command) {
 		(this->*functionCallMap[command])(command);
 	}
-
-
 };
-
 
 int client_write_test() {
 
