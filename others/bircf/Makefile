@@ -1,8 +1,7 @@
 
-SRCS =	main.cpp init_env.cpp clean_fd.cpp get_opt.cpp x.cpp main_loop.cpp \
+SRCS =	main.cpp init_env.cpp get_opt.cpp x.cpp main_loop.cpp \
 	init_fd.cpp do_select.cpp check_fd.cpp \
-	srv_create.cpp srv_accept.cpp \
-	client_read.cpp client_write.cpp
+	srv_create.cpp
 
 OBJS = ${SRCS:.cpp=.o}
 
