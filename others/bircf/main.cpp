@@ -1,13 +1,12 @@
 
-#include "birce.hpp"
+#include "bircf.hpp"
 
-int	main(int ac, char **av)
-{
-	t_env	e;
+int	main(int ac, char **av) {
+	Ircserv		ircserv;
 
-	init_env(&e);
-	get_opt(&e, ac, av);
-	srv_create(&e, e.port);
-	main_loop(&e);
-	return (0);
+	ircserv.get_opt(ac, av);
+	ircserv.srv_create(ircserv.port);
+	ircserv.main_loop();
+
+	return 0;
 }

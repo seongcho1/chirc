@@ -1,8 +1,10 @@
 #ifndef STRINGUTILS_HPP
 #define STRINGUTILS_HPP
 
+#include <cerrno>
 #include <iostream>
 #include <sstream>
+
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -94,6 +96,26 @@ class SS {
 		}
 		return result;
 	}
+
+	static int		x_int(int err, int res, char *str, char *file, int line) {
+		if (res == err) {
+			fprintf(stderr, "%s error (%s, %d): %s\n",
+			str, file, line, strerror(errno));
+			exit (1);
+		}
+		return (res);
+	}
+
+	static	void	*x_void(void *err, void *res, char *str, char *file, int line)
+	{
+		if (res == err) {
+			fprintf(stderr, "%s error (%s, %d): %s\n",
+			str, file, line, strerror(errno));
+			exit (1);
+		}
+		return (res);
+	}
+
 
 
 };
