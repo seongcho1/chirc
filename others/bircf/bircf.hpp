@@ -1,7 +1,6 @@
 #ifndef BIRCE_HPP
 #define BIRCE_HPP
 
-#include "fd.hpp"
 #include "MessageManager.hpp"
 #include <sys/select.h>
 #include <fcntl.h>

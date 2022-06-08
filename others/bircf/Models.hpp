@@ -7,12 +7,13 @@
 #include <set>
 #include "fd.hpp"
 
-// #define BUFF_SIZE 4096
+//#define BUFF_SIZE 4096
 // #define R 13
+#define BUF_SIZE	512
 #define N 10
 #define NICK_MAX_LENGTH 9
 #define CHANNEL_MAX_LENGTH 50 // Channel names are case insensitive.
-#define CHANNEL_PREFIX "#&+!" // [&] is local channel, [+] not support channel modes, [!] identified as the "channel creator", 
+#define CHANNEL_PREFIX "#&+!" // [&] is local channel, [+] not support channel modes, [!] identified as the "channel creator",
 #define CHANNEL_NOT_ALLOW "^G ," // ^G is ascii(7), blank, comma
 #define MESSAGE_PREFIX ":" // not allow blank
 #define TIMEOUT 300
@@ -67,7 +68,7 @@ public:
   bool IsAlive(void)                { return time(NULL) < alive; }
   bool IsDead(void)                 { return dead < time(NULL); }
   void KeepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
-  
+
   bool readFromFd(std::string &buffer)    {
     int r = recv(fd, read, BUF_SIZE, 0);
     char read[BUF_SIZE + 1];
@@ -76,7 +77,7 @@ public:
     if (0 < r && r < BUF_SIZE)
       buffer.append(read);
   }
-  
+
   void fdWriteBy(std::string &message)  {
     if (message.empty())
       return;
