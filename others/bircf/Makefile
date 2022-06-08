@@ -1,5 +1,5 @@
 
-SRCS =	main.cpp
+SRCS =	main.cpp MessageManager.cpp \
 
 OBJS = ${SRCS:.cpp=.o}
 
