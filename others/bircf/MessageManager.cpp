@@ -128,6 +128,7 @@ std::cout << "(" << cs << ") " << "check in buff\n" << in_messages_[cs] << ":" <
 			messageVec.erase(messageVec.begin()); //in case of vector
 			//messageVec.pop(); 					//in case of queue
 		}
+		in_messages_[cs].clear();
 	}
 
 	std::vector<std::string> MessageManager::splitMessages(int cs, bool bSkipLast, bool bClearMessages) {
@@ -198,19 +199,31 @@ std::cout << "(" << cs << ") " << "check in buff\n" << in_messages_[cs] << ":" <
 	}
 
 	void MessageManager::clientRead(int cs) {
-		int		r;
-		char	buf_read[BUF_SIZE + 1];
-
-		r = recv(cs, buf_read, BUF_SIZE, 0);
-		if (r <= 0) {
+std::cout << "before = [" << in_messages_[cs] << "] cnt = " << in_messages_[cs].length() << std::endl;
+		if (users_[cs].clientRead(in_messages_[cs]))
+		{
+std::cout << "input = [" << in_messages_[cs] << "] cnt = " << in_messages_[cs].length() << std::endl;
+			executeMessages(cs);
+		}
+		else {
 			clean_fd(cs); //del User *, in_messages_, out_commands
 			close(cs); //cleaning the table first, and then the table will be ready for another client
-
 			std::cout << "client #" << cs << " gone away" << std::endl;
-		} else {
-			if (r == BUF_SIZE)
-				buf_read[r-1] = NEWLINE[0];
-			buf_read[r] = 0;
-			append_and_execute(cs, std::string(buf_read));
 		}
+
+		// int		r;
+		// char	buf_read[BUF_SIZE + 1];
+
+		// r = recv(cs, buf_read, BUF_SIZE, 0);
+		// if (r <= 0) {
+		// 	clean_fd(cs); //del User *, in_messages_, out_commands
+		// 	close(cs); //cleaning the table first, and then the table will be ready for another client
+
+		// 	std::cout << "client #" << cs << " gone away" << std::endl;
+		// } else {
+		// 	if (r == BUF_SIZE)
+		// 		buf_read[r-1] = NEWLINE[0];
+		// 	buf_read[r] = 0;
+		// 	append_and_execute(cs, std::string(buf_read));
+		// }
 	}
