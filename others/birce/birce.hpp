@@ -15,6 +15,7 @@ typedef struct	s_env {
 	int				port;
 	int				maxfd;
 	int				r;
+	int				irc_fd;
 
 	fd_set					fd_read;
 	fd_set					fd_write;

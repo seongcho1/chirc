@@ -17,11 +17,12 @@
 // }					t_fd;
 
 class User {
- 	int		type_;
+ 	//int		type_;
 
   public:
-	User(int type) : type_(type) {}
-	int	const &type() const { return type_; }
+	User() {}
+	//User(int type) : type_(type) {}
+	//int	const &type() const { return type_; }
 };
 
 #endif

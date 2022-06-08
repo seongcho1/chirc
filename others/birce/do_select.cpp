@@ -9,8 +9,11 @@ void	do_select(t_env *e) {
 	timeout.tv_usec = 0;		//0 micro second timeout
 	*/
 
-	std::map<int, User *>::reverse_iterator urit = e->commander.userMap().rbegin();
-	int		max = urit->first;
+	int		max = e->irc_fd;
+	if (!e->commander.userMap().empty()) {
+		std::map<int, User>::reverse_iterator urit = e->commander.userMap().rbegin();
+		max = urit->first;
+	}
 
 	e->r = select(max + 1, &e->fd_read, &e->fd_write, NULL, NULL); //&timeout); //NULL, 0
 	//std::cout << "[select=" << e->r << "]" << std::endl;

@@ -22,7 +22,5 @@ void			srv_create(t_env *e, int port) {
 	X(-1, bind(s, (struct sockaddr*)&sin, sizeof(sin)), (char *)"bind");
 	X(-1, listen(s, 42), (char *)"listen");
 
-	User *user = new User(FD_SERV);
-	e->commander.userMap().insert(std::pair<int, User *>(s, user));
-
+	e->irc_fd = s;
 }

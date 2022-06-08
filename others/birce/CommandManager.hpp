@@ -14,8 +14,7 @@
 class CommandManager {
 
   private:
-	std::map<int, User *>		userMap_;
-
+	std::map<int, User>			userMap_;
 	std::map<int, std::string>	in_commands_;
 	std::map<int, std::string>	out_commands_;
 	//t_fd						*fds_;
@@ -46,7 +45,7 @@ class CommandManager {
 			return;
 		}
 
-		std::map<int, User *>::iterator uit = userMap_.find(toFd);
+		std::map<int, User>::iterator uit = userMap_.find(toFd);
 		if (uit == userMap_.end()) {
 			//do something with errcode errcode:errstr map
 			return;
@@ -64,7 +63,7 @@ class CommandManager {
 			//do something with errcode errcode:errstr map
 			return;
 		}
-		std::map<int, User *>::iterator uit = userMap_.find(cs);
+		std::map<int, User>::iterator uit = userMap_.find(cs);
 		if (uit == userMap_.end()) {
 			//do something with errcode errcode:errstr map
 			return;
@@ -82,7 +81,7 @@ class CommandManager {
 			//do something with errcode errcode:errstr map
 			return;
 		}
-		std::map<int, User *>::iterator uit = userMap_.find(cs);
+		std::map<int, User>::iterator uit = userMap_.find(cs);
 		if (uit == userMap_.end()) {
 			//do something with errcode errcode:errstr map
 			return;
@@ -111,11 +110,7 @@ class CommandManager {
 */
 	~CommandManager() {
 
-		std::map<int, User *>::iterator uit;
-		for (uit = userMap_.begin(); uit != userMap_.end(); ++uit)
-			delete uit->second;
 		userMap_.clear();
-
 		in_commands_.clear();
 		out_commands_.clear();
 	}
@@ -131,11 +126,10 @@ class CommandManager {
 		// //fds_[cs].fct_write = NULL;
 
 		//delete User * from userMap_
-		std::map<int, User *>::iterator uit = userMap_.find(cs);
-		if (uit != userMap_.end()) {
-			delete uit->second;
+		std::map<int, User>::iterator uit = userMap_.find(cs);
+		if (uit != userMap_.end())
 			userMap_.erase(cs);
-		}
+
 		//delete from in_commands_
 		std::map<int, std::string>::iterator cit = in_commands_.find(cs);
 		if (cit != in_commands_.end())
@@ -147,7 +141,7 @@ class CommandManager {
 			out_commands_.erase(cs);
 	}
 
-	std::map<int, User *>		&userMap() { return userMap_; }
+	std::map<int, User>			&userMap() { return userMap_; }
 	std::map<int, std::string>	&in_commands() { return in_commands_; }
 	std::map<int, std::string>	&out_commands() { return out_commands_; }
 	std::size_t					in_size() const { return in_commands_.size(); }
@@ -248,8 +242,7 @@ class CommandManager {
 		// fds_[cs].type = FD_CLIENT;
 		// //fds_[cs].fct_read = client_read;
 		// //fds_[cs].fct_write = client_write;
-		User *user = new User(FD_CLIENT);
-		userMap_.insert(std::pair<int, User *>(cs, user));
+		userMap_.insert(std::pair<int, User>(cs, User()));
 	}
 
 	void	client_read(int cs) {
@@ -258,8 +251,8 @@ class CommandManager {
 
 		r = recv(cs, buf_read, BUF_SIZE, 0);
 		if (r <= 0) {
-			close(cs);
 			clean_fd(cs); //del User *, in_commands_, out_commands
+			close(cs); //cleaning the table first, and then the table will be ready for another client
 
 			std::cout << "client #" << cs << " gone away" << std::endl;
 		} else {
