@@ -62,7 +62,7 @@ public:
   std::string real;
   std::string host;
   std::string server;
-  bool initialized;
+  bool authenticated;
   bool waitPong;
   time_t dead;
   time_t alive;
