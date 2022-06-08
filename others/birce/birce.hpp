@@ -2,7 +2,7 @@
 #define BIRCE_HPP
 
 # include "fd.hpp"
-# include "CommandManager.hpp"
+# include "MessageManager.hpp"
 # include <sys/select.h>
 
 # define Xv(err,res,str)	(x_void(err,res,str,(char *)__FILE__,__LINE__))
@@ -19,7 +19,7 @@ typedef struct	s_env {
 
 	fd_set					fd_read;
 	fd_set					fd_write;
-	CommandManager			commander;
+	MessageManager			messenger;
 }				t_env;
 
 void	init_env(t_env *e);

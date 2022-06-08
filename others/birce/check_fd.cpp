@@ -7,7 +7,7 @@ void	check_fd(t_env *e)
 
 	//server
 	if (FD_ISSET(e->irc_fd, &e->fd_read)) {
-		e->commander.srv_accept(e->irc_fd);
+		e->messenger.srv_accept(e->irc_fd);
 		e->r--;
 	}
 	//else if (FD_ISSET(e->irc_fd, &e->fd_write))
@@ -15,12 +15,12 @@ void	check_fd(t_env *e)
 
 	//clients
 	std::map<int, User>::iterator uit;
-	for (uit = e->commander.userMap().begin(); uit != e->commander.userMap().end(); ++uit) {
+	for (uit = e->messenger.userMap().begin(); uit != e->messenger.userMap().end(); ++uit) {
 		if (FD_ISSET(uit->first, &e->fd_read))
-			e->commander.client_read(uit->first);
+			e->messenger.client_read(uit->first);
 
 		if (FD_ISSET(uit->first, &e->fd_write))
-				e->commander.client_write(uit->first);
+				e->messenger.client_write(uit->first);
 
 		if (FD_ISSET(uit->first, &e->fd_read) || FD_ISSET(uit->first, &e->fd_write))
 			e->r--;

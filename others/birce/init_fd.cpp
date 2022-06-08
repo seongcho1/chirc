@@ -12,11 +12,11 @@ void	init_fd(t_env *e) {
 
 	//clients
 	std::map<int, User>::iterator uit;
-	for (uit = e->commander.userMap().begin(); uit != e->commander.userMap().end(); ++uit) {
+	for (uit = e->messenger.userMap().begin(); uit != e->messenger.userMap().end(); ++uit) {
 
 		FD_SET(uit->first, &e->fd_read);
 
-		if (e->commander.out_commands()[uit->first].length() > 0) {
+		if (e->messenger.out_messages()[uit->first].length() > 0) {
 			FD_SET(uit->first, &e->fd_write);
 		}
 	}

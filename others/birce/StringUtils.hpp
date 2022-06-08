@@ -25,10 +25,30 @@ class SS {
 
 	static std::string	toUpper(std::string &s)
 	{
-		//for (std::size_t i = 0; i < s.size(); i++)
-		//	s[i] = (std::toupper(s[i]));
+		for (std::size_t i = 0; i < s.size(); i++) {
 
-		std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+			s[i] = (std::toupper(s[i]));
+
+			// 123:{ => 91:[
+			// 124:| => 92:\
+			// 125:} => 93:]
+			// 94:^ => 126:~
+			switch(s[i]) {
+
+				case '{' : s[i] = '[';
+							break;
+				case '|' : s[i] = '\\';
+							break;
+				case '}' : s[i] = ']';
+							break;
+				case '^' : s[i] = '~';
+							break;
+				default:
+							break;
+			}
+		}
+
+		//std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 
 		//int (*tu)(int) = toupper; // Select that particular overload
 		//std::transform(s.begin(),s.end(),s.begin(),tu );
@@ -39,7 +59,7 @@ class SS {
 	}
 
 	static std::vector<std::string>	splitString(std::string &s, std::string delimiter,
-												bool bSkipLast = false, bool bClearCommands = false,
+												bool bSkipLast = false, bool bClearProcessedString = false,
 												bool bCutOnce = false) {
 		size_t pos_start = 0, pos_end, delim_len = delimiter.length();
 		std::string token;
@@ -54,7 +74,7 @@ class SS {
 				(!token.empty()) ) {
 				result.push_back(token);  //in case of vector
 				i++;
-				if (bClearCommands == true) {
+				if (bClearProcessedString == true) {
 					s.erase(pos_start, pos_end + delim_len);
 					pos_end = pos_end - token.length();
 				}
@@ -68,7 +88,7 @@ class SS {
 			token = s.substr(pos_start);
 			if (!token.empty()) {
 				result.push_back(token);
-				if (bClearCommands == true)
+				if (bClearProcessedString == true)
 					s.clear();
 			}
 		}
