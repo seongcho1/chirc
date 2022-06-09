@@ -8,30 +8,6 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
 }
 
-void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-  if (paramsVec.size() != 1 || !trailing.empty()) {
-    // do something with errcode errcode:errstr map
-    return;
-  }
-
-  if (*paramsVec.begin() == pass) {
-    authenticates()[cs].authenticated = AUTH_LEVEL1;
-std::cout << "pass: AUTH_LEVEL is 1\n";
-  }
-}
-
-void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-  if (paramsVec.size() != 1 || !trailing.empty()) {
-    // do something with errcode errcode:errstr map
-    return;
-  }
-
-  if (authenticates()[cs].authenticated == AUTH_LEVEL1 && true /* is unique check */) {
-    authenticates()[cs].authenticated = AUTH_LEVEL2;
-std::cout << "pass: AUTH_LEVEL is 2\n";
-  }
-}
-
 void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
   if (paramsVec.size() != 1) {
     // do something with errcode errcode:errstr map
@@ -57,7 +33,7 @@ void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::st
     return;
   }
 
-  trailing = std::string("[from " + SS::toString(cs) + ", to " + paramsVec[0] + "]").append(trailing).append(NEWLINE);
+  trailing = std::string("[from " + SS::toString(cs) + "(" + users_[cs].nick + ")" + ", to " + paramsVec[0] + "]").append(trailing).append(NEWLINE);
   outMessages_[toFd].append(trailing);
 }
 
@@ -76,7 +52,7 @@ void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec, std::st
     return;
   }
 
-  trailing = std::string("[from myself, " + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
+  trailing = std::string("[from myself, " + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(trailing).append(NEWLINE);
   outMessages_[cs].append(trailing);
 }
 
@@ -95,7 +71,7 @@ void MessageManager::PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::
     return;
   }
 
-  trailing = std::string("[from" + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
+  trailing = std::string("[from" + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(trailing).append(NEWLINE);
   for (uit = users_.begin(); uit != users_.end(); ++uit) {
     if (uit->first != cs)
       outMessages_[uit->first].append(trailing);
@@ -243,4 +219,14 @@ void MessageManager::kickUser(int cs) {
     fdClean(cs); // del User *, inMessages_, out_commands
     close(cs);    // cleaning the table first, and then the table will be ready for another client
     std::cout << "client #" << cs << " gone away" << std::endl;
+}
+
+User &MessageManager::anyUser(int cs) {
+  if (users_.find(cs) != users_.end())
+    return users_[cs];
+
+  if (reqAuthenticates_.find(cs) != reqAuthenticates_.end())
+    return reqAuthenticates_[cs];
+
+  exit(1);
 }

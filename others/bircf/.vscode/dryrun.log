@@ -1,6 +1,10 @@
 make --dry-run --keep-going --print-directory
 make: Entering directory `/Users/kyuhokim/Cadet/chirc/others/bircf'
+c++ -I. -g3 -Wall -Wextra -Werror    -c -o main.o main.cpp
 c++ -I. -g3 -Wall -Wextra -Werror    -c -o MessageManager.o MessageManager.cpp
-c++ -I. -g3 -Wall -Wextra -Werror  -o bircf main.o init_env.o clean_fd.o get_opt.o x.o main_loop.o init_fd.o do_select.o check_fd.o srv_create.o srv_accept.o client_read.o client_write.o MessageManager.o 
+ 
+c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/Pass.o Commands/Pass.cpp
+c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/Nick.o Commands/Nick.cpp
+c++ -I. -g3 -Wall -Wextra -Werror  -o bircf main.o MessageManager.o Commands/Pass.o Commands/Nick.o 
 make: Leaving directory `/Users/kyuhokim/Cadet/chirc/others/bircf'
  

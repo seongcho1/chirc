@@ -20,6 +20,7 @@ private:
 	std::map<int, std::string>			inMessages_;
 	std::map<int, std::string>			outMessages_;
 	std::map<std::string, Channel>	channels_;
+	std::map<std::string, int>			nickFdPair_;
 
 	typedef void(MessageManager::*FuncPtr)(int cs, std::vector<std::string> paramsVec, std::string trailing);
 
@@ -56,6 +57,8 @@ public:
 	void											clientRead(int cs);
 	void											clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
 	void											kickUser(int cs);
+	bool 											isUniqueNick(int cs, std::string &nick);
+	User											&anyUser(int cs);
 };
 
 /*
