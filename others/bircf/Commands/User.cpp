@@ -20,6 +20,6 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
     it++;
     it++;
     user.real = *it;
-    outMessages_[cs].append("-- welcome [SIR ").append(user.real).append(".] --\n");
+    outMessages_[cs].append("-- welcome Sir-[").append(user.real).append("]. --\n");
   }
 }

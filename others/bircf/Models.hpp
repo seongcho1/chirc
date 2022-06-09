@@ -14,7 +14,8 @@
 #define CHANNEL_NOT_ALLOW "^G ," // ^G is ascii(7), blank, comma
 #define MESSAGE_PREFIX ":" // not allow blank
 #define TIMEOUT 300
-#define WAIT_TIME 30
+// #define WAIT_TIME 30
+#define WAIT_TIME 3
 #define PING "PING "
 #define PONG ":FT_IRC"
 
@@ -73,9 +74,12 @@ public:
   std::set<std::string> engaged;
 
   User() {}
-  User(int const &fd, std::string const &host, char auth) : fd(fd), host(host), authenticated(auth) {}
+  User(int const &fd, std::string const &host, char auth) : fd(fd), host(host), authenticated(auth) {
+    dead = time(NULL) + WAIT_TIME;
+  }
   bool isAlive(void)                { return time(NULL) < alive; }
   bool isDead(void)                 { return dead < time(NULL); }
+  void toDead(void)                 { dead = 0; }
   void keepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
   bool clientRead(std::string &buffer)    {

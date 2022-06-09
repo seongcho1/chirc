@@ -11,14 +11,14 @@
 class	Ircserv {
 public:
 	int							port;
-	// std::string			pass;
-
 	int							r;
 	int							ircFd;
 	fd_set					fdRead;
 	fd_set					fdWrite;
 
 	MessageManager	messenger;
+	std::stack<User> timeout;
+	std::stack<User> passed;
 
 	void	getOpt(int ac, char **av);
 	void	srvCreate(int port);
@@ -27,6 +27,8 @@ public:
 	void	doSelect();
 	void	checkFd();
 	void 	authenticate();
+	void	disposeCorpse();
+	void	promoteToUser();
 };
 
 
@@ -72,6 +74,8 @@ void	Ircserv::mainLoop() {
 		doSelect();
 		checkFd();
 		authenticate();
+		disposeCorpse();
+		promoteToUser();
 	}
 }
 
@@ -124,7 +128,6 @@ void	Ircserv::doSelect() {
 }
 
 void	Ircserv::checkFd() {
-
 	if (r <= 0) return;
 
 	//server
@@ -137,7 +140,13 @@ void	Ircserv::checkFd() {
 
 	//clients
 	std::map<int, User>::iterator uit = messenger.users().begin();
+	time_t now = time(NULL);
 	for (; uit != messenger.users().end(); ++uit) {
+		if (uit->second.dead < now) {
+			timeout.push(uit->second);
+			continue;
+		}
+
 		if (FD_ISSET(uit->first, &fdRead))
 			messenger.clientRead(uit->first);
 
@@ -152,29 +161,37 @@ void	Ircserv::checkFd() {
 
 void Ircserv::authenticate() {
 	std::map<int, User>::iterator uit = messenger.authenticates().begin();
-	std::stack<User> passed;
+	time_t now = time(NULL);
 	for (; uit != messenger.authenticates().end(); ++uit) {
-		if (FD_ISSET(uit->first, &fdRead)) {
-			messenger.authRead(uit->first);
-
-			if (uit->second.authenticated == AUTH_MASK)
-				passed.push(uit->second);
+		if (uit->second.dead < now) {
+			timeout.push(uit->second);
+			continue;
 		}
 
+		if (FD_ISSET(uit->first, &fdRead)) {
+			messenger.clientRead(uit->first);
+
 		if (FD_ISSET(uit->first, &fdWrite))
-			messenger.authWrite(uit->first);
+			messenger.clientWrite(uit->first);
+
+		if (uit->second.authenticated == AUTH_MASK)
+			passed.push(uit->second);
+		}
 	}
-	
-	// go from reqAuthenticates_ to users_
-	// Because can not erase elements while iterating through the loop
+}
+
+void Ircserv::disposeCorpse() {
+	while (timeout.size()) {
+		messenger.kickUser(timeout.top().fd);
+		timeout.pop();
+	}
+}
+
+void Ircserv::promoteToUser() {
 	while (passed.size()) {
 		User &user = passed.top();
 		messenger.users().insert(std::pair<int, User>(user.fd, user));
 		messenger.authenticates().erase(user.fd);
-		
-/**/std::cout << user.host << "[" << user.fd << "] transfered to users_ container\n"; // test code
-/**/std::cout << "user = [" << user.user << "], host = [" << user.host << "], real = [" << user.real << "]\n";
-
 		passed.pop();
 	}
 }

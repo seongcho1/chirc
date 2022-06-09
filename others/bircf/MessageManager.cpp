@@ -1,4 +1,5 @@
 #include "MessageManager.hpp"
+#include <sys/stat.h>
 
 void MessageManager::registerFunctions() {
   functionCallMap_["PASS"] = &MessageManager::PASS;
@@ -7,47 +8,6 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PRIVMSG"] =	&MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =	&MessageManager::SELFMSG;
   functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
-}
-
-void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-  if (paramsVec.size() != 0) {
-    // do something with errcode errcode:errstr map
-    return;
-  }
-  if (trailing.length() == 0) {
-    // do something with errcode errcode:errstr map
-    return;
-  }
-  std::map<int, User>::iterator uit = users_.find(cs);
-  if (uit == users_.end()) {
-    // do something with errcode errcode:errstr map
-    return;
-  }
-
-  trailing = std::string("[from myself, " + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(trailing).append(NEWLINE);
-  outMessages_[cs].append(trailing);
-}
-
-void MessageManager::PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-  if (paramsVec.size() != 0) {
-    // do something with errcode errcode:errstr map
-    return;
-  }
-  if (trailing.length() == 0) {
-    // do something with errcode errcode:errstr map
-    return;
-  }
-  std::map<int, User>::iterator uit = users_.find(cs);
-  if (uit == users_.end()) {
-    // do something with errcode errcode:errstr map
-    return;
-  }
-
-  trailing = std::string("[from" + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(trailing).append(NEWLINE);
-  for (uit = users_.begin(); uit != users_.end(); ++uit) {
-    if (uit->first != cs)
-      outMessages_[uit->first].append(trailing);
-  }
 }
 
 MessageManager::~MessageManager() {
@@ -154,23 +114,8 @@ void MessageManager::srvAccept(int s) {
 }
 
 void MessageManager::clientRead(int cs) {
-std::cout << "Debug begin\n* " << inMessages_[cs] << "before len = " << inMessages_[cs].length() << std::endl;
-std::cout << "Debug end\n";
-  if (users_[cs].clientRead(inMessages_[cs])) {
-std::cout << "Debug begin\n* " << inMessages_[cs] << "after len = " << inMessages_[cs].length() << std::endl;
-std::cout << "Debug end\n";
-    executeMessages(cs);
-  }
-  else {
-    kickUser(cs);
-  }
-}
-
-void MessageManager::authRead(int cs) {
-  if (reqAuthenticates_[cs].clientRead(inMessages_[cs]))
-    executeMessages(cs);
-  else
-    kickUser(cs);
+  anyUser(cs).clientRead(inMessages_[cs]) ?
+    executeMessages(cs) : anyUser(cs).toDead(); /*kickUser(cs);*/
 }
 
 void MessageManager::kickUser(int cs) {
