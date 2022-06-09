@@ -76,11 +76,11 @@ public:
 
   bool clientRead(std::string &buffer)    {
     char read[BUF_SIZE + 1];
-    char oob[1];
-    int r = recv(fd, read, BUF_SIZE, 0);
-    int o = recv(fd, oob, 1, 0);
+    int r = recv(fd, read, BUF_SIZE + 1, 0);
 
-    if (r <= 0 || 0 < o)
+    if (r <= 0 ||
+        BUF_SIZE < buffer.length() + r ||
+        (r == BUF_SIZE && read[BUF_SIZE - 1] != '\n'))
       return false;
     
     read[r] = 0;
