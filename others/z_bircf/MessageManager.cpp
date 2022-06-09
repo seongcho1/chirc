@@ -1,14 +1,53 @@
 #include "MessageManager.hpp"
-#include <sys/stat.h>
 
 void MessageManager::registerFunctions() {
   functionCallMap_["PASS"] = &MessageManager::PASS;
   functionCallMap_["NICK"] = &MessageManager::NICK;
-  functionCallMap_["USER"] = &MessageManager::USER;
   functionCallMap_["PRIVMSG"] =	&MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =	&MessageManager::SELFMSG;
   functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
   functionCallMap_["TESTMSG"] =	&MessageManager::TESTMSG;
+}
+
+void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+  if (paramsVec.size() != 0) {
+    // do something with errcode errcode:errstr map
+    return;
+  }
+  if (trailing.length() == 0) {
+    // do something with errcode errcode:errstr map
+    return;
+  }
+  std::map<int, User>::iterator uit = users_.find(cs);
+  if (uit == users_.end()) {
+    // do something with errcode errcode:errstr map
+    return;
+  }
+
+  trailing = std::string("[from myself, " + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(trailing).append(NEWLINE);
+  outMessages_[cs].append(trailing);
+}
+
+void MessageManager::PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+  if (paramsVec.size() != 0) {
+    // do something with errcode errcode:errstr map
+    return;
+  }
+  if (trailing.length() == 0) {
+    // do something with errcode errcode:errstr map
+    return;
+  }
+  std::map<int, User>::iterator uit = users_.find(cs);
+  if (uit == users_.end()) {
+    // do something with errcode errcode:errstr map
+    return;
+  }
+
+  trailing = std::string("[from" + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(trailing).append(NEWLINE);
+  for (uit = users_.begin(); uit != users_.end(); ++uit) {
+    if (uit->first != cs)
+      outMessages_[uit->first].append(trailing);
+  }
 }
 
 MessageManager::~MessageManager() {
@@ -18,6 +57,20 @@ MessageManager::~MessageManager() {
 }
 
 void MessageManager::fdClean(int cs) {
+  // std::map<int, User>::iterator uit = users_.find(cs);
+  // if (uit != users_.end())
+  //   users_.erase(cs);
+
+  // delete from inMessages_
+  // std::map<int, std::string>::iterator cit = inMessages_.find(cs);
+  // if (cit != inMessages_.end())
+  //   inMessages_.erase(cs);
+
+  // // delete from outMessages_
+  // cit = outMessages_.find(cs);
+  // if (cit != outMessages_.end())
+  //   outMessages_.erase(cs);
+
   if (users_.find(cs) != users_.end())
     users_.erase(cs);
 
@@ -36,7 +89,7 @@ void MessageManager::executeMessages(int cs) {
   std::string message;
 
   while (messageVec.size()) {
-    message = messageVec.front();    
+    message = messageVec.front();
     executeMessage(cs, message);
     messageVec.erase(messageVec.begin()); // in case of vector
     // messageVec.pop(); 					//in case of queue
@@ -115,8 +168,23 @@ void MessageManager::srvAccept(int s) {
 }
 
 void MessageManager::clientRead(int cs) {
-  anyUser(cs).clientRead(inMessages_[cs]) ?
-    executeMessages(cs) : anyUser(cs).toDead(); /*kickUser(cs);*/
+std::cout << "Debug begin\n* " << inMessages_[cs] << "before len = " << inMessages_[cs].length() << std::endl;
+std::cout << "Debug end\n";
+  if (users_[cs].clientRead(inMessages_[cs])) {
+std::cout << "Debug begin\n* " << inMessages_[cs] << "after len = " << inMessages_[cs].length() << std::endl;
+std::cout << "Debug end\n";
+    executeMessages(cs);
+  }
+  else {
+    kickUser(cs);
+  }
+}
+
+void MessageManager::authRead(int cs) {
+  if (reqAuthenticates_[cs].clientRead(inMessages_[cs]))
+    executeMessages(cs);
+  else
+    kickUser(cs);
 }
 
 void MessageManager::kickUser(int cs) {
