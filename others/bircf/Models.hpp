@@ -9,7 +9,7 @@
 #define BUF_SIZE	512
 #define N 10
 #define NICK_MAX_LENGTH 9
-#define CHANNEL_MAX_LENGTH 50 // Channel names are case insensitive.
+#define CHANNEL_MAX_LENGTH 200 // Channel names are case insensitive. (200 or 50?)
 #define CHANNEL_PREFIX "#&+!" // [&] is local channel, [+] not support channel modes, [!] identified as the "channel creator",
 #define CHANNEL_NOT_ALLOW "^G ," // ^G is ascii(7), blank, comma
 #define MESSAGE_PREFIX ":" // not allow blank
