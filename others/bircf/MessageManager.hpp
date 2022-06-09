@@ -20,11 +20,14 @@ private:
 	std::map<int, std::string>			inMessages_;
 	std::map<int, std::string>			outMessages_;
 	std::map<std::string, Channel>	channels_;
+	std::map<std::string, int>			nickFdPair_;
 
 	typedef void(MessageManager::*FuncPtr)(int cs, std::vector<std::string> paramsVec, std::string trailing);
 
 	std::map<std::string, FuncPtr>	functionCallMap_;
 	void	registerFunctions();
+	void	PASS(int cs, std::vector<std::string> paramsVec, std::string);
+	void	NICK(int cs, std::vector<std::string> paramsVec, std::string);
 	void	reply(int cs, int code, std::vector<std::string> paramsVec, std::string trailing);
 	void	PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
@@ -37,6 +40,7 @@ public:
 	MessageManager()	{ registerFunctions(); }
 	~MessageManager();
 	void	fdClean(int cs);
+	std::string 								pass;
 
 	std::map<int, User>					&users() 						{ return users_; }
 	std::map<int, User>					&authenticates()		{ return reqAuthenticates_; }
@@ -50,8 +54,13 @@ public:
 	//tried to use terms in https://datatracker.ietf.org/doc/html/rfc2812#section-2.3.1
 	void											executeMessage(int cs, std::string message);
 	void											srvAccept(int s);
+	void											authRead(int cs);
 	void											clientRead(int cs);
+	void											authWrite(int cs)	{ reqAuthenticates_[cs].clientWrite(outMessages_[cs]); }
 	void											clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
+	void											kickUser(int cs);
+	bool 											isUniqueNick(int cs, std::string &nick);
+	User											&anyUser(int cs);
 };
 
 /*

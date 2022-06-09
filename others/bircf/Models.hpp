@@ -6,12 +6,10 @@
 #include <cstring>
 #include <set>
 
-//#define BUFF_SIZE 4096
-// #define R 13
 #define BUF_SIZE	512
 #define N 10
 #define NICK_MAX_LENGTH 9
-#define CHANNEL_MAX_LENGTH 50 // Channel names are case insensitive.
+#define CHANNEL_MAX_LENGTH 200 // Channel names are case insensitive. (200 or 50?)
 #define CHANNEL_PREFIX "#&+!" // [&] is local channel, [+] not support channel modes, [!] identified as the "channel creator",
 #define CHANNEL_NOT_ALLOW "^G ," // ^G is ascii(7), blank, comma
 #define MESSAGE_PREFIX ":" // not allow blank
@@ -19,6 +17,10 @@
 #define WAIT_TIME 30
 #define PING "PING "
 #define PONG ":FT_IRC"
+
+#define AUTH_LEVEL1 1
+#define AUTH_LEVEL2 2
+
 
 #define Xv(err,res,str)		(SS::x_void(err,res,str,(char *)__FILE__,__LINE__))
 #define X(err,res,str)		(SS::x_int(err,res,str,(char *)__FILE__,__LINE__))
@@ -62,14 +64,14 @@ public:
   std::string real;
   std::string host;
   std::string server;
-  bool authenticated;
+  char authenticated;
   bool waitPong;
   time_t dead;
   time_t alive;
   std::set<std::string> engaged;
 
   User() {}
-  User(int const &fd, std::string const &host) : fd(fd), host(host) {}
+  User(int const &fd, std::string const &host, char auth) : fd(fd), host(host), authenticated(auth) {}
   bool isAlive(void)                { return time(NULL) < alive; }
   bool isDead(void)                 { return dead < time(NULL); }
   void keepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
