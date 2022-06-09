@@ -31,6 +31,7 @@ private:
 	void	registerFunctions();
 	void	PASS(int cs, std::vector<std::string> paramsVec, std::string);
 	void	NICK(int cs, std::vector<std::string> paramsVec, std::string);
+	void	USER(int cs, std::vector<std::string> paramsVec, std::string);
 	void	reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, std::string trailing);
 	void	PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
@@ -63,10 +64,10 @@ public:
 	//tried to use terms in https://datatracker.ietf.org/doc/html/rfc2812#section-2.3.1
 	void											executeMessage(int cs, std::string message);
 	void											srvAccept(int s);
-	void											authRead(int cs);
+	// void											authRead(int cs);
 	void											clientRead(int cs);
-	void											authWrite(int cs)	{ reqAuthenticates_[cs].clientWrite(outMessages_[cs]); }
-	void											clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
+	// void											authWrite(int cs)	{ reqAuthenticates_[cs].clientWrite(outMessages_[cs]); }
+	void											clientWrite(int cs)	{ anyUser(cs).clientWrite(outMessages_[cs]); }
 	void											kickUser(int cs);
 	bool 											isUniqueNick(int cs, std::string &nick);
 	User											&anyUser(int cs);

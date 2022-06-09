@@ -14,12 +14,15 @@
 #define CHANNEL_NOT_ALLOW "^G ," // ^G is ascii(7), blank, comma
 #define MESSAGE_PREFIX ":" // not allow blank
 #define TIMEOUT 300
-#define WAIT_TIME 30
+// #define WAIT_TIME 30
+#define WAIT_TIME 3
 #define PING "PING "
 #define PONG ":FT_IRC"
 
-#define AUTH_LEVEL1 1
-#define AUTH_LEVEL2 2
+#define AUTH_LEVEL1 0x1
+#define AUTH_LEVEL2 0x2
+#define AUTH_LEVEL3 0x4
+#define AUTH_MASK   0x7
 
 
 #define Xv(err,res,str)		(SS::x_void(err,res,str,(char *)__FILE__,__LINE__))
@@ -71,9 +74,12 @@ public:
   std::set<std::string> engaged;
 
   User() {}
-  User(int const &fd, std::string const &host, char auth) : fd(fd), host(host), authenticated(auth) {}
+  User(int const &fd, std::string const &host, char auth) : fd(fd), host(host), authenticated(auth) {
+    dead = time(NULL) + WAIT_TIME;
+  }
   bool isAlive(void)                { return time(NULL) < alive; }
   bool isDead(void)                 { return dead < time(NULL); }
+  void toDead(void)                 { dead = 0; }
   void keepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
   bool clientRead(std::string &buffer)    {
