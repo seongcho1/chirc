@@ -19,10 +19,10 @@
 #define PING "PING "
 #define PONG ":FT_IRC"
 
-#define AUTH_LEVEL1 0x1
-#define AUTH_LEVEL2 0x2
-#define AUTH_LEVEL3 0x4
-#define AUTH_MASK   0x7
+#define AUTH_LEVEL1 0x1 // pass
+#define AUTH_LEVEL2 0x2 // nick
+#define AUTH_LEVEL3 0x4 // user
+#define AUTH_MASK   0x7 // all
 
 
 #define Xv(err,res,str)		(SS::x_void(err,res,str,(char *)__FILE__,__LINE__))
@@ -63,10 +63,8 @@ public:
   int fd;
   std::string nick;
   std::string user;
-  int mode;
   std::string real;
   std::string host;
-  std::string server;
   char authenticated;
   bool waitPong;
   time_t dead;
@@ -74,7 +72,8 @@ public:
   std::set<std::string> engaged;
 
   User() {}
-  User(int const &fd, std::string const &host, char auth) : fd(fd), host(host), authenticated(auth) {
+  User(int const &fd, std::string const &host, char auth) : 
+    fd(fd), host(host), authenticated(auth) {
     dead = time(NULL) + WAIT_TIME;
   }
   bool isAlive(void)                { return time(NULL) < alive; }
@@ -108,6 +107,8 @@ public:
     }
     message.clear();
   }
+
+  bool isAuthenticated(void) { return authenticated == AUTH_MASK; }
 };
 
 #endif

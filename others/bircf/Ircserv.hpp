@@ -4,7 +4,6 @@
 #include "MessageManager.hpp"
 #include <sys/select.h>
 #include <fcntl.h>
-//#include <sys/socket.h>
 #include <netdb.h>
 #include <stack>
 
@@ -18,7 +17,7 @@ public:
 
 	MessageManager	messenger;
 	std::stack<User> timeout;
-	std::stack<User> passed;
+	// std::stack<User> passed;
 
 	void	getOpt(int ac, char **av);
 	void	srvCreate(int port);
@@ -26,9 +25,7 @@ public:
 	void	initFd();
 	void	doSelect();
 	void	checkFd();
-	void 	authenticate();
 	void	disposeCorpse();
-	void	promoteToUser();
 };
 
 
@@ -41,7 +38,6 @@ void	Ircserv::getOpt(int ac, char **av) {
 			port = atoi(av[1]);
 			break;
 		default:
-			// std::cerr << stderr << "Usage: " << av[0] << " port" << std::endl;
 			std::cerr << "Usage: " << av[0] << " PORT(required) PASS(optional)" << std::endl;
 			exit(1);
 	}
@@ -73,9 +69,7 @@ void	Ircserv::mainLoop() {
 		initFd();
 		doSelect();
 		checkFd();
-		authenticate();
 		disposeCorpse();
-		promoteToUser();
 	}
 }
 
@@ -95,22 +89,12 @@ void	Ircserv::initFd() {
 			FD_SET(uit->first, &fdWrite);
 		}
 	}
-
-	for (uit = messenger.authenticates().begin(); uit != messenger.authenticates().end(); ++uit) {
-		FD_SET(uit->first, &fdRead);
-
-		if (messenger.outMessages()[uit->first].length() > 0) {
-			FD_SET(uit->first, &fdWrite);
-		}
-	}
 }
 
 void	Ircserv::doSelect() {
-	/*
-	struct timeval timeout;
-	timeout.tv_sec = 3;			//3 second timeout
-	timeout.tv_usec = 0;		//0 micro second timeout
-	*/
+	// struct timeval timeout;
+	// timeout.tv_sec = 0;			//3 second timeout
+	// timeout.tv_usec = 100;		//0 micro second timeout
 
 	int		max = ircFd;
 	if (!messenger.users().empty()) {
@@ -118,13 +102,8 @@ void	Ircserv::doSelect() {
 		max = urit->first;
 	}
 
-	if (!messenger.authenticates().empty()) {
-		std::map<int, User>::reverse_iterator urit = messenger.authenticates().rbegin();
-		max = MAX(urit->first, max);
-	}
-
 	r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&timeout); //NULL, 0
-	//std::cout << "[select=" << e->r << "]" << std::endl;
+	// std::cout << "[select=" << e->r << "]" << std::endl;
 }
 
 void	Ircserv::checkFd() {
@@ -159,40 +138,12 @@ void	Ircserv::checkFd() {
 	}
 }
 
-void Ircserv::authenticate() {
-	std::map<int, User>::iterator uit = messenger.authenticates().begin();
-	time_t now = time(NULL);
-	for (; uit != messenger.authenticates().end(); ++uit) {
-		if (uit->second.dead < now) {
-			timeout.push(uit->second);
-			continue;
-		}
-
-		if (FD_ISSET(uit->first, &fdRead)) {
-			messenger.clientRead(uit->first);
-
-		if (FD_ISSET(uit->first, &fdWrite))
-			messenger.clientWrite(uit->first);
-
-		if (uit->second.authenticated == AUTH_MASK)
-			passed.push(uit->second);
-		}
-	}
-}
-
 void Ircserv::disposeCorpse() {
 	while (timeout.size()) {
+		messenger.outMessages()[timeout.top().fd].append("timeout\n");
+		messenger.clientWrite(timeout.top().fd);
 		messenger.kickUser(timeout.top().fd);
 		timeout.pop();
-	}
-}
-
-void Ircserv::promoteToUser() {
-	while (passed.size()) {
-		User &user = passed.top();
-		messenger.users().insert(std::pair<int, User>(user.fd, user));
-		messenger.authenticates().erase(user.fd);
-		passed.pop();
 	}
 }
 

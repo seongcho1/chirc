@@ -21,9 +21,6 @@ void MessageManager::fdClean(int cs) {
   if (users_.find(cs) != users_.end())
     users_.erase(cs);
 
-  if (reqAuthenticates_.find(cs) != reqAuthenticates_.end())
-    reqAuthenticates_.erase(cs);
-
   if (inMessages_.find(cs) != inMessages_.end())
     inMessages_.erase(cs);
 
@@ -41,7 +38,6 @@ void MessageManager::executeMessages(int cs) {
     messageVec.erase(messageVec.begin()); // in case of vector
     // messageVec.pop(); 					//in case of queue
   }
-  // inMessages_[cs].clear();
 }
 
 std::vector<std::string> MessageManager::splitMessages(int cs, bool bSkipLast, bool bClearMessages) {
@@ -110,27 +106,16 @@ void MessageManager::srvAccept(int s) {
   // fds_[cs].type = FD_CLIENT;
   // //fds_[cs].fct_read = client_read;
   // //fds_[cs].fct_write = client_write;
-  reqAuthenticates_.insert(std::pair<int, User>(cs, User(cs, inet_ntoa(csin.sin_addr), pass.empty())));
-  // users_.insert(std::pair<int, User>(cs, User(cs)));
+  users_.insert(std::pair<int, User>(cs, User(cs, inet_ntoa(csin.sin_addr), pass.empty())));
 }
 
 void MessageManager::clientRead(int cs) {
-  anyUser(cs).clientRead(inMessages_[cs]) ?
-    executeMessages(cs) : anyUser(cs).toDead(); /*kickUser(cs);*/
+  users_[cs].clientRead(inMessages_[cs]) ?
+    executeMessages(cs) : users_[cs].toDead(); /*kickUser(cs);*/
 }
 
 void MessageManager::kickUser(int cs) {
     fdClean(cs); // del User *, inMessages_, out_commands
     close(cs);    // cleaning the table first, and then the table will be ready for another client
-    std::cout << "client #" << cs << " gone away" << std::endl;
-}
-
-User &MessageManager::anyUser(int cs) {
-  if (users_.find(cs) != users_.end())
-    return users_[cs];
-
-  if (reqAuthenticates_.find(cs) != reqAuthenticates_.end())
-    return reqAuthenticates_[cs];
-
-  exit(1);
+std::cout << "client #" << cs << " gone away" << std::endl;
 }

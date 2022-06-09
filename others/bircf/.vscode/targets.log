@@ -8,12 +8,13 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This program built for i386-apple-darwin11.3.0
  
 
-# Make data base, printed on Thu Jun  9 21:30:17 2022
+# Make data base, printed on Thu Jun  9 22:49:32 2022
 
 # Variables
 
 # automatic
 <D = $(patsubst %/,%,$(dir $<))
+ 
 # automatic
 ?F = $(notdir $?)
 # environment
@@ -30,7 +31,7 @@ VSCODE_LOG_NATIVE = false
 CURDIR := /Users/kyuhokim/Cadet/chirc/others/bircf
 # makefile
 SHELL = /bin/sh
-# makefile (from `Makefile', line 22)
+# makefile (from `Makefile', line 19)
 RM = rm -f
 # environment
 VSCODE_NLS_CONFIG = {"locale":"ko","availableLanguages":{},"_languagePackSupport":true}
@@ -38,7 +39,7 @@ VSCODE_NLS_CONFIG = {"locale":"ko","availableLanguages":{},"_languagePackSupport
 _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
 MAKEFILE_LIST :=  Makefile
-# makefile (from `Makefile', line 18)
+# makefile (from `Makefile', line 15)
 CXXFLAGS = -I. -g3 -Wall -Wextra -Werror 
 # environment
 VSCODE_VERBOSE_LOGGING = true
@@ -54,12 +55,11 @@ VSCODE_CWD = /Users/kyuhokim/Cadet/chirc/others/bircf
 PATH = /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
- 
 # environment
 VSCODE_LOG_STACK = false
 # environment
 ELECTRON_RUN_AS_NODE = 1
-# makefile (from `Makefile', line 19)
+# makefile (from `Makefile', line 16)
 LDFLAGS = 
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
@@ -69,7 +69,7 @@ SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.VNAmwG83DD/Listeners
 %F = $(notdir $%)
 # environment
 VSCODE_PIPE_LOGGING = true
-# makefile (from `Makefile', line 14)
+# makefile (from `Makefile', line 11)
 OBJS = ${SRCS:.cpp=.o}
 # environment
 PWD = /Users/kyuhokim/Cadet/chirc/others/bircf
@@ -105,7 +105,7 @@ XPC_FLAGS = 0x0
 MAKE = $(MAKE_COMMAND)
 # default
 MAKECMDGOALS := all
-# makefile (from `Makefile', line 2)
+# makefile (from `Makefile', line 1)
 SRCS = main.cpp MessageManager.cpp Commands/Pass.cpp Commands/Nick.cpp Commands/User.cpp Commands/Privmsg.cpp reply.cpp Commands/TESTMSG.cpp Commands/Publicmsg.cpp Commands/Selfmsg.cpp 
 # environment
 SHLVL = 3
@@ -114,11 +114,11 @@ MAKE_VERSION := 3.81
 # environment
 USER = kyuhokim
 # makefile
-.DEFAULT_GOAL := bircf
+.DEFAULT_GOAL := ircserv
 # environment
 TERM_SESSION_ID = 2070FFE1-1D4F-40DF-8059-BA2BFE93651E
-# makefile (from `Makefile', line 16)
-NAME = bircf
+# makefile (from `Makefile', line 13)
+NAME = ircserv
 # environment
 LESS = -R
 # automatic
@@ -138,6 +138,7 @@ VSCODE_IPC_HOOK = /Users/kyuhokim/Library/Application Support/Code/1.67.2-main.s
 # makefile
 MAKEFLAGS = Rrqp
 # environment
+ 
 MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
@@ -161,7 +162,7 @@ COMMAND_MODE = unix2003
 MAKEFILES := 
 # automatic
 <F = $(notdir $<)
-# makefile (from `Makefile', line 21)
+# makefile (from `Makefile', line 18)
 CXX = c++
 # environment
 PAGER = less
@@ -180,7 +181,6 @@ TERM = xterm-256color
 # environment
 VSCODE_PID = 73028
 # variable set hash-table stats:
- 
 # Load=83/1024=8%, Rehash=0, Collisions=5/110=5%
 
 # Pattern-specific Variable Values
@@ -189,9 +189,9 @@ VSCODE_PID = 73028
 
 # Directories
 
-# . (device 16777233, inode 11864172): 21 files, no impossibilities.
+# . (device 16777233, inode 11864172): 20 files, no impossibilities.
 
-# 21 files, no impossibilities in 1 directories.
+# 20 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -199,7 +199,7 @@ VSCODE_PID = 73028
 
 # Files
 
-all: bircf
+all: ircserv
 #  Command-line target.
 #  Implicit rule search has been done.
 #  File does not exist.
@@ -217,29 +217,29 @@ all: bircf
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:14
+#  Last modified 2022-06-09 22:48:45
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+ircserv: main.o MessageManager.o Commands/Pass.o Commands/Nick.o Commands/User.o Commands/Privmsg.o reply.o Commands/TESTMSG.o Commands/Publicmsg.o Commands/Selfmsg.o
+#  Implicit rule search has not been done.
+#  Last modified 2022-06-09 22:49:05
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+#  commands to execute (from `Makefile', line 22):
+	${CXX} ${CXXFLAGS} -o ${NAME} ${OBJS} ${LDFLAGS}
+	
 
 fclean: clean
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 33):
+#  commands to execute (from `Makefile', line 30):
 	${RM} ${NAME}
-	
-
-bircf: main.o MessageManager.o Commands/Pass.o Commands/Nick.o Commands/User.o Commands/Privmsg.o reply.o Commands/TESTMSG.o Commands/Publicmsg.o Commands/Selfmsg.o
-#  Implicit rule search has not been done.
-#  Last modified 2022-06-09 21:29:20
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-#  commands to execute (from `Makefile', line 25):
-	${CXX} ${CXXFLAGS} -o ${NAME} ${OBJS} ${LDFLAGS}
 	
 
 # Not a target:
@@ -251,10 +251,11 @@ bircf: main.o MessageManager.o Commands/Pass.o Commands/Nick.o Commands/User.o C
 # Not a target:
 Commands/Nick.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:18
+#  Last modified 2022-06-09 22:49:03
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
+ 
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
 re: fclean all
@@ -266,14 +267,14 @@ clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 30):
+#  commands to execute (from `Makefile', line 27):
 	${RM} ${OBJS} *~ #*#
 	
 
 # Not a target:
 Commands/Selfmsg.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:20
+#  Last modified 2022-06-09 22:49:05
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -282,7 +283,7 @@ Commands/Selfmsg.o:
 # Not a target:
 reply.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:19
+#  Last modified 2022-06-09 22:49:04
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -291,7 +292,7 @@ reply.o:
 # Not a target:
 main.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:17
+#  Last modified 2022-06-09 22:49:02
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -300,7 +301,7 @@ main.o:
 # Not a target:
 Commands/Publicmsg.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:20
+#  Last modified 2022-06-09 22:49:05
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -309,7 +310,7 @@ Commands/Publicmsg.o:
 # Not a target:
 MessageManager.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:17
+#  Last modified 2022-06-09 22:49:02
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -318,7 +319,7 @@ MessageManager.o:
 # Not a target:
 Commands/User.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:18
+#  Last modified 2022-06-09 22:49:03
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -327,7 +328,7 @@ Commands/User.o:
 # Not a target:
 Commands/Privmsg.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:19
+#  Last modified 2022-06-09 22:49:04
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -336,7 +337,7 @@ Commands/Privmsg.o:
 # Not a target:
 Commands/Pass.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:18
+#  Last modified 2022-06-09 22:49:03
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -345,7 +346,7 @@ Commands/Pass.o:
 # Not a target:
 Commands/TESTMSG.o:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-09 21:29:19
+#  Last modified 2022-06-09 22:49:04
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -364,6 +365,6 @@ Commands/TESTMSG.o:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Thu Jun  9 21:30:17 2022
+# Finished Make data base on Thu Jun  9 22:49:32 2022
 
  

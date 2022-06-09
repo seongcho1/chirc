@@ -16,11 +16,11 @@
 class MessageManager {
 
 private:
-	std::map<int, User>					reqAuthenticates_;
-	std::map<int, User>					users_;
+	// std::map<int, User>							reqAuthenticates_;
+	std::map<int, User>							users_;
 	std::map<int, std::string>			inMessages_;
 	std::map<int, std::string>			outMessages_;
-	std::map<std::string, Channel>		channels_;
+	std::map<std::string, Channel>	channels_;
 	std::map<std::string, int>			nickFdPair_;
 	std::map<int, std::string>			replies_;
 
@@ -53,7 +53,7 @@ public:
 	std::string 								pass;
 
 	std::map<int, User>					&users() 						{ return users_; }
-	std::map<int, User>					&authenticates()		{ return reqAuthenticates_; }
+	// std::map<int, User>					&authenticates()		{ return reqAuthenticates_; }
 	std::map<int, std::string>	&inMessages() 			{ return inMessages_; }
 	std::map<int, std::string>	&outMessages() 			{ return outMessages_; }
 	std::size_t									inSize() const 			{ return inMessages_.size(); }
@@ -66,11 +66,11 @@ public:
 	void											srvAccept(int s);
 	// void											authRead(int cs);
 	void											clientRead(int cs);
-	// void											authWrite(int cs)	{ reqAuthenticates_[cs].clientWrite(outMessages_[cs]); }
-	void											clientWrite(int cs)	{ anyUser(cs).clientWrite(outMessages_[cs]); }
+	// void											authWrite(int cs)	{ reqAuthenticates_[cs].authWrite(outMessages_[cs]); }
+	void											clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
 	void											kickUser(int cs);
 	bool 											isUniqueNick(int cs, std::string &nick);
-	User											&anyUser(int cs);
+	// User											&anyUser(int cs);
 };
 
 /*
