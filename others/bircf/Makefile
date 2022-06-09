@@ -2,6 +2,7 @@
 SRCS =	main.cpp MessageManager.cpp \
 				Commands/Pass.cpp \
 				Commands/Nick.cpp \
+				Commands/Privmsg.cpp \
 
 OBJS = ${SRCS:.cpp=.o}
 

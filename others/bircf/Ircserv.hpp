@@ -155,15 +155,14 @@ void Ircserv::authenticate() {
 	std::stack<User> passed;
 	for (; uit != messenger.authenticates().end(); ++uit) {
 		if (FD_ISSET(uit->first, &fdRead)) {
-			// need auth check logic
-			// If successful, it will be stacked in a container called [passed]
 			messenger.authRead(uit->first);
-			// if (uit->second.clientRead(messenger.inMessages()[uit->first]))
-			// 	messenger.executeMessages(uit->first);
 
 			if (uit->second.authenticated == AUTH_LEVEL2)
 				passed.push(uit->second);
 		}
+
+		if (FD_ISSET(uit->first, &fdWrite))
+			messenger.authWrite(uit->first);
 	}
 	
 	// go from reqAuthenticates_ to users_

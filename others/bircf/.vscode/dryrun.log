@@ -1,10 +1,5 @@
 make --dry-run --keep-going --print-directory
 make: Entering directory `/Users/kyuhokim/Cadet/chirc/others/bircf'
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o main.o main.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o MessageManager.o MessageManager.cpp
- 
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/Pass.o Commands/Pass.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/Nick.o Commands/Nick.cpp
-c++ -I. -g3 -Wall -Wextra -Werror  -o bircf main.o MessageManager.o Commands/Pass.o Commands/Nick.o 
+make: `bircf' is up to date.
 make: Leaving directory `/Users/kyuhokim/Cadet/chirc/others/bircf'
  

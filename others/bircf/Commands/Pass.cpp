@@ -10,4 +10,7 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::strin
     authenticates()[cs].authenticated = AUTH_LEVEL1;
 std::cout << "pass: AUTH_LEVEL is 1\n";
   }
+  else {
+    outMessages_[cs].append("** WRONG PASSWORD! **\n");
+  }
 }

@@ -55,6 +55,7 @@ public:
 	void											srvAccept(int s);
 	void											authRead(int cs);
 	void											clientRead(int cs);
+	void											authWrite(int cs)	{ reqAuthenticates_[cs].clientWrite(outMessages_[cs]); }
 	void											clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
 	void											kickUser(int cs);
 	bool 											isUniqueNick(int cs, std::string &nick);
