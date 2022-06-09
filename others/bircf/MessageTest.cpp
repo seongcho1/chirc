@@ -24,9 +24,9 @@ class MessageManager {
 	}
 };
 
-int client_write_test() {
+int clientWriteTest() {
 
-	std::string out_commands = "aaa\nbbb ccc\nddddddddddd\n";;
+	std::string out_commands = "aaa\n";;
 	std::string token;
 	char	buf_write[BUF_SIZE + 1];
 
@@ -47,11 +47,11 @@ int client_write_test() {
 	return 0;
 }
 
-int split_string_test() {
+int splitSstringTest() {
 
 	int i;
-	std::string a1 = "aaa\nbbb ccc\nddddddddddd";
-	std::string a2 = "a:b";
+	std::string a1 = "\n\n\naaa\nbbb\nccc\nddd";
+	std::string a2 = "aaaaa   bbbb :5 z     2 :1    a b c   e";
 
 	std::vector<std::string> avec1 = SS::splitString(a1, NEWLINE, true, true);
 
@@ -63,7 +63,8 @@ int split_string_test() {
 	}
 	std::cout << std::endl << "a1=(" << a1 << ")" << std::endl;
 
-	std::vector<std::string> avec2 = SS::splitString(a2, SPACE_COLON, false, false, true);
+
+	std::vector<std::string> avec2 = SS::splitString(a2, SPACE_COLON, false, true, false);
 
 	std::cout << "vec size=" << avec2.size() << std::endl;
 	i = 0;
@@ -75,19 +76,24 @@ int split_string_test() {
 
 	return 0;
 }
+
+
+int toUpperTest() {
+	std::string a = "a{|}^z";
+	a = SS::toUpper(a);
+	std::cout << a << std::endl;
+
+	return 0;
+}
+
 int main() {
 
 	//MessageManager c;
 	//c.executeCommand("PRIVMSG");
 
-	//client_write_test();
-	//split_string_test();
-
-	std::string a = "a{|}^z";
-
-	a = SS::toUpper(a);
-
-	std::cout << a << std::endl;
+	//clientWriteTest();
+	splitSstringTest();
+	//toUpperTest();
 
 
 }

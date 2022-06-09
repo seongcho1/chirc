@@ -28,6 +28,7 @@ private:
 	void	registerFunctions();
 	void	PASS(int cs, std::vector<std::string> paramsVec, std::string);
 	void	NICK(int cs, std::vector<std::string> paramsVec, std::string);
+	void	reply(int cs, int code, std::vector<std::string> paramsVec, std::string trailing);
 	void	PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
