@@ -72,19 +72,23 @@ class SS {
 
 		while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
 			token = s.substr(pos_start, pos_end - pos_start); //+ delimiter.length());
+			//std::cout << "end=" << pos_end << "[" << token << "]->" << std::endl;
 			if ( (bCutOnce && i == 0 && token.empty()) ||
 				(!token.empty()) ) {
 				result.push_back(token);  //in case of vector
 				i++;
-				if (bClearProcessedString == true) {
-					s.erase(pos_start, pos_end + delim_len);
-					pos_end = pos_end - token.length();
-				}
 			}
+
+			if (bClearProcessedString == true) {
+				s.erase(pos_start, pos_end + delim_len);
+				pos_end = pos_end - (token.length() + delim_len);
+			}
+
 			pos_start = pos_end + delim_len;
 			if (bCutOnce)
 				break;
 		}
+
 		//in case of "aaa\nbbb", deals with "bbb"
 		if (bSkipLast == false && pos_start < s.length()) {
 			token = s.substr(pos_start);
@@ -94,6 +98,7 @@ class SS {
 					s.clear();
 			}
 		}
+		//std::cout << std::endl;
 		return result;
 	}
 

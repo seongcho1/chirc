@@ -25,6 +25,7 @@ private:
 
 	std::map<std::string, FuncPtr>	functionCallMap_;
 	void	registerFunctions();
+	void	reply(int cs, int code, std::vector<std::string> paramsVec, std::string trailing);
 	void	PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
