@@ -11,7 +11,7 @@
 class	Ircserv {
 public:
 	int							port;
-	std::string			pass;
+	// std::string			pass;
 
 	int							r;
 	int							ircFd;
@@ -33,7 +33,7 @@ public:
 void	Ircserv::getOpt(int ac, char **av) {
 	switch (ac) {
 		case 3:
-			pass = av[2];
+			messenger.pass = av[2];
 			--ac;
 		case 2:
 			port = atoi(av[1]);
@@ -85,7 +85,14 @@ void	Ircserv::initFd() {
 	//clients
 	std::map<int, User>::iterator uit;
 	for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
+		FD_SET(uit->first, &fdRead);
 
+		if (messenger.outMessages()[uit->first].length() > 0) {
+			FD_SET(uit->first, &fdWrite);
+		}
+	}
+
+	for (uit = messenger.authenticates().begin(); uit != messenger.authenticates().end(); ++uit) {
 		FD_SET(uit->first, &fdRead);
 
 		if (messenger.outMessages()[uit->first].length() > 0) {
@@ -105,6 +112,11 @@ void	Ircserv::doSelect() {
 	if (!messenger.users().empty()) {
 		std::map<int, User>::reverse_iterator urit = messenger.users().rbegin();
 		max = urit->first;
+	}
+
+	if (!messenger.authenticates().empty()) {
+		std::map<int, User>::reverse_iterator urit = messenger.authenticates().rbegin();
+		max = MAX(urit->first, max);
 	}
 
 	r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&timeout); //NULL, 0
@@ -142,12 +154,18 @@ void Ircserv::authenticate() {
 	std::map<int, User>::iterator uit = messenger.authenticates().begin();
 	std::stack<User> passed;
 	for (; uit != messenger.authenticates().end(); ++uit) {
-		// need auth check logic
-		// If successful, it will be stacked in a container called [passed]
-/**/if (uit->first % 2 == 0) // test condition
-		passed.push(uit->second);
-	}
+		if (FD_ISSET(uit->first, &fdRead)) {
+			// need auth check logic
+			// If successful, it will be stacked in a container called [passed]
+			messenger.authRead(uit->first);
+			// if (uit->second.clientRead(messenger.inMessages()[uit->first]))
+			// 	messenger.executeMessages(uit->first);
 
+			if (uit->second.authenticated == AUTH_LEVEL2)
+				passed.push(uit->second);
+		}
+	}
+	
 	// go from reqAuthenticates_ to users_
 	// Because can not erase elements while iterating through the loop
 	while (passed.size()) {

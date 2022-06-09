@@ -25,6 +25,8 @@ private:
 
 	std::map<std::string, FuncPtr>	functionCallMap_;
 	void	registerFunctions();
+	void	PASS(int cs, std::vector<std::string> paramsVec, std::string);
+	void	NICK(int cs, std::vector<std::string> paramsVec, std::string);
 	void	PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
@@ -36,6 +38,7 @@ public:
 	MessageManager()	{ registerFunctions(); }
 	~MessageManager();
 	void	fdClean(int cs);
+	std::string 								pass;
 
 	std::map<int, User>					&users() 						{ return users_; }
 	std::map<int, User>					&authenticates()		{ return reqAuthenticates_; }
@@ -49,8 +52,10 @@ public:
 	//tried to use terms in https://datatracker.ietf.org/doc/html/rfc2812#section-2.3.1
 	void											executeMessage(int cs, std::string message);
 	void											srvAccept(int s);
+	void											authRead(int cs);
 	void											clientRead(int cs);
 	void											clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
+	void											kickUser(int cs);
 };
 
 /*

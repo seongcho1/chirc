@@ -1,9 +1,35 @@
 #include "MessageManager.hpp"
 
 void MessageManager::registerFunctions() {
+  functionCallMap_["PASS"] = &MessageManager::PASS;
+  functionCallMap_["NICK"] = &MessageManager::NICK;
   functionCallMap_["PRIVMSG"] =	&MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =	&MessageManager::SELFMSG;
   functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
+}
+
+void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+  if (paramsVec.size() != 1 || !trailing.empty()) {
+    // do something with errcode errcode:errstr map
+    return;
+  }
+
+  if (*paramsVec.begin() == pass) {
+    authenticates()[cs].authenticated = AUTH_LEVEL1;
+std::cout << "pass: AUTH_LEVEL is 1\n";
+  }
+}
+
+void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+  if (paramsVec.size() != 1 || !trailing.empty()) {
+    // do something with errcode errcode:errstr map
+    return;
+  }
+
+  if (authenticates()[cs].authenticated == AUTH_LEVEL1 && true /* is unique check */) {
+    authenticates()[cs].authenticated = AUTH_LEVEL2;
+std::cout << "pass: AUTH_LEVEL is 2\n";
+  }
 }
 
 void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
@@ -83,18 +109,30 @@ MessageManager::~MessageManager() {
 }
 
 void MessageManager::fdClean(int cs) {
-  std::map<int, User>::iterator uit = users_.find(cs);
-  if (uit != users_.end())
-    users_.erase(cs);
+  // std::map<int, User>::iterator uit = users_.find(cs);
+  // if (uit != users_.end())
+  //   users_.erase(cs);
 
   // delete from inMessages_
-  std::map<int, std::string>::iterator cit = inMessages_.find(cs);
-  if (cit != inMessages_.end())
+  // std::map<int, std::string>::iterator cit = inMessages_.find(cs);
+  // if (cit != inMessages_.end())
+  //   inMessages_.erase(cs);
+
+  // // delete from outMessages_
+  // cit = outMessages_.find(cs);
+  // if (cit != outMessages_.end())
+  //   outMessages_.erase(cs);
+
+  if (users_.find(cs) != users_.end())
+    users_.erase(cs);
+
+  if (reqAuthenticates_.find(cs) != reqAuthenticates_.end())
+    reqAuthenticates_.erase(cs);
+
+  if (inMessages_.find(cs) != inMessages_.end())
     inMessages_.erase(cs);
 
-  // delete from outMessages_
-  cit = outMessages_.find(cs);
-  if (cit != outMessages_.end())
+  if (outMessages_.find(cs) != outMessages_.end())
     outMessages_.erase(cs);
 }
 
@@ -177,7 +215,7 @@ void MessageManager::srvAccept(int s) {
   // fds_[cs].type = FD_CLIENT;
   // //fds_[cs].fct_read = client_read;
   // //fds_[cs].fct_write = client_write;
-  reqAuthenticates_.insert(std::pair<int, User>(cs, User(cs, inet_ntoa(csin.sin_addr))));
+  reqAuthenticates_.insert(std::pair<int, User>(cs, User(cs, inet_ntoa(csin.sin_addr), pass.empty())));
   // users_.insert(std::pair<int, User>(cs, User(cs)));
 }
 
@@ -190,8 +228,19 @@ std::cout << "Debug end\n";
     executeMessages(cs);
   }
   else {
+    kickUser(cs);
+  }
+}
+
+void MessageManager::authRead(int cs) {
+  if (reqAuthenticates_[cs].clientRead(inMessages_[cs]))
+    executeMessages(cs);
+  else
+    kickUser(cs);
+}
+
+void MessageManager::kickUser(int cs) {
     fdClean(cs); // del User *, inMessages_, out_commands
     close(cs);    // cleaning the table first, and then the table will be ready for another client
     std::cout << "client #" << cs << " gone away" << std::endl;
-  }
 }
