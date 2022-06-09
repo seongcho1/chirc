@@ -18,6 +18,51 @@
 class SS {
   public:
 
+	//trim from left
+	static std::string& ltrim(std::string& s, const char* t = " \t") { //\n\r\f\v")
+		s.erase(0, s.find_first_not_of(t));
+		return s;
+	}
+
+	//trim from right
+	static std::string& rtrim(std::string& s, const char* t = " \t") { //\n\r\f\v")
+		s.erase(s.find_last_not_of(t) + 1);
+		return s;
+	}
+
+	//trim from left & right
+	static std::string& trim(std::string& s, const char* t = " \t") { //\n\r\f\v")
+		return ltrim(rtrim(s, t), t);
+	}
+
+	static std::string replaceString1(std::string subject, const std::string& search, const std::string& replace) {
+		size_t pos = 0;
+		while((pos = subject.find(search, pos)) != std::string::npos) {
+			subject.replace(pos, search.length(), replace);
+			pos += replace.length();
+		}
+		return subject;
+	}
+
+	static void replaceString2(std::string& subject, const std::string& search, const std::string& replace) {
+		size_t pos = 0;
+		while((pos = subject.find(search, pos)) != std::string::npos) {
+			subject.replace(pos, search.length(), replace);
+			pos += replace.length();
+		}
+	}
+
+	static void replaceString(std::string& subject, std::vector<std::string> const &searchVec, std::vector<std::string> const &replaceVec) {
+		if (searchVec.size() != replaceVec.size())
+			return;
+		size_t	i = 0;
+		while (i < searchVec.size()) {
+			replaceString2(subject, searchVec[i], replaceVec[i]);
+			i++;
+		}
+	}
+
+
 	template <typename T>
 	static std::string	toString ( T number ) {
 		std::ostringstream ss;

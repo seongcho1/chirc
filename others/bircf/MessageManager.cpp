@@ -6,6 +6,7 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PRIVMSG"] =	&MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =	&MessageManager::SELFMSG;
   functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
+  functionCallMap_["TESTMSG"] =	&MessageManager::TESTMSG;
 }
 
 void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {

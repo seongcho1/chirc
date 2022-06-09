@@ -3,8 +3,7 @@
 
 void MessageManager::TESTMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
   if (paramsVec.size() == 0) {
-    // do something with errcode errcode:errstr map
-	  reply(cs, RPL_WELCOME, paramsVec, trailing);
+	  reply(cs, ERR_NEEDMOREPARAMS, "TESTMSG", paramsVec, trailing);
     return;
   }
   if (trailing.length() == 0) {

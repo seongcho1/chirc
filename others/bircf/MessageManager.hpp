@@ -16,20 +16,22 @@
 class MessageManager {
 
 private:
-	std::map<int, User>							reqAuthenticates_;
-	std::map<int, User>							users_;
+	std::map<int, User>					reqAuthenticates_;
+	std::map<int, User>					users_;
 	std::map<int, std::string>			inMessages_;
 	std::map<int, std::string>			outMessages_;
-	std::map<std::string, Channel>	channels_;
+	std::map<std::string, Channel>		channels_;
 	std::map<std::string, int>			nickFdPair_;
+	std::map<int, std::string>			replies_;
 
 	typedef void(MessageManager::*FuncPtr)(int cs, std::vector<std::string> paramsVec, std::string trailing);
 
 	std::map<std::string, FuncPtr>	functionCallMap_;
+	int		initReplies(std::string configFile = "./reply.cfg");
 	void	registerFunctions();
 	void	PASS(int cs, std::vector<std::string> paramsVec, std::string);
 	void	NICK(int cs, std::vector<std::string> paramsVec, std::string);
-	void	reply(int cs, int code, std::vector<std::string> paramsVec, std::string trailing);
+	void	reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, std::string trailing);
 	void	PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
@@ -41,7 +43,10 @@ private:
 
 public:
 
-	MessageManager()	{ registerFunctions(); }
+	MessageManager()	{
+		X(-1, initReplies(), (char *)"initReplies");
+		registerFunctions();
+	}
 	~MessageManager();
 	void	fdClean(int cs);
 	std::string 								pass;

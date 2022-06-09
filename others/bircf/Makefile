@@ -7,7 +7,7 @@ SRCS =	main.cpp MessageManager.cpp \
 
 OBJS = ${SRCS:.cpp=.o}
 
-NAME = bircf
+NAME = ircserv
 
 CXXFLAGS = -I. -g3 -Wall -Wextra -Werror #-fsanitize=address
 LDFLAGS =

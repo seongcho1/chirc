@@ -10,11 +10,9 @@
 
 class	Ircserv {
 public:
-	int							port;
-	// std::string			pass;
-
-	int							r;
-	int							ircFd;
+	int						port;
+	int						r;
+	int						ircFd;
 	fd_set					fdRead;
 	fd_set					fdWrite;
 
@@ -164,14 +162,14 @@ void Ircserv::authenticate() {
 		if (FD_ISSET(uit->first, &fdWrite))
 			messenger.authWrite(uit->first);
 	}
-	
+
 	// go from reqAuthenticates_ to users_
 	// Because can not erase elements while iterating through the loop
 	while (passed.size()) {
 		User &user = passed.top();
 		messenger.users().insert(std::pair<int, User>(user.fd, user));
 		messenger.authenticates().erase(user.fd);
-		
+
 /**/std::cout << user.host << "[" << user.fd << "] transfered to users_ container\n"; // test code
 
 		passed.pop();
