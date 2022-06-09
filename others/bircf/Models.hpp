@@ -20,6 +20,12 @@
 #define PING "PING "
 #define PONG ":FT_IRC"
 
+#define Xv(err,res,str)		(SS::x_void(err,res,str,(char *)__FILE__,__LINE__))
+#define X(err,res,str)		(SS::x_int(err,res,str,(char *)__FILE__,__LINE__))
+#define MAX(a,b)					((a > b) ? a : b)
+#define MIN(a,b)					((a > b) ? b : a)
+
+
 // following CHANNEL_PREFIX sequence (MUST)
 enum CreateOption {
   NORMAL,   // #
@@ -38,8 +44,8 @@ public:
   int mode;
   std::string title;
   std::string topic;
-  int c_creator;
-  std::set<int> c_operator;
+  int channelCreator;
+  std::set<int> channelOperators;
   std::set<int> member;
 
   Channel() {}
@@ -56,27 +62,30 @@ public:
   std::string real;
   std::string host;
   std::string server;
-  bool initialized;
-  bool wait_pong;
+  bool authenticated;
+  bool waitPong;
   time_t dead;
   time_t alive;
   std::set<std::string> engaged;
 
   User() {}
-  User(int const &fd) : fd(fd)      {}
-  bool IsAlive(void)                { return time(NULL) < alive; }
-  bool IsDead(void)                 { return dead < time(NULL); }
-  void KeepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
+  User(int const &fd, std::string const &host) : fd(fd), host(host) {}
+  bool isAlive(void)                { return time(NULL) < alive; }
+  bool isDead(void)                 { return dead < time(NULL); }
+  void keepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
   bool clientRead(std::string &buffer)    {
-    // int r = recv(fd, read, BUF_SIZE, 0);
-    // char read[BUF_SIZE + 1];
+    char read[BUF_SIZE + 1];
+    int r = recv(fd, read, BUF_SIZE + 1, 0);
 
-    // read[BUF_SIZE] = 0;
-    // if (0 < r && r < BUF_SIZE)
-    //   buffer.append(read);
-    (void)buffer;
-    return false;
+    if (r <= 0 ||
+        BUF_SIZE < buffer.length() + r ||
+        (r == BUF_SIZE && read[BUF_SIZE - 1] != '\n'))
+      return false;
+    
+    read[r] = 0;
+    buffer.append(read);
+    return true;
   }
 
   void clientWrite(std::string &message)  {
@@ -85,10 +94,7 @@ public:
 
     unsigned long endset, offset = 0;
     while (offset < message.length()) {
-      if (message.length() > BUF_SIZE + offset)
-        endset = BUF_SIZE;
-      else
-        endset = message.length();
+      endset = MIN(BUF_SIZE, message.length() - offset);
       send(fd, message.c_str() + offset, endset, 0);
       offset += endset;
     }

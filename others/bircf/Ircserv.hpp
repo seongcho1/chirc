@@ -6,44 +6,46 @@
 #include <fcntl.h>
 //#include <sys/socket.h>
 #include <netdb.h>
-
-#define Xv(err,res,str)		(SS::x_void(err,res,str,(char *)__FILE__,__LINE__))
-#define X(err,res,str)		(SS::x_int(err,res,str,(char *)__FILE__,__LINE__))
-//#define MAX(a,b)			((a > b) ? a : b)
+#include <stack>
 
 class	Ircserv {
-  public:
-	int						port;
-	//char					*passwd;
+public:
+	int							port;
+	std::string			pass;
 
-	int						r;
-	int						irc_fd;
-	fd_set					fd_read;
-	fd_set					fd_write;
+	int							r;
+	int							ircFd;
+	fd_set					fdRead;
+	fd_set					fdWrite;
 
-	MessageManager			messenger;
+	MessageManager	messenger;
 
-	void	init_env();
-	void	get_opt(int ac, char **av);
-	void	srv_create(int port);
-	void	main_loop();
-	void	init_fd();
-	void	do_select();
-	void	check_fd();
+	void	getOpt(int ac, char **av);
+	void	srvCreate(int port);
+	void	mainLoop();
+	void	initFd();
+	void	doSelect();
+	void	checkFd();
+	void 	authenticate();
 };
 
 
-void	Ircserv::get_opt(int ac, char **av) {
-	//need to add passwd
-	if (ac != 2) {
-		std::cerr << stderr << "Usage: " << av[0] << " port" << std::endl;
-		exit(1);
+void	Ircserv::getOpt(int ac, char **av) {
+	switch (ac) {
+		case 3:
+			pass = av[2];
+			--ac;
+		case 2:
+			port = atoi(av[1]);
+			break;
+		default:
+			// std::cerr << stderr << "Usage: " << av[0] << " port" << std::endl;
+			std::cerr << "Usage: " << av[0] << " PORT(required) PASS(optional)" << std::endl;
+			exit(1);
 	}
-	port = atoi(av[1]);
-	//passwd = av[2];
 }
 
-void	Ircserv::srv_create(int port) {
+void	Ircserv::srvCreate(int port) {
 	int			s;
 	struct sockaddr_in	sin;
 	struct protoent	*pe;
@@ -61,81 +63,102 @@ void	Ircserv::srv_create(int port) {
 	X(-1, bind(s, (struct sockaddr*)&sin, sizeof(sin)), (char *)"bind");
 	X(-1, listen(s, 42), (char *)"listen");
 
-	irc_fd = s;
+	ircFd = s;
 }
 
-void	Ircserv::main_loop() {
+void	Ircserv::mainLoop() {
 	while (42) {
-		init_fd();
-		do_select();
-		check_fd();
+		initFd();
+		doSelect();
+		checkFd();
+		authenticate();
 	}
 }
 
-void	Ircserv::init_fd() {
-	FD_ZERO(&fd_read);
-	FD_ZERO(&fd_write);
+void	Ircserv::initFd() {
+	FD_ZERO(&fdRead);
+	FD_ZERO(&fdWrite);
 
 	//server
-	FD_SET(irc_fd, &fd_read);
+	FD_SET(ircFd, &fdRead);
 
 	//clients
 	std::map<int, User>::iterator uit;
 	for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
 
-		FD_SET(uit->first, &fd_read);
+		FD_SET(uit->first, &fdRead);
 
 		if (messenger.outMessages()[uit->first].length() > 0) {
-			FD_SET(uit->first, &fd_write);
+			FD_SET(uit->first, &fdWrite);
 		}
 	}
 }
 
-void	Ircserv::do_select() {
+void	Ircserv::doSelect() {
 	/*
 	struct timeval timeout;
 	timeout.tv_sec = 3;			//3 second timeout
 	timeout.tv_usec = 0;		//0 micro second timeout
 	*/
 
-	int		max = irc_fd;
+	int		max = ircFd;
 	if (!messenger.users().empty()) {
 		std::map<int, User>::reverse_iterator urit = messenger.users().rbegin();
 		max = urit->first;
 	}
 
-	r = select(max + 1, &fd_read, &fd_write, NULL, NULL); //&timeout); //NULL, 0
+	r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&timeout); //NULL, 0
 	//std::cout << "[select=" << e->r << "]" << std::endl;
 }
 
-void	Ircserv::check_fd() {
+void	Ircserv::checkFd() {
 
 	if (r <= 0) return;
 
 	//server
-	if (FD_ISSET(irc_fd, &fd_read)) {
-		messenger.srvAccept(irc_fd);
+	if (FD_ISSET(ircFd, &fdRead)) {
+		messenger.srvAccept(ircFd);
 		r--;
 	}
-	//else if (FD_ISSET(e->irc_fd, &e->fd_write))
+	//else if (FD_ISSET(e->ircFd, &e->fdWrite))
 		//server-to-server
 
 	//clients
-	std::map<int, User>::iterator uit;
-	for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
-		if (FD_ISSET(uit->first, &fd_read))
+	std::map<int, User>::iterator uit = messenger.users().begin();
+	for (; uit != messenger.users().end(); ++uit) {
+		if (FD_ISSET(uit->first, &fdRead))
 			messenger.clientRead(uit->first);
 
-		if (FD_ISSET(uit->first, &fd_write))
+		if (FD_ISSET(uit->first, &fdWrite))
 			messenger.clientWrite(uit->first);
 
-		if (FD_ISSET(uit->first, &fd_read) || FD_ISSET(uit->first, &fd_write))
+		if (FD_ISSET(uit->first, &fdRead) || FD_ISSET(uit->first, &fdWrite))
 			r--;
 		if (r == 0) break;
 	}
 }
 
+void Ircserv::authenticate() {
+	std::map<int, User>::iterator uit = messenger.authenticates().begin();
+	std::stack<User> passed;
+	for (; uit != messenger.authenticates().end(); ++uit) {
+		// need auth check logic
+		// If successful, it will be stacked in a container called [passed]
+/**/if (uit->first % 2 == 0) // test condition
+		passed.push(uit->second);
+	}
 
+	// go from reqAuthenticates_ to users_
+	// Because can not erase elements while iterating through the loop
+	while (passed.size()) {
+		User &user = passed.top();
+		messenger.users().insert(std::pair<int, User>(user.fd, user));
+		messenger.authenticates().erase(user.fd);
+		
+/**/std::cout << user.host << "[" << user.fd << "] transfered to users_ container\n"; // test code
 
+		passed.pop();
+	}
+}
 
 #endif
