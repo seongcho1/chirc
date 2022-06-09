@@ -3,6 +3,7 @@
 
 #include "StringUtils.hpp"
 #include "Models.hpp"
+#include "reply.hpp"
 //#include <stdio.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -33,6 +34,9 @@ private:
 	void	PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
 	void	PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
+	void	TESTMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
+
+
 	MessageManager(MessageManager const &) 						{}
 	MessageManager &operator=(MessageManager const &) { return *this; }
 

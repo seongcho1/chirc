@@ -3,6 +3,8 @@ SRCS =	main.cpp MessageManager.cpp \
 				Commands/Pass.cpp \
 				Commands/Nick.cpp \
 				Commands/Privmsg.cpp \
+				Commands/TESTMSG.cpp \
+				reply.cpp \
 
 OBJS = ${SRCS:.cpp=.o}
 
