@@ -50,16 +50,20 @@ void	MessageManager::reply(int cs, int code, std::string command, std::vector<st
 	std::vector<std::string>			sVec;
 	std::vector<std::string>			rVec;
 
-	sVec.push_back("<command>");	rVec.push_back(command);
-
 	switch (code) {
-		//case	ERR_NEEDMOREPARAMS:
-		//								SS::replaceString(msg, sVec, rVec );
-		//								break;
-		default:						SS::replaceString(msg, sVec, rVec );
-										break;
+
+		case	ERR_NOSUCHNICK			:	sVec.push_back("<nickname>");		rVec.push_back(paramsVec[0]);
+											break;	//401
+		case	ERR_CANNOTSENDTOCHAN	:	sVec.push_back("<channel name>");	rVec.push_back(paramsVec[0]);
+											break;	//404
+
+		case	ERR_NEEDMOREPARAMS		:	sVec.push_back("<command>");		rVec.push_back(command);
+											break;	//461
+
+		default	:						break;
 	}
 
+	SS::replaceString(msg, sVec, rVec);
 	msg = std::string("").append(msg).append(NEWLINE);
 	outMessages_[cs].append(msg);
 }
