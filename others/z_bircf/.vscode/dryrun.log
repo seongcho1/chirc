@@ -1,0 +1,5 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory `/Users/kyuhokim/Cadet/chirc/others/bircf'
+make: `bircf' is up to date.
+make: Leaving directory `/Users/kyuhokim/Cadet/chirc/others/bircf'
+ 
