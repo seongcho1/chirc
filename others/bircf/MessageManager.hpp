@@ -72,5 +72,3 @@ std::ostream& operator<<(std::ostream& out, const MessageManager& c) {
 	return out << "MessageManager (map size=" << c.size() << ")";
 }
 */
-
-#endif

@@ -209,13 +209,13 @@ int main(int ac, char **av)
                 }
                 else
                 {
-			int ret_recv = 1000;
-			while (ret_recv == 1000 || str[strlen(str) - 1] != '\n')
-			{
-				ret_recv = recv(fd, str + strlen(str), 1000, 0);
-				if (ret_recv <= 0)
-					break ;
-			}
+                    int ret_recv = 1000;
+                    while (ret_recv == 1000 || str[strlen(str) - 1] != '\n')
+                    {
+                        ret_recv = recv(fd, str + strlen(str), 1000, 0);
+                        if (ret_recv <= 0)
+                            break ;
+                    }
                     if (ret_recv <= 0)
                     {
                         bzero(&msg, sizeof(msg));

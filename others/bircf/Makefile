@@ -1,4 +1,3 @@
-
 SRCS =	main.cpp MessageManager.cpp \
 				Commands/Pass.cpp \
 				Commands/Nick.cpp \
