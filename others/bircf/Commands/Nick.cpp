@@ -8,11 +8,11 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
     return;
   }
 
-  if (AUTH_LEVEL1 <= anyUser(cs).authenticated) {
+  if (AUTH_LEVEL1 <= users_[cs].authenticated) {
     if (NICK_MAX_LENGTH < (*paramsVec.begin()).length())
       outMessages_[cs].append("** nickname having a maximum length of nine(9) characters **\n");
     else if (isUniqueNick(cs, *paramsVec.begin())) {
-      anyUser(cs).authenticated |= AUTH_LEVEL2;
+      users_[cs].authenticated |= AUTH_LEVEL2;
       outMessages_[cs].append("-- welcome [").append(*paramsVec.begin()).append("] --\n");
     }
     else
@@ -22,7 +22,7 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
 
 bool MessageManager::isUniqueNick(int cs, std::string &nick) {
   if (nickFdPair_.find(nick) == nickFdPair_.end()) {
-    User &user = anyUser(cs);
+    User &user = users_[cs];
     std::string current = user.nick;
     nickFdPair_[nick] = cs;
     user.nick = nick;

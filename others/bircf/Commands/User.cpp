@@ -7,12 +7,13 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
     return;
   }
 
-  if (reqAuthenticates_.find(cs) == reqAuthenticates_.end()) {
+  if (users_[cs].authenticated & AUTH_LEVEL3) {
+  // if (users_.find(cs) == users_.end()) {
     outMessages_[cs].append("** You may not reregister **\n");
     return;
   }
 
-  User &user = reqAuthenticates_[cs];
+  User &user = users_[cs];
   std::vector<std::string>::iterator it = paramsVec.begin();
   if (AUTH_LEVEL1 <= user.authenticated) {
     user.authenticated |= AUTH_LEVEL3;
