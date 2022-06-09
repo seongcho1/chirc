@@ -8,7 +8,7 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::strin
   }
 
   if (*paramsVec.begin() == pass) {
-    authenticates()[cs].authenticated = AUTH_LEVEL1;
+    authenticates()[cs].authenticated |= AUTH_LEVEL1;
     outMessages_[cs].append("-- welcome [SOMEBODY], setup nickname please --\n");
   }
   else

@@ -157,7 +157,7 @@ void Ircserv::authenticate() {
 		if (FD_ISSET(uit->first, &fdRead)) {
 			messenger.authRead(uit->first);
 
-			if (uit->second.authenticated == AUTH_LEVEL2)
+			if (uit->second.authenticated == AUTH_MASK)
 				passed.push(uit->second);
 		}
 
@@ -173,6 +173,7 @@ void Ircserv::authenticate() {
 		messenger.authenticates().erase(user.fd);
 		
 /**/std::cout << user.host << "[" << user.fd << "] transfered to users_ container\n"; // test code
+/**/std::cout << "user = [" << user.user << "], host = [" << user.host << "], real = [" << user.real << "]\n";
 
 		passed.pop();
 	}

@@ -18,8 +18,10 @@
 #define PING "PING "
 #define PONG ":FT_IRC"
 
-#define AUTH_LEVEL1 1
-#define AUTH_LEVEL2 2
+#define AUTH_LEVEL1 0x1
+#define AUTH_LEVEL2 0x2
+#define AUTH_LEVEL3 0x4
+#define AUTH_MASK   0x7
 
 
 #define Xv(err,res,str)		(SS::x_void(err,res,str,(char *)__FILE__,__LINE__))

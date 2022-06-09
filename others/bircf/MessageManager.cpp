@@ -3,6 +3,7 @@
 void MessageManager::registerFunctions() {
   functionCallMap_["PASS"] = &MessageManager::PASS;
   functionCallMap_["NICK"] = &MessageManager::NICK;
+  functionCallMap_["USER"] = &MessageManager::USER;
   functionCallMap_["PRIVMSG"] =	&MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =	&MessageManager::SELFMSG;
   functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
@@ -56,20 +57,6 @@ MessageManager::~MessageManager() {
 }
 
 void MessageManager::fdClean(int cs) {
-  // std::map<int, User>::iterator uit = users_.find(cs);
-  // if (uit != users_.end())
-  //   users_.erase(cs);
-
-  // delete from inMessages_
-  // std::map<int, std::string>::iterator cit = inMessages_.find(cs);
-  // if (cit != inMessages_.end())
-  //   inMessages_.erase(cs);
-
-  // // delete from outMessages_
-  // cit = outMessages_.find(cs);
-  // if (cit != outMessages_.end())
-  //   outMessages_.erase(cs);
-
   if (users_.find(cs) != users_.end())
     users_.erase(cs);
 
@@ -88,7 +75,7 @@ void MessageManager::executeMessages(int cs) {
   std::string message;
 
   while (messageVec.size()) {
-    message = messageVec.front();
+    message = messageVec.front();    
     executeMessage(cs, message);
     messageVec.erase(messageVec.begin()); // in case of vector
     // messageVec.pop(); 					//in case of queue
