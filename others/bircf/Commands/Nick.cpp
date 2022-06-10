@@ -2,6 +2,15 @@
 #include <sstream>
 
 void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+/*
+ERR_NONICKNAMEGIVEN
+ERR_ERRONEUSNICKNAME
+ERR_NICKNAMEINUSE
+//ERR_NICKCOLLISION not in the scope <-server to server
+ERR_UNAVAILRESOURCE
+ERR_RESTRICTED
+*/
+
   if (paramsVec.size() != 1 || !trailing.empty()) {
     // do something with errcode errcode:errstr map
     outMessages_[cs].append("** Usage: [NICK <nickname>] **\n");
