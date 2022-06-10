@@ -65,6 +65,9 @@ void	MessageManager::reply(int cs, int code, std::string command, std::vector<st
 		case	ERR_NEEDMOREPARAMS		:	sVec.push_back("<command>");		rVec.push_back(command);
 											break;	//461
 
+		case	ERR_ALREADYREGISTRED	:
+											break;	//462
+
 		default	:						break;
 	}
 

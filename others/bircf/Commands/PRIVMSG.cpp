@@ -1,10 +1,12 @@
 #include "../MessageManager.hpp"
+#include <cassert>
 
 void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 	if (paramsVec.size() != 1) {
 		reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec, trailing);
 		return;
 	}
+	assert(!paramsVec.empty());
 	if (trailing.length() == 0) {
 		reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec, trailing);
 		return;
