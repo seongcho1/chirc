@@ -15,7 +15,7 @@
 #define MESSAGE_PREFIX ":" // not allow blank
 #define TIMEOUT 300
 // #define WAIT_TIME 30
-#define WAIT_TIME 3
+#define WAIT_TIME 3000 //3
 #define PING "PING "
 #define PONG ":FT_IRC"
 
@@ -72,7 +72,7 @@ public:
   std::set<std::string> engaged;
 
   User() {}
-  User(int const &fd, std::string const &host, char auth) : 
+  User(int const &fd, std::string const &host, char auth) :
     fd(fd), host(host), authenticated(auth) {
     dead = time(NULL) + WAIT_TIME;
   }
@@ -89,7 +89,7 @@ public:
         BUF_SIZE < buffer.length() + r ||
         (r == BUF_SIZE && read[BUF_SIZE - 1] != '\n'))
       return false;
-    
+
     read[r] = 0;
     buffer.append(read);
     return true;

@@ -57,6 +57,11 @@ void	MessageManager::reply(int cs, int code, std::string command, std::vector<st
 		case	ERR_CANNOTSENDTOCHAN	:	sVec.push_back("<channel name>");	rVec.push_back(paramsVec[0]);
 											break;	//404
 
+		case	ERR_NORECIPIENT			:	sVec.push_back("<command>");		rVec.push_back(command);
+											break;	//411
+		case	ERR_NOTEXTTOSEND			:
+											break;	//412
+
 		case	ERR_NEEDMOREPARAMS		:	sVec.push_back("<command>");		rVec.push_back(command);
 											break;	//461
 
