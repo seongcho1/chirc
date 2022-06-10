@@ -70,14 +70,14 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.3.1
 
    Numeric Replies:
 
-           ERR_NORECIPIENT				:done
-					 ERR_NOTEXTTOSEND				:done
-           ERR_CANNOTSENDTOCHAN		:done
-					 ERR_NOTOPLEVEL					:not in the scope <-server to server
-           ERR_WILDTOPLEVEL				:not in the scope <-server to server
-					 ERR_TOOMANYTARGETS			:
-           ERR_NOSUCHNICK					:done
-           RPL_AWAY								:
+        ERR_NORECIPIENT                 :done
+        ERR_NOTEXTTOSEND                :done
+        ERR_CANNOTSENDTOCHAN            :
+        ERR_NOTOPLEVEL                  :not in the scope <-server to server
+        ERR_WILDTOPLEVEL                :not in the scope <-server to server
+        ERR_TOOMANYTARGETS              :
+        ERR_NOSUCHNICK                  :done
+        RPL_AWAY                        :
 
    Examples:
 
