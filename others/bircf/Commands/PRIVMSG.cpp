@@ -3,23 +3,23 @@
 
 void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 	if (paramsVec.size() != 1) {
-		reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec, trailing);
+		reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec, trailing); //411
 		return;
 	}
 	assert(!paramsVec.empty());
 	if (trailing.length() == 0) {
-		reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec, trailing);
+		reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec, trailing); //412
 		return;
 	}
 	std::string msgtarget = paramsVec[0];
 	if (msgtarget[0] != '#' &&
 		nickFdPair_.find(msgtarget) == nickFdPair_.end()) {
-		reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing);
+		reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
 		return;
 	}
 	if (msgtarget[0]  == '#' &&
 		( msgtarget.length() == 1 || channels_.find(msgtarget) == channels_.end()) ) {
-		reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec, trailing);
+		reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
 		return;
 	}
 
@@ -32,17 +32,23 @@ void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::st
 	//to user
 	if (msgtarget[0] != '#') {
 		recipient = nickFdPair_[msgtarget];
-		msg = std::string(":" + users_[cs].nick + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
+		msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
 		outMessages_[recipient].append(msg);
 	}
 	//to channel
 	else {
 		std::string title = channels_.find(msgtarget)->first;
 		Channel channel =  channels_[title];
-		std::set<int> recipients = channel.member;
-		for (std::set<int>::iterator it = recipients.begin(); it != recipients.end(); ++it) {
+		std::set<int> member = channel.member;
+		if (member.find(cs) == member.end()) {
+			reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec, trailing); //404
+			return;
+		}
+		for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
 			recipient = *it;
-			msg = std::string(":" + users_[cs].nick + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
+			if (recipient == cs)
+				continue;
+			msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
 			outMessages_[recipient].append(msg);
 		}
 	}
@@ -70,13 +76,13 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.3.1
 
    Numeric Replies:
 
-        ERR_NORECIPIENT                 :done
-        ERR_NOTEXTTOSEND                :done
-        ERR_CANNOTSENDTOCHAN            :
+        ERR_NORECIPIENT                 :411 done
+        ERR_NOTEXTTOSEND                :412 done
+        ERR_CANNOTSENDTOCHAN            :404 done
         ERR_NOTOPLEVEL                  :not in the scope <-server to server
         ERR_WILDTOPLEVEL                :not in the scope <-server to server
         ERR_TOOMANYTARGETS              :
-        ERR_NOSUCHNICK                  :done
+        ERR_NOSUCHNICK                  :401 done
         RPL_AWAY                        :
 
    Examples:

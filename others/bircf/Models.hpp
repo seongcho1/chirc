@@ -109,6 +109,13 @@ public:
   }
 
   bool isAuthenticated(void) { return authenticated == AUTH_MASK; }
+  std::string prefix(void) {
+    if (!isAuthenticated())
+      return std::string("");
+    else if (user.length() && host.length())
+	    return std::string(nick + "!" + user + "@" + host);
+    return nick;
+  }
 };
 
 #endif

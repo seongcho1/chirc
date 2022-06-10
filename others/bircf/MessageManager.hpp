@@ -71,6 +71,7 @@ public:
 	void											kickUser(int cs);
 	bool 											isUniqueNick(int cs, std::string &nick);
 	// User											&anyUser(int cs);
+  std::string               prefix(int cs) { return users_[cs].prefix(); }
 };
 
 /*
