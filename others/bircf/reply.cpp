@@ -52,37 +52,123 @@ void	MessageManager::reply(int cs, int code, std::string command, std::vector<st
 
 	switch (code) {
 
-		case	ERR_NOSUCHNICK				:	sVec.push_back("<nickname>");			rVec.push_back(paramsVec[0]);
-																	break;	//401
-		case	ERR_CANNOTSENDTOCHAN	:	sVec.push_back("<channel name>");	rVec.push_back(paramsVec[0]);
-																	break;	//404
-
-		case	ERR_NORECIPIENT				:	sVec.push_back("<command>");			rVec.push_back(command);
-																	break;	//411
-		case	ERR_NOTEXTTOSEND			:	break;	//412
-
-
-		case	ERR_NONICKNAMEGIVEN		:	break;	//431
-		case	ERR_ERRONEUSNICKNAME	:	sVec.push_back("<nick>");					rVec.push_back(paramsVec[0]);
-																	break;	//432
-		case	ERR_NICKNAMEINUSE			:	sVec.push_back("<nick>");					rVec.push_back(paramsVec[0]);
-																	break;	//433
-
-		//case	ERR_NICKCOLLISION		  :	break;	//436 not in the scope <-server to server
-
-		case	ERR_UNAVAILRESOURCE		:	sVec.push_back("<nick/channel>");	rVec.push_back(paramsVec[0]);
-																	break;	//437
 		//work start
 
 		//work end
 
+
+		//401		=	<nickname> :No such nick/channel
+		case	ERR_NOSUCHNICK				:	sVec.push_back("<nickname>");			rVec.push_back(paramsVec[0]);
+																	break;	//401
+		//402		=	<server name> :No such server
+		case	ERR_NOSUCHSERVER			:	sVec.push_back("<server name>");	rVec.push_back(paramsVec[0]);
+																	break;	//402
+		//403		=	<channel name> :No such channel
+		case	ERR_NOSUCHCHANNEL			:	sVec.push_back("<channel name>");	rVec.push_back(paramsVec[0]);
+																	break;	//403
+		//404		=	<channel name> :Cannot send to channel
+		case	ERR_CANNOTSENDTOCHAN	:	sVec.push_back("<channel name>");	rVec.push_back(paramsVec[0]);
+																	break;	//404
+		//405		=	<channel name> :You have joined too many channels
+		case	ERR_TOOMANYCHANNELS		:	sVec.push_back("<channel name>");	rVec.push_back(paramsVec[0]);
+																	break;	//405
+		//406		=	<nickname> :There was no such nickname
+		case	ERR_WASNOSUCHNICK			:	sVec.push_back("<nickname>");			rVec.push_back(paramsVec[0]);
+																	break;	//406
+		//407		=	<target> :<error code> recipients. <abort message>
+		case	ERR_TOOMANYTARGETS		:	//sVec.push_back("<target>");			rVec.push_back(users_[cs].nick);				???
+																	sVec.push_back("<error code>");		rVec.push_back(SS::toString(code));
+																	//sVec.push_back("<abort message>");rVec.push_back(trailing);							???
+																	break;	//407
+		//408		=	<service name> :No such service
+		case	ERR_NOSUCHSERVICE			:	//sVec.push_back("<service name>");	rVec.push_back(??);										???
+																	break;	//408
+		//409		=	:No origin specified
+		case	ERR_NOORIGIN					:	break;	//409
+
+
+
+		//411		=	:No recipient given (<command>)
+		case	ERR_NORECIPIENT				:	sVec.push_back("<command>");			rVec.push_back(command);
+																	break;	//411
+		//412		=	:No text to send
+		case	ERR_NOTEXTTOSEND			:	break;	//412
+		//413		=	<mask> :No toplevel domain specified
+		case	ERR_NOTOPLEVEL				:	//sVec.push_back("<mask>");						rVec.push_back(??);										???
+																	break;	//413
+		//414		=	<mask> :Wildcard in toplevel domain
+		case	ERR_WILDTOPLEVEL			:	//sVec.push_back("<mask>");						rVec.push_back(??);										???
+																	break;	//414
+		//415		=	<mask> :Bad Server/host mask
+		case	ERR_BADMASK						:	//sVec.push_back("<mask>");						rVec.push_back(??);										???
+																	break;	//415
+
+
+		//421		=	<command> :Unknown command
+		case	ERR_UNKNOWNCOMMAND		:	sVec.push_back("<command>");			rVec.push_back(paramsVec[0]);
+																	break;	//421
+		//422		=	:MOTD File is missing
+		case	ERR_NOMOTD						:	break;	//422
+		//423		=	<server> :No administrative info available
+		case	ERR_NOADMININFO				:	//sVec.push_back("<server>");					rVec.push_back(??);										???
+																	break;	//423
+		//424		=	:File error doing <file op> on <file>
+		case	ERR_FILEERROR					:	//sVec.push_back("<file op>");				rVec.push_back(??);										???
+																	//sVec.push_back("<file>");						rVec.push_back(??);										???
+																	break;	//424
+
+
+		//431		=	:No nickname given
+		case	ERR_NONICKNAMEGIVEN		:	break;	//431
+		//432		=	<nick> :Erroneous nickname
+		case	ERR_ERRONEUSNICKNAME	:	sVec.push_back("<nick>");					rVec.push_back(paramsVec[0]);
+																	break;	//432
+		//433		=	<nick> :Nickname is already in use
+		case	ERR_NICKNAMEINUSE			:	sVec.push_back("<nick>");					rVec.push_back(paramsVec[0]);
+																	break;	//433
+		//436		=	<nick> :Nickname collision KILL from <user>@<host>
+		//case	ERR_NICKCOLLISION		  :	break;	//436 not in the scope <-server to server
+		//437		=	<nick/channel> :Nick/channel is temporarily unavailable
+		case	ERR_UNAVAILRESOURCE		:	sVec.push_back("<nick/channel>");	rVec.push_back(paramsVec[0]);
+																	break;	//437
+
+
+		//441		=	<nick> <channel> :They are not on that channel
+		case	ERR_USERNOTINCHANNEL	:	//sVec.push_back("<nick>");					rVec.push_back(??);										???
+																	//sVec.push_back("<channel>");			rVec.push_back(??);										???
+																	break;	//441
+		//442		=	<channel> :You are not on that channel
+		case	ERR_NOTONCHANNEL			:	sVec.push_back("<channel>");			rVec.push_back(paramsVec[0]);
+																	break;	//442
+		//443		=	<user> <channel> :is already on channel
+		case	ERR_USERONCHANNEL			:	//sVec.push_back("<user>");						rVec.push_back(paramsVec[0]);					???
+																	//sVec.push_back("<channel>");				rVec.push_back(paramsVec[1]);					???
+																	break;	//443
+		//444		=	<user> :User not logged in
+		case	ERR_NOLOGIN						:	sVec.push_back("<user>");					rVec.push_back(paramsVec[0]);
+																	break;	//444
+		//445		=	:SUMMON has been disabled
+		case	ERR_SUMMONDISABLED		:	break;	//445
+		//446		=	:USERS has been disabled
+		case	ERR_USERSDISABLED			:	break;	//446
+
+
+		//451		=	:You have not registered
+		case	ERR_NOTREGISTERED			:	break;	//451
+
+
+		//461		=	<command> :Not enough parameters
 		case	ERR_NEEDMOREPARAMS		:	sVec.push_back("<command>");			rVec.push_back(command);
 																	break;	//461
-
+		//462		=	:Unauthorized command (already registered)
 		case	ERR_ALREADYREGISTRED	:	break;	//462
+		//463		=	:Your host is not among the privileged
 		case	ERR_NOPERMFORHOST			:	break;	//463
+		//464		=	:Password incorrect
 		case	ERR_PASSWDMISMATCH		:	break;	//464
+		//465		=	:You are banned from this server
 		case	ERR_YOUREBANNEDCREEP	:	break;	//465
+		//466		=	ERR_YOUWILLBEBANNED
 		case	ERR_YOUWILLBEBANNED		:	break;	//466
 		//467		=	<channel> :Channel key already set
 		case	ERR_KEYSET						:	sVec.push_back("<channel>");	rVec.push_back(paramsVec[0]);
@@ -93,8 +179,8 @@ void	MessageManager::reply(int cs, int code, std::string command, std::vector<st
 		case	ERR_CHANNELISFULL			:	sVec.push_back("<channel>");	rVec.push_back(paramsVec[0]);
 																	break;	//471
 		//472		=	<char> :is unknown mode char to me for <channel>
-		case	ERR_UNKNOWNMODE				:	//sVec.push_back("<char>");	rVec.push_back(??);
-																	//sVec.push_back("<channel>");	rVec.push_back(??);
+		case	ERR_UNKNOWNMODE				:	//sVec.push_back("<char>");			rVec.push_back(??);										???
+																	//sVec.push_back("<channel>");	rVec.push_back(??);										???
 																	break;	//472
 		//473		=	<channel> :Cannot join channel (+i)
 		case	ERR_INVITEONLYCHAN		:	sVec.push_back("<channel>");	rVec.push_back(paramsVec[0]);
@@ -119,7 +205,7 @@ void	MessageManager::reply(int cs, int code, std::string command, std::vector<st
 		//481		=	:Permission Denied- You are not an IRC operator
 		case	ERR_NOPRIVILEGES			:	break;	//481
 		//482		=	<channel> :You are not channel operator
-		case	ERR_CHANOPRIVSNEEDED	:	//sVec.push_back("<channel>");	rVec.push_back(??);
+		case	ERR_CHANOPRIVSNEEDED	:	//sVec.push_back("<channel>");	rVec.push_back(??);										???
 																	break;	//482
 		//483		=	:You can not kill a server!
 		case	ERR_CANTKILLSERVER		:	break;	//483
