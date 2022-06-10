@@ -86,14 +86,46 @@ int toUpperTest() {
 	return 0;
 }
 
+int	matchStringTest() {
+	std::string str = "baaabab";
+	//char str[] = "baaabab";
+	//char pattern[] = "*****ba*****ab";
+	// char pattern[] = "ba*****ab";
+	std::string pattern = "*ba*?*ab*";
+
+	// char pattern[] = "*ba*?*ab*";
+	// char pattern[] = "a*ab";
+	// char pattern[] = "a*****ab";
+	// char pattern[] = "*a*****ab";
+	// char pattern[] = "ba*ab****";
+	// char pattern[] = "****";
+	// char pattern[] = "*";
+	// char pattern[] = "aa?ab";
+	// char pattern[] = "b*b";
+	// char pattern[] = "a*a";
+	// char pattern[] = "baaabab";
+	// char pattern[] = "?baaabab";
+	// char pattern[] = "*baaaba*";
+
+	//if (strmatch(str, pattern, strlen(str), strlen(pattern)))
+	if (SS::matchString(str, pattern))
+			std::cout << "Yes" << std::endl;
+	else
+			std::cout << "No" << std::endl;
+
+	return 0;
+}
+
+
 int main() {
 
 	//MessageManager c;
 	//c.executeCommand("PRIVMSG");
 
 	//clientWriteTest();
-	splitSstringTest();
+	//splitSstringTest();
 	//toUpperTest();
+	matchStringTest();
 
-
+    return 0;
 }

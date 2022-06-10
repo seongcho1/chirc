@@ -16,7 +16,59 @@
 
 
 class SS {
-  public:
+public:
+
+	//whildcard *, ?
+	static bool matchString(const char* source, const char* pattern) {
+		// If we reach at the end of both strings, we are done
+		if (*pattern == '\0' && *source == '\0')
+				return true;
+
+		// Make sure to eliminate consecutive '*'
+		if (*pattern == '*') {
+				while (*(pattern + 1) == '*')
+						pattern++;
+		}
+
+		// Make sure that the characters after '*' are present
+		// in source string. This function assumes that the
+		// pattern string will not contain two consecutive '*'
+		if (*pattern == '*' && *(pattern + 1) != '\0' && *source == '\0')
+				return false;
+
+		// If the pattern string contains '?', or current
+		// characters of both strings match
+		if (*pattern == '?' || *pattern == *source)
+				return matchString(source + 1, pattern + 1);
+
+		// If there is *, then there are two possibilities
+		// a) We consider current character of source string
+		// b) We ignore current character of source string.
+		if (*pattern == '*')
+				return matchString(source, pattern + 1)
+							|| matchString(source + 1, pattern);
+		return false;
+	}
+
+	static bool matchString(std::string source, std::string pattern) {
+		return matchString(source.c_str(), pattern.c_str());
+	}
+
+	static void matchStringVector(std::vector<std::string> &sourceVec, std::string pattern) {
+		std::vector<std::string>::iterator it, temp;
+
+		it = sourceVec.begin();
+		while (it != sourceVec.end()) {
+			if (it->empty())
+				continue;
+			temp = it;
+			++it;
+
+			if (!matchString(*temp, pattern))
+				sourceVec.erase(temp);
+		}
+	}
+
 
 	//trim from left
 	static std::string& ltrim(std::string& s, const char* t = " \t") { //\n\r\f\v")

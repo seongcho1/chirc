@@ -94,14 +94,14 @@ void	MessageManager::reply(int cs, int code, std::string command, std::vector<st
 		//412		=	:No text to send
 		case	ERR_NOTEXTTOSEND			:	break;	//412
 		//413		=	<mask> :No toplevel domain specified
-		case	ERR_NOTOPLEVEL				:	//sVec.push_back("<mask>");						rVec.push_back(??);										???
-																	break;	//413
+		//case	ERR_NOTOPLEVEL				:	//sVec.push_back("<mask>");						rVec.push_back(??);
+		//															break;	//413 not in the scope <-server to server
 		//414		=	<mask> :Wildcard in toplevel domain
-		case	ERR_WILDTOPLEVEL			:	//sVec.push_back("<mask>");						rVec.push_back(??);										???
-																	break;	//414
+		//case	ERR_WILDTOPLEVEL			:	//sVec.push_back("<mask>");						rVec.push_back(??);
+		//															break;	//414 not in the scope <-server to server
 		//415		=	<mask> :Bad Server/host mask
-		case	ERR_BADMASK						:	//sVec.push_back("<mask>");						rVec.push_back(??);										???
-																	break;	//415
+		//case	ERR_BADMASK						:	//sVec.push_back("<mask>");						rVec.push_back(??);
+		//															break;	//415 not in the scope <-server to server
 
 
 		//421		=	<command> :Unknown command
