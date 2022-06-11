@@ -74,9 +74,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
   // then remove the first element and the rest should be args
   paramsVec.erase(paramsVec.begin());
 
-
   if (users_[cs].authenticated < AUTH_MASK) {
-    std::cout << (command.compare("PASS") != 0) << (command.compare("NICK") != 0) << (command.compare("USER") != 0) << std::endl;
 
     if (command.compare("PASS") != 0 &&
         command.compare("NICK") != 0 &&
