@@ -2,7 +2,7 @@ SRCS =	main.cpp MessageManager.cpp \
 				Commands/3.1ConnectionRegistration/PASS.cpp \
 				Commands/NICK.cpp \
 				Commands/USER.cpp \
-				Commands/PRIVMSG.cpp \
+				Commands/3.3SendingMessages/PRIVMSG.cpp \
 				Commands/TESTMSG.cpp \
 				Commands/PUBLICMSG.cpp \
 				Commands/SELFMSG.cpp \

@@ -4,8 +4,7 @@
 void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 
   if (paramsVec.size() != 1 || !trailing.empty()) {
-    // do something with errcode errcode:errstr map
-    outMessages_[cs].append("** Usage: [NICK <nickname>] **\n");
+    reply(cs, ERR_NONICKNAMEGIVEN, "NICK", paramsVec, trailing); //431
     return;
   }
 
@@ -46,12 +45,12 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.1.2
 
    Numeric Replies:
 
-           ERR_NONICKNAMEGIVEN
-           ERR_ERRONEUSNICKNAME
-           ERR_NICKNAMEINUSE
-           ERR_NICKCOLLISION
-           ERR_UNAVAILRESOURCE
-           ERR_RESTRICTED
+           ERR_NONICKNAMEGIVEN                :431 done
+           ERR_ERRONEUSNICKNAME               :432
+           ERR_NICKNAMEINUSE                  :433
+           ERR_NICKCOLLISION                  :436 not in the scope <-server to server
+           ERR_UNAVAILRESOURCE                :437
+           ERR_RESTRICTED                     :484 when user mode "+r"
 
    Examples:
 

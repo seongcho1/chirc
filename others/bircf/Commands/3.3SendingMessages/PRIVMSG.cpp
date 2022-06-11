@@ -1,4 +1,4 @@
-#include "../MessageManager.hpp"
+#include "../../MessageManager.hpp"
 #include <cassert>
 
 void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
