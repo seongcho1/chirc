@@ -108,6 +108,11 @@ void MessageManager::executeMessage(int cs, std::string message) {
   std::map<std::string, FuncPtr>::iterator it = functionCallMap_.find(command);
   if (it != functionCallMap_.end())
     (this->*functionCallMap_[command])(cs, paramsVec, trailing);
+  else {
+    paramsVec.insert(paramsVec.begin(), command);
+    reply(cs, ERR_UNKNOWNCOMMAND, "executeMessage", paramsVec, trailing); //421
+  }
+
 }
 
 void MessageManager::srvAccept(int s) {
