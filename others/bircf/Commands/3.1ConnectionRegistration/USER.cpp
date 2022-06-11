@@ -3,14 +3,14 @@
 
 void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 
-  if (paramsVec.size() != 4 || !trailing.empty()) {
-    reply(cs, ERR_NEEDMOREPARAMS, "USER", paramsVec, trailing); //461
-    outMessages_[cs].append("** Usage: [USER <user_name> <host> <not use> <real_name>] **\n");
+  if (users_[cs].authenticated & AUTH_LEVEL3) {
+    reply(cs, ERR_ALREADYREGISTRED, "USER", paramsVec, trailing); //462
     return;
   }
 
-  if (users_[cs].authenticated & AUTH_LEVEL3) {
-    reply(cs, ERR_ALREADYREGISTRED, "USER", paramsVec, trailing); //462
+  if (paramsVec.size() != 4 || !trailing.empty()) {
+    reply(cs, ERR_NEEDMOREPARAMS, "USER", paramsVec, trailing); //461
+    outMessages_[cs].append("** Usage: [USER <user_name> <host> <not use> <real_name>] **\n");
     return;
   }
 

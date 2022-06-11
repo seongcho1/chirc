@@ -3,13 +3,13 @@
 
 void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 
-  if (paramsVec.size() != 1 || !trailing.empty()) {
-    reply(cs, ERR_NONICKNAMEGIVEN, "NICK", paramsVec, trailing); //431
+  if (users_[cs].authenticated < AUTH_LEVEL1) {
+    reply(cs, ERR_RESTRICTED, "NICK", paramsVec, trailing); //484
     return;
   }
 
-  if (users_[cs].authenticated < AUTH_LEVEL1) {
-    reply(cs, ERR_RESTRICTED, "NICK", paramsVec, trailing); //484
+  if (paramsVec.size() != 1 || !trailing.empty()) {
+    reply(cs, ERR_NONICKNAMEGIVEN, "NICK", paramsVec, trailing); //431
     return;
   }
 
