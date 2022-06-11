@@ -21,7 +21,9 @@ int    MessageManager::initReplies(std::string configFile) {
     std::string value;
 
     std::vector<std::string> valueVec = SS::splitString(valueLine, "=", false, false, true);
-    if (valueVec.size() != 2)
+
+    if ( (valueVec.size() != 2)  ||
+         (valueVec[0].empty() && valueVec[1].empty()) )
       continue;
 
     key = SS::trim(valueVec[0]);

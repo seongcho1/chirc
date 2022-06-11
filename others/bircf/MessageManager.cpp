@@ -75,8 +75,12 @@ void MessageManager::executeMessage(int cs, std::string message) {
        (command_params_trailing[0].empty() && command_params_trailing[1].empty()) )
     return;
 
+  command_params = command_params_trailing[0];
+  trailing = command_params_trailing[1];
+
   std::string command;
   std::vector<std::string> paramsVec = SS::splitString(command_params, SPACE);
+
   if (paramsVec.empty())
     return;
   // get the commandName which is the first element in the argsVec
@@ -133,7 +137,7 @@ void MessageManager::clientRead(int cs) {
 }
 
 void MessageManager::kickUser(int cs) {
-    fdClean(cs); // del User *, inMessages_, out_commands
-    close(cs);    // cleaning the table first, and then the table will be ready for another client
-std::cout << "client #" << cs << " gone away" << std::endl;
+  fdClean(cs); // del User *, inMessages_, out_commands
+  close(cs);    // cleaning the table first, and then the table will be ready for another client
+  std::cout << "client #" << cs << " gone away" << std::endl;
 }
