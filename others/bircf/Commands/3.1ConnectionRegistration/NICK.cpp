@@ -1,5 +1,4 @@
 #include "../../MessageManager.hpp"
-#include <sstream>
 
 void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 
@@ -26,17 +25,26 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
   //  return;
   // }
 
-  if (nickFdPair_.find(nick) != nickFdPair_.end()) {
-    reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec, trailing); //433
-    return;
-  }
-
   if (isUniqueNick(cs, nick)) {
     users_[cs].authenticated |= AUTH_LEVEL2;
     // welcome msg after pass + nick + user
     if (users_[cs].authenticated == AUTH_MASK)
       reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
   }
+  else {
+    reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec, trailing); //433
+  }
+
+  // if (nickFdPair_.find(nick) != nickFdPair_.end()) {
+  //   reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec, trailing); //433
+  //   return;
+  // }
+
+  // if (isUniqueNick(cs, nick)) {
+  //   users_[cs].authenticated |= AUTH_LEVEL2;
+  //   //welcome msg after nick + user??
+  //   reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
+  // }
 }
 
 bool MessageManager::isUniqueNick(int cs, std::string &nick) {

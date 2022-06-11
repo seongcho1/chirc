@@ -32,6 +32,17 @@ private:
   void  PASS(int cs, std::vector<std::string> paramsVec, std::string);
   void  NICK(int cs, std::vector<std::string> paramsVec, std::string);
   void  USER(int cs, std::vector<std::string> paramsVec, std::string);
+
+  void  QUIT(int cs, std::vector<std::string>, std::string);
+  void  JOIN(int cs, std::vector<std::string> paramsVec, std::string);
+  void  PART(int cs, std::vector<std::string> paramsVec, std::string);
+  void  LIST(int cs, std::vector<std::string> paramsVec, std::string);
+  void  NAMES(int cs, std::vector<std::string> paramsVec, std::string);
+  void  KICK(int cs, std::vector<std::string> paramsVec, std::string);
+  void  MODE(int cs, std::vector<std::string> paramsVec, std::string);
+  void  INVITE(int cs, std::vector<std::string> paramsVec, std::string);
+  void  TOPIC(int cs, std::vector<std::string> paramsVec, std::string);
+
   void  PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
   void  SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
