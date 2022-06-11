@@ -5,11 +5,11 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PASS"] = &MessageManager::PASS;
   functionCallMap_["NICK"] = &MessageManager::NICK;
   functionCallMap_["USER"] = &MessageManager::USER;
-  
+
   functionCallMap_["QUIT"] = &MessageManager::QUIT;
   functionCallMap_["JOIN"] = &MessageManager::JOIN;
   functionCallMap_["PART"] = &MessageManager::PART;
-  
+
   functionCallMap_["PRIVMSG"] =	&MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =	&MessageManager::SELFMSG;
   functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
@@ -58,25 +58,22 @@ std::vector<std::string> MessageManager::splitMessages(int cs, bool bSkipLast, b
 }
 
 void MessageManager::executeMessage(int cs, std::string message) {
+
+  //For a client, the only valid prefix is the registered nickname associated with the client.
+  //If the case, delete the prefix to make it easy to split
+  if (users_[cs].authenticated == AUTH_MASK &&
+      !message.empty() && message[0] == ':') {
+    SS::ltrim(message, std::string(":" + users_[cs].nick + " ").c_str());
+    SS::trim(message);
+  }
+
   std::string command_params, trailing;
   std::vector<std::string> command_params_trailing = SS::splitString(message, SPACE_COLON, false, false, true);
 
-  if (command_params_trailing.empty())
+  //now SS::splitString(message, SPACE_COLON, false, false, true) always returns two (empty) elements
+  if ( (command_params_trailing.size() != 2)  ||
+       (command_params_trailing[0].empty() && command_params_trailing[1].empty()) )
     return;
-  switch (command_params_trailing.size())
-  {
-  case 1:
-    command_params = command_params_trailing[0];
-    trailing = "";
-    break;
-  case 2:
-    command_params = command_params_trailing[0];
-    trailing = command_params_trailing[1];
-    break;
-  default:
-    return;
-    break;
-  }
 
   std::string command;
   std::vector<std::string> paramsVec = SS::splitString(command_params, SPACE);
@@ -87,27 +84,23 @@ void MessageManager::executeMessage(int cs, std::string message) {
   // then remove the first element and the rest should be args
   paramsVec.erase(paramsVec.begin());
 
+  //if not registered yet, only three following commands are usable
   if (users_[cs].authenticated < AUTH_MASK) {
-
     if (command.compare("PASS") != 0 &&
         command.compare("NICK") != 0 &&
         command.compare("USER") != 0) {
-
       reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec, trailing); //451
       return;
     }
   }
 
-  // change this pattern tcsin_leno using a map<commandName, commandFunc>
-  // execute commandMap[command](cs, command)
-  /*
-  if (commandName.compare("PRIVMSG") == 0)
-    PRIVMSG(cs, command);
-  else if (commandName.compare("SELFMSG") == 0)
-    SELFMSG(cs, command);
-  else if (commandName.compare("PUBLICMSG") == 0)
-    PUBLICMSG(cs, command);
-  */
+  //the command parameters (maximum of fifteen including trailing)
+  if ( (paramsVec.size() > 15 && trailing.empty()) ||
+       (paramsVec.size() > 14 && !trailing.empty()) ) {
+    reply(cs, ERR_NEEDMOREPARAMS, "executeMessage", paramsVec, trailing); //461 too many parameters
+    return;
+  }
+
   std::map<std::string, FuncPtr>::iterator it = functionCallMap_.find(command);
   if (it != functionCallMap_.end())
     (this->*functionCallMap_[command])(cs, paramsVec, trailing);

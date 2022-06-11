@@ -51,8 +51,8 @@ int splitSstringTest() {
 
   int i;
   std::string a1 = "\n\n\naaa\nbbb\nccc\nddd";
-  std::string a2 = "aaaaa   bbbb :5 z     2 :1    a b c   e";
-
+  std::string a2 = "";
+/*
   std::vector<std::string> avec1 = SS::splitString(a1, NEWLINE, true, true);
 
   std::cout << "vec size=" << avec1.size() << std::endl;
@@ -63,8 +63,8 @@ int splitSstringTest() {
   }
   std::cout << std::endl << "a1=(" << a1 << ")" << std::endl;
 
-
-  std::vector<std::string> avec2 = SS::splitString(a2, SPACE_COLON, false, true, false);
+*/
+  std::vector<std::string> avec2 = SS::splitString(a2, SPACE_COLON, false, false, true);
 
   std::cout << "vec size=" << avec2.size() << std::endl;
   i = 0;
@@ -116,6 +116,19 @@ int	matchStringTest() {
   return 0;
 }
 
+int trimStringTest() {
+
+  //std::string source = ":hello privmsg bbb :hello";
+  std::string source = "privmsg bbb :hello";
+
+  SS::ltrim(source, std::string(":hello ").c_str());
+
+  std::cout << source << std::endl;
+
+
+
+  return 0;
+}
 
 int main() {
 
@@ -123,9 +136,10 @@ int main() {
   //c.executeCommand("PRIVMSG");
 
   //clientWriteTest();
-  //splitSstringTest();
+  splitSstringTest();
   //toUpperTest();
-  matchStringTest();
+  //matchStringTest();
+  //trimStringTest();
 
-    return 0;
+  return 0;
 }

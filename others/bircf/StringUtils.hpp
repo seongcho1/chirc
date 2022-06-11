@@ -54,7 +54,7 @@ public:
     return matchString(source.c_str(), pattern.c_str());
   }
 
-  static void matchStringVector(std::vector<std::string> &sourceVec, std::string pattern) {
+  static std::vector<std::string>& matchStringVector(std::vector<std::string>& sourceVec, std::string pattern) {
     std::vector<std::string>::iterator it, temp;
 
     it = sourceVec.begin();
@@ -67,6 +67,7 @@ public:
       if (!matchString(*temp, pattern))
         sourceVec.erase(temp);
     }
+    return sourceVec;
   }
 
 
@@ -87,7 +88,7 @@ public:
     return ltrim(rtrim(s, t), t);
   }
 
-  static std::string replaceString1(std::string subject, const std::string& search, const std::string& replace) {
+  static std::string& replaceString(std::string& subject, const std::string& search, const std::string& replace) {
     size_t pos = 0;
     while((pos = subject.find(search, pos)) != std::string::npos) {
       subject.replace(pos, search.length(), replace);
@@ -96,22 +97,15 @@ public:
     return subject;
   }
 
-  static void replaceString2(std::string& subject, const std::string& search, const std::string& replace) {
-    size_t pos = 0;
-    while((pos = subject.find(search, pos)) != std::string::npos) {
-      subject.replace(pos, search.length(), replace);
-      pos += replace.length();
-    }
-  }
-
-  static void replaceString(std::string& subject, std::vector<std::string> const &searchVec, std::vector<std::string> const &replaceVec) {
+  static std::string& replaceString(std::string& subject, std::vector<std::string> const &searchVec, std::vector<std::string> const &replaceVec) {
     if (searchVec.size() != replaceVec.size())
-      return;
+      return subject;
     size_t  i = 0;
     while (i < searchVec.size()) {
-      replaceString2(subject, searchVec[i], replaceVec[i]);
+      replaceString(subject, searchVec[i], replaceVec[i]);
       i++;
     }
+    return subject;
   }
 
 
@@ -160,19 +154,18 @@ public:
   static std::vector<std::string>  splitString(std::string &s, std::string delimiter,
                                               bool bSkipLast = false,
                                               bool bClearProcessedString = false,
-                                              bool bCutOnce = false) {
+                                              bool bCutOnceMakeTwo = false) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     std::string token;
     std::vector<std::string> result;
     int i = 0;
-    if (s.empty())
+    if (s.empty() && !bCutOnceMakeTwo)
       return result;
 
     while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
       token = s.substr(pos_start, pos_end - pos_start); //+ delimiter.length());
-      //std::cout << "end=" << pos_end << "[" << token << "]->" << std::endl;
-      if ( (bCutOnce && i == 0 && token.empty()) ||
-        (!token.empty()) ) {
+      if ( (bCutOnceMakeTwo && i == 0 && token.empty()) ||
+           (!token.empty()) ) {
         result.push_back(token);  //in case of vector
         i++;
       }
@@ -183,7 +176,7 @@ public:
       }
 
       pos_start = pos_end + delim_len;
-      if (bCutOnce)
+      if (bCutOnceMakeTwo)
         break;
     }
 
@@ -196,7 +189,13 @@ public:
           s.clear();
       }
     }
-    //std::cout << std::endl;
+
+    //if bCutOnceMakeTwo is true, the result always have two (empty) elements
+    if (bCutOnceMakeTwo && result.size() == 0)
+      result.push_back(std::string());
+    if (bCutOnceMakeTwo && result.size() == 1)
+      result.push_back(std::string());
+
     return result;
   }
 
