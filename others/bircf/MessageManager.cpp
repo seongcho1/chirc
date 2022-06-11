@@ -5,6 +5,11 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PASS"] = &MessageManager::PASS;
   functionCallMap_["NICK"] = &MessageManager::NICK;
   functionCallMap_["USER"] = &MessageManager::USER;
+  
+  functionCallMap_["QUIT"] = &MessageManager::QUIT;
+  functionCallMap_["JOIN"] = &MessageManager::JOIN;
+  functionCallMap_["PART"] = &MessageManager::PART;
+  
   functionCallMap_["PRIVMSG"] =	&MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =	&MessageManager::SELFMSG;
   functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
@@ -18,8 +23,16 @@ MessageManager::~MessageManager() {
 }
 
 void MessageManager::fdClean(int cs) {
-  if (users_.find(cs) != users_.end())
+  if (users_.find(cs) != users_.end()) {
+    PART(cs, std::vector<std::string>(users_[cs].engaged.begin(), users_[cs].engaged.end()), "");
+    // std::set<std::string>::iterator it = users_[cs].engaged.begin();
+    // while (it != users_[cs].engaged.end()) {
+    //   PART(cs, std::vector<std::string>(users_[cs].engaged.begin(), users_[cs].engaged.end()), "");
+    //   channels_[*it++].leave(cs);
+    // }
+    nickFdPair_.erase(users_[cs].nick);
     users_.erase(cs);
+  }
 
   if (inMessages_.find(cs) != inMessages_.end())
     inMessages_.erase(cs);

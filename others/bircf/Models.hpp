@@ -55,7 +55,7 @@ public:
 
   Channel() {}
   Channel(std::string &title) : title(title)  {}
-  bool Leave(int fd)                          { return member.erase(fd); }
+  bool leave(int fd)                          { return member.erase(fd); }
 };
 
 class User {
@@ -78,7 +78,7 @@ public:
   }
   bool isAlive(void)                { return time(NULL) < alive; }
   bool isDead(void)                 { return dead < time(NULL); }
-  void toDead(void)                 { dead = 0; }
+  void toDead(void)                 { dead = 1; }
   void keepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
   bool clientRead(std::string &buffer)    {
