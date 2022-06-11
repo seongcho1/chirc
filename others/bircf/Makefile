@@ -3,6 +3,7 @@ SRCS =	main.cpp MessageManager.cpp \
 				Commands/3.1ConnectionRegistration/NICK.cpp \
 				Commands/3.1ConnectionRegistration/USER.cpp \
 				Commands/3.1ConnectionRegistration/QUIT.cpp \
+				Commands/3.1ConnectionRegistration/PONG.cpp \
 				Commands/3.2Channel/JOIN.cpp \
 				Commands/3.2Channel/PART.cpp \
 				Commands/3.3SendingMessages/PRIVMSG.cpp \

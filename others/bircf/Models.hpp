@@ -2,6 +2,7 @@
 #define __MODELS_H__
 
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <iostream>
 #include <cstring>
 #include <set>
@@ -13,11 +14,12 @@
 #define CHANNEL_PREFIX "#&+!" // [&] is local channel, [+] not support channel modes, [!] identified as the "channel creator",
 #define CHANNEL_NOT_ALLOW "^G ," // ^G is ascii(7), blank, comma
 #define MESSAGE_PREFIX ":" // not allow blank
+// #define TIMEOUT 300
 #define TIMEOUT 300
 // #define WAIT_TIME 30
-#define WAIT_TIME 3000 //3
-#define PING "PING "
-#define PONG ":FT_IRC"
+#define WAIT_TIME 30
+#define PING_REQUEST "PING :"
+#define PONG_RESULT "FT_IRC"
 
 #define AUTH_LEVEL1 0x1 // pass
 #define AUTH_LEVEL2 0x2 // nick
@@ -67,18 +69,22 @@ public:
   std::string host;
   char authenticated;
   bool waitPong;
+  bool quit;
   time_t dead;
   time_t alive;
   std::set<std::string> engaged;
 
   User() {}
   User(int const &fd, std::string const &host, char auth) :
-    fd(fd), host(host), authenticated(auth) {
-    dead = time(NULL) + WAIT_TIME;
-  }
+    fd(fd),
+    host(host),
+    authenticated(auth),
+    quit(false),
+    dead(time(NULL) + WAIT_TIME),
+    alive(time(NULL) + TIMEOUT) {}
   bool isAlive(void)                { return time(NULL) < alive; }
   bool isDead(void)                 { return dead < time(NULL); }
-  void toDead(void)                 { dead = 1; }
+  void toQuit(void)                 { quit = true; }
   void keepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
   bool clientRead(std::string &buffer)    {

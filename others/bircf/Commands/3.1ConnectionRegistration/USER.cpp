@@ -26,6 +26,7 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
     user.real = *it;
     //welcome msg after nick + user??
     reply(cs, RPL_WELCOME, "USER", paramsVec, trailing); //001
+    ping(cs);
     //outMessages_[cs].append("-- welcome Sir-[").append(user.real).append("]. --\n");
   }
 }

@@ -32,6 +32,7 @@ private:
   void  PASS(int cs, std::vector<std::string> paramsVec, std::string);
   void  NICK(int cs, std::vector<std::string> paramsVec, std::string);
   void  USER(int cs, std::vector<std::string> paramsVec, std::string);
+  void  PONG(int cs, std::vector<std::string>, std::string trailing);
 
   void  QUIT(int cs, std::vector<std::string>, std::string);
   void  JOIN(int cs, std::vector<std::string> paramsVec, std::string);
@@ -79,6 +80,7 @@ public:
   void                        clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
   void                        kickUser(int cs);
   bool                        isUniqueNick(int cs, std::string &nick);
+  void                        ping(int cs);
   // User                     &anyUser(int cs);
   std::string                 prefix(int cs) { return users_[cs].prefix(); }
 };
