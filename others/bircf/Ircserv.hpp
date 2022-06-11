@@ -1,5 +1,5 @@
-#ifndef __IRCSERV_HPP__
-#define __IRCSERV_HPP__
+#ifndef __IRCSERV_H__
+#define __IRCSERV_H__
 
 #include "MessageManager.hpp"
 #include <sys/select.h>
@@ -7,144 +7,144 @@
 #include <netdb.h>
 #include <stack>
 
-class	Ircserv {
+class Ircserv {
 public:
-	int							port;
-	int							r;
-	int							ircFd;
-	fd_set					fdRead;
-	fd_set					fdWrite;
+  int              port;
+  int              r;
+  int              ircFd;
+  fd_set           fdRead;
+  fd_set           fdWrite;
 
-	MessageManager	messenger;
-	std::stack<User> timeout;
-	// std::stack<User> passed;
+  MessageManager    messenger;
+  std::stack<User>  timeout;
+  //std::stack<User>  passed;
 
-	void	getOpt(int ac, char **av);
-	void	srvCreate(int port);
-	void	mainLoop();
-	void	initFd();
-	void	doSelect();
-	void	checkFd();
-	void	disposeCorpse();
+  void              getOpt(int ac, char **av);
+  void              srvCreate(int port);
+  void              mainLoop();
+  void              initFd();
+  void              doSelect();
+  void              checkFd();
+  void              disposeCorpse();
 };
 
 
-void	Ircserv::getOpt(int ac, char **av) {
-	switch (ac) {
-		case 3:
-			messenger.pass = av[2];
-			--ac;
-		case 2:
-			port = atoi(av[1]);
-			break;
-		default:
-			std::cerr << "Usage: " << av[0] << " PORT(required) PASS(optional)" << std::endl;
-			exit(1);
-	}
+void  Ircserv::getOpt(int ac, char **av) {
+  switch (ac) {
+    case 3:
+      messenger.pass = av[2];
+      --ac;
+    case 2:
+      port = atoi(av[1]);
+      break;
+    default:
+      std::cerr << "Usage: " << av[0] << " PORT(required) PASS(optional)" << std::endl;
+      exit(1);
+  }
 }
 
 void	Ircserv::srvCreate(int port) {
-	int			s;
-	struct sockaddr_in	sin;
-	struct protoent	*pe;
-	int yes = 1;
+  int                 s;
+  struct sockaddr_in  sin;
+  struct protoent     *pe;
+  int                 yes = 1;
 
-	pe = (struct protoent*)Xv(NULL, getprotobyname("tcp"), (char *)"getprotobyname");
-	s = X(-1, socket(PF_INET, SOCK_STREAM, pe->p_proto), (char *)"socket");
+  pe = (struct protoent*)Xv(NULL, getprotobyname("tcp"), (char *)"getprotobyname");
+  s = X(-1, socket(PF_INET, SOCK_STREAM, pe->p_proto), (char *)"socket");
 
-	X(-1, setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)), (char *)"setsockopt");
-	X(-1, fcntl(s, F_SETFL, O_NONBLOCK), (char *)"fcntl");
+  X(-1, setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)), (char *)"setsockopt");
+  X(-1, fcntl(s, F_SETFL, O_NONBLOCK), (char *)"fcntl");
 
-	sin.sin_family = AF_INET;
-	sin.sin_addr.s_addr = INADDR_ANY;
-	sin.sin_port = htons(port);
-	X(-1, bind(s, (struct sockaddr*)&sin, sizeof(sin)), (char *)"bind");
-	X(-1, listen(s, 42), (char *)"listen");
+  sin.sin_family = AF_INET;
+  sin.sin_addr.s_addr = INADDR_ANY;
+  sin.sin_port = htons(port);
+  X(-1, bind(s, (struct sockaddr*)&sin, sizeof(sin)), (char *)"bind");
+  X(-1, listen(s, 42), (char *)"listen");
 
-	ircFd = s;
+  ircFd = s;
 }
 
 void	Ircserv::mainLoop() {
-	while (42) {
-		initFd();
-		doSelect();
-		checkFd();
-		disposeCorpse();
-	}
+  while (42) {
+    initFd();
+    doSelect();
+    checkFd();
+    disposeCorpse();
+  }
 }
 
 void	Ircserv::initFd() {
-	FD_ZERO(&fdRead);
-	FD_ZERO(&fdWrite);
+  FD_ZERO(&fdRead);
+  FD_ZERO(&fdWrite);
 
-	//server
-	FD_SET(ircFd, &fdRead);
+  //server
+  FD_SET(ircFd, &fdRead);
 
-	//clients
-	std::map<int, User>::iterator uit;
-	for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
-		FD_SET(uit->first, &fdRead);
+  //clients
+  std::map<int, User>::iterator uit;
+  for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
+    FD_SET(uit->first, &fdRead);
 
-		if (messenger.outMessages()[uit->first].length() > 0) {
-			FD_SET(uit->first, &fdWrite);
-		}
-	}
+    if (messenger.outMessages()[uit->first].length() > 0) {
+      FD_SET(uit->first, &fdWrite);
+    }
+  }
 }
 
 void	Ircserv::doSelect() {
-	// struct timeval timeout;
-	// timeout.tv_sec = 0;			//3 second timeout
-	// timeout.tv_usec = 100;		//0 micro second timeout
+  // struct timeval timeout;
+  // timeout.tv_sec = 0;			//3 second timeout
+  // timeout.tv_usec = 100;		//0 micro second timeout
 
-	int		max = ircFd;
-	if (!messenger.users().empty()) {
-		std::map<int, User>::reverse_iterator urit = messenger.users().rbegin();
-		max = urit->first;
-	}
+  int		max = ircFd;
+  if (!messenger.users().empty()) {
+    std::map<int, User>::reverse_iterator urit = messenger.users().rbegin();
+    max = urit->first;
+  }
 
-	r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&timeout); //NULL, 0
-	// std::cout << "[select=" << e->r << "]" << std::endl;
+  r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&timeout); //NULL, 0
+  // std::cout << "[select=" << e->r << "]" << std::endl;
 }
 
 void	Ircserv::checkFd() {
-	if (r <= 0) return;
+  if (r <= 0) return;
 
-	//server
-	if (FD_ISSET(ircFd, &fdRead)) {
-		messenger.srvAccept(ircFd);
-		r--;
-	}
-	//else if (FD_ISSET(e->ircFd, &e->fdWrite))
-		//server-to-server
+  //server
+  if (FD_ISSET(ircFd, &fdRead)) {
+    messenger.srvAccept(ircFd);
+    r--;
+  }
+  //else if (FD_ISSET(e->ircFd, &e->fdWrite))
+    //server-to-server
 
-	//clients
-	std::map<int, User>::iterator uit = messenger.users().begin();
-	time_t now = time(NULL);
-	for (; uit != messenger.users().end(); ++uit) {
-		if (uit->second.dead < now) {
-			timeout.push(uit->second);
-			continue;
-		}
+  //clients
+  std::map<int, User>::iterator uit = messenger.users().begin();
+  time_t now = time(NULL);
+  for (; uit != messenger.users().end(); ++uit) {
+    if (uit->second.dead < now) {
+      timeout.push(uit->second);
+      continue;
+    }
 
-		if (FD_ISSET(uit->first, &fdRead))
-			messenger.clientRead(uit->first);
+    if (FD_ISSET(uit->first, &fdRead))
+      messenger.clientRead(uit->first);
 
-		if (FD_ISSET(uit->first, &fdWrite))
-			messenger.clientWrite(uit->first);
+    if (FD_ISSET(uit->first, &fdWrite))
+      messenger.clientWrite(uit->first);
 
-		if (FD_ISSET(uit->first, &fdRead) || FD_ISSET(uit->first, &fdWrite))
-			r--;
-		if (r == 0) break;
-	}
+    if (FD_ISSET(uit->first, &fdRead) || FD_ISSET(uit->first, &fdWrite))
+      r--;
+    if (r == 0) break;
+  }
 }
 
 void Ircserv::disposeCorpse() {
-	while (timeout.size()) {
-		messenger.outMessages()[timeout.top().fd].append("timeout\n");
-		messenger.clientWrite(timeout.top().fd);
-		messenger.kickUser(timeout.top().fd);
-		timeout.pop();
-	}
+  while (timeout.size()) {
+    messenger.outMessages()[timeout.top().fd].append("timeout\n");
+    messenger.clientWrite(timeout.top().fd);
+    messenger.kickUser(timeout.top().fd);
+    timeout.pop();
+  }
 }
 
 #endif
