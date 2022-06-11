@@ -11,7 +11,6 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::strin
     reply(cs, ERR_ALREADYREGISTRED, "PASS", paramsVec, trailing); //462
     return;
   }
-    return;
 
   if (*paramsVec.begin() == pass) {
     users_[cs].authenticated |= AUTH_LEVEL1;
