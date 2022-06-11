@@ -11,7 +11,7 @@
 class Ircserv {
 public:
   int              port;
-  int              r;
+  // int              r;
   int              ircFd;
   fd_set           fdRead;
   fd_set           fdWrite;
@@ -117,7 +117,8 @@ void	Ircserv::doSelect() {
   }
 
   // r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&loopInterval); //NULL, 0
-  r = select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
+  // r = select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
+  select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
 }
 
 void	Ircserv::checkFd() {
@@ -126,7 +127,7 @@ void	Ircserv::checkFd() {
   //server
   if (FD_ISSET(ircFd, &fdRead)) {
     messenger.srvAccept(ircFd);
-    r--;
+    // r--;
   }
   //else if (FD_ISSET(e->ircFd, &e->fdWrite))
     //server-to-server
@@ -135,18 +136,18 @@ void	Ircserv::checkFd() {
   std::map<int, User>::iterator uit = messenger.users().begin();
   time_t now = time(NULL);
   for (; uit != messenger.users().end(); ++uit) {
-    if (uit->second.dead < now || uit->second.quit) {
+    if (uit->second.dead < now || uit->second.quit)
       timeout.push(uit->second);
-      continue;
+    else {
+      if (uit->second.alive < now)
+        messenger.ping(uit->first);
+
+      if (FD_ISSET(uit->first, &fdRead))
+        messenger.clientRead(uit->first);
+      
+      if (FD_ISSET(uit->first, &fdWrite))
+        messenger.clientWrite(uit->first);
     }
-    if (uit->second.alive < now) {
-      messenger.ping(uit->first);
-      // messenger.outMessages()[uit->first].append(PING_REQUEST).append(PONG_RESULT);
-    }
-    if (FD_ISSET(uit->first, &fdRead))
-      messenger.clientRead(uit->first);
-    if (FD_ISSET(uit->first, &fdWrite))
-      messenger.clientWrite(uit->first);
     // if (FD_ISSET(uit->first, &fdRead) || FD_ISSET(uit->first, &fdWrite))
     //   r--;
     // if (r == 0) break;
