@@ -92,7 +92,8 @@ void MessageManager::executeMessage(int cs, std::string message) {
 
     if (command.compare("PASS") != 0 &&
         command.compare("NICK") != 0 &&
-        command.compare("USER") != 0) {
+        command.compare("USER") != 0 &&
+        command.compare("QUIT") != 0) {
 
       reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec, trailing); //451
       return;

@@ -24,17 +24,11 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
     it++;
     it++;
     user.real = *it;
-<<<<<<< HEAD
-    //welcome msg after nick + user??
-    reply(cs, RPL_WELCOME, "USER", paramsVec, trailing); //001
-    ping(cs);
-    //outMessages_[cs].append("-- welcome Sir-[").append(user.real).append("]. --\n");
-=======
-    // welcome msg after pass + nick + user
-    if (users_[cs].authenticated == AUTH_MASK)
+
+    if (users_[cs].authenticated == AUTH_MASK) {
       reply(cs, RPL_WELCOME, "USER", paramsVec, trailing); //001
-      // outMessages_[cs].append("-- welcome Sir-[").append(user.real).append("]. --\n");
->>>>>>> 27ad166b97f077bef6bd73c3f3eda04ab517911e
+      ping(cs);
+    }
   }
 }
 
