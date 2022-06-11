@@ -47,7 +47,7 @@ void MessageManager::executeMessages(int cs) {
   std::string message;
 
   while (messageVec.size()) {
-    message = messageVec.front();    
+    message = messageVec.front();
     executeMessage(cs, message);
     messageVec.erase(messageVec.begin()); // in case of vector
     // messageVec.pop(); 					//in case of queue
@@ -61,6 +61,7 @@ std::vector<std::string> MessageManager::splitMessages(int cs, bool bSkipLast, b
 void MessageManager::executeMessage(int cs, std::string message) {
   std::string command_params, trailing;
   std::vector<std::string> command_params_trailing = SS::splitString(message, SPACE_COLON, false, false, true);
+
   if (command_params_trailing.empty())
     return;
   switch (command_params_trailing.size())
@@ -86,6 +87,17 @@ void MessageManager::executeMessage(int cs, std::string message) {
   command = SS::toUpper(paramsVec.front());
   // then remove the first element and the rest should be args
   paramsVec.erase(paramsVec.begin());
+
+  if (users_[cs].authenticated < AUTH_MASK) {
+
+    if (command.compare("PASS") != 0 &&
+        command.compare("NICK") != 0 &&
+        command.compare("USER") != 0) {
+
+      reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec, trailing); //451
+      return;
+    }
+  }
 
   // change this pattern tcsin_leno using a map<commandName, commandFunc>
   // execute commandMap[command](cs, command)
