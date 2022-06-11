@@ -2,14 +2,6 @@
 #include <sstream>
 
 void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-/*
-ERR_NONICKNAMEGIVEN
-ERR_ERRONEUSNICKNAME
-ERR_NICKNAMEINUSE
-//ERR_NICKCOLLISION not in the scope <-server to server
-ERR_UNAVAILRESOURCE
-ERR_RESTRICTED
-*/
 
   if (paramsVec.size() != 1 || !trailing.empty()) {
     // do something with errcode errcode:errstr map
@@ -40,3 +32,35 @@ bool MessageManager::isUniqueNick(int cs, std::string &nick) {
   }
   return false;
 }
+
+/*
+https://datatracker.ietf.org/doc/html/rfc2812#section-3.1.2
+3.1.2 Nick message
+
+
+      Command: NICK
+   Parameters: <nickname>
+
+   NICK command is used to give user a nickname or change the existing
+   one.
+
+   Numeric Replies:
+
+           ERR_NONICKNAMEGIVEN
+           ERR_ERRONEUSNICKNAME
+           ERR_NICKNAMEINUSE
+           ERR_NICKCOLLISION
+           ERR_UNAVAILRESOURCE
+           ERR_RESTRICTED
+
+   Examples:
+
+   NICK Wiz                ; Introducing new nick "Wiz" if session is
+                           still unregistered, or user changing his
+                           nickname to "Wiz"
+
+   :WiZ!jto@tolsun.oulu.fi NICK Kilroy
+                           ; Server telling that WiZ changed his
+                           nickname to Kilroy.
+
+*/
