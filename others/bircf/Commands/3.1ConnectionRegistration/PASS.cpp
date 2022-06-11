@@ -17,8 +17,8 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::strin
     //welcome msg will be sent after nick (+ user)
     //outMessages_[cs].append("-- welcome [SOMEBODY], setup nickname please --\n");
   }
-  //else
-  //  outMessages_[cs].append("** WRONG PASSWORD! **\n");
+  else
+    outMessages_[cs].append("** WRONG PASSWORD! **\n");
 }
 
 

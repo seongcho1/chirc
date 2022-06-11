@@ -2,14 +2,15 @@
 #include <sstream>
 
 void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+
   if (paramsVec.size() != 4 || !trailing.empty()) {
+    reply(cs, ERR_NEEDMOREPARAMS, "USER", paramsVec, trailing); //461
     outMessages_[cs].append("** Usage: [USER <user_name> <host> <not use> <real_name>] **\n");
     return;
   }
 
   if (users_[cs].authenticated & AUTH_LEVEL3) {
-  // if (users_.find(cs) == users_.end()) {
-    outMessages_[cs].append("** You may not reregister **\n");
+    reply(cs, ERR_ALREADYREGISTRED, "USER", paramsVec, trailing); //462
     return;
   }
 
@@ -46,8 +47,10 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.1.3
 
    Numeric Replies:
 
-           ERR_NEEDMOREPARAMS
-           ERR_ALREADYREGISTRED
+           ERR_NEEDMOREPARAMS                 :461 done
+           ERR_ALREADYREGISTRED               :462 done
+
+
 
    Example:
 
