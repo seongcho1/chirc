@@ -14,7 +14,8 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
     return;
   }
 
-  //params check here?
+  //params check here? <host> check?? <not use> check??
+
 
   User &user = users_[cs];
   std::vector<std::string>::iterator it = paramsVec.begin();
