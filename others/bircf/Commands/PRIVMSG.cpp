@@ -40,7 +40,8 @@ void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::st
 		std::string title = channels_.find(msgtarget)->first;
 		Channel channel =  channels_[title];
 		std::set<int> member = channel.member;
-		if (member.find(cs) == member.end()) {
+		if (member.find(cs) == member.end() ||
+        (member.size() == 1 &&  *(member.begin()) == cs)) {
 			reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec, trailing); //404
 			return;
 		}
