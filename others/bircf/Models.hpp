@@ -115,6 +115,7 @@ public:
   }
 
   bool isAuthenticated(void) { return authenticated == AUTH_MASK; }
+  
   std::string prefix(void) {
     if (!isAuthenticated())
       return std::string("");

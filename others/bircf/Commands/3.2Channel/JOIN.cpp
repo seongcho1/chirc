@@ -6,10 +6,10 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec, std::strin
     return;
   }
 
-  if (!users_[cs].isAuthenticated()) {
-    reply(cs, ERR_NOTREGISTERED, "PART", paramsVec, trailing); //461
-    return;
-  }
+  // if (!users_[cs].isAuthenticated()) {
+  //   reply(cs, ERR_NOTREGISTERED, "PART", paramsVec, trailing);
+  //   return;
+  // }
 
   std::vector<std::string>::iterator it = paramsVec.begin();
   while (it != paramsVec.end()) {
