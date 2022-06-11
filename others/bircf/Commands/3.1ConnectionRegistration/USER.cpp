@@ -16,7 +16,6 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
 
   //params check here? <host> check?? <not use> check??
 
-
   User &user = users_[cs];
   std::vector<std::string>::iterator it = paramsVec.begin();
   if (AUTH_LEVEL1 <= user.authenticated) {
@@ -25,9 +24,10 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
     it++;
     it++;
     user.real = *it;
-    //welcome msg after nick + user??
-    reply(cs, RPL_WELCOME, "USER", paramsVec, trailing); //001
-    //outMessages_[cs].append("-- welcome Sir-[").append(user.real).append("]. --\n");
+    // welcome msg after pass + nick + user
+    if (users_[cs].authenticated == AUTH_MASK)
+      reply(cs, RPL_WELCOME, "USER", paramsVec, trailing); //001
+      // outMessages_[cs].append("-- welcome Sir-[").append(user.real).append("]. --\n");
   }
 }
 
