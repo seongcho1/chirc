@@ -2,57 +2,57 @@
 #include <cassert>
 
 void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-	if (paramsVec.size() != 1) {
-		reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec, trailing); //411
-		return;
-	}
-	assert(!paramsVec.empty());
-	if (trailing.length() == 0) {
-		reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec, trailing); //412
-		return;
-	}
-	std::string msgtarget = paramsVec[0];
-	if (msgtarget[0] != '#' &&
-		nickFdPair_.find(msgtarget) == nickFdPair_.end()) {
-		reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
-		return;
-	}
-	if (msgtarget[0]  == '#' &&
-		( msgtarget.length() == 1 || channels_.find(msgtarget) == channels_.end()) ) {
-		reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
-		return;
-	}
+  if (paramsVec.size() != 1) {
+    reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec, trailing); //411
+    return;
+  }
+  assert(!paramsVec.empty());
+  if (trailing.length() == 0) {
+    reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec, trailing); //412
+    return;
+  }
+  std::string msgtarget = paramsVec[0];
+  if (msgtarget[0] != '#' &&
+    nickFdPair_.find(msgtarget) == nickFdPair_.end()) {
+    reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
+    return;
+  }
+  if (msgtarget[0]  == '#' &&
+    ( msgtarget.length() == 1 || channels_.find(msgtarget) == channels_.end()) ) {
+    reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
+    return;
+  }
 
-	//if cs is an operator, cs can use wildcards (*, ?)
-	//SS::matchStringVector(usersVec, pattern) then, usersVec only keeps memebers matched the pattern
+  //if cs is an operator, cs can use wildcards (*, ?)
+  //SS::matchStringVector(usersVec, pattern) then, usersVec only keeps memebers matched the pattern
 
-	int recipient;
-	std::string msg;
+  int recipient;
+  std::string msg;
 
-	//to user
-	if (msgtarget[0] != '#') {
-		recipient = nickFdPair_[msgtarget];
-		msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
-		outMessages_[recipient].append(msg);
-	}
-	//to channel
-	else {
-		std::string title = channels_.find(msgtarget)->first;
-		Channel channel =  channels_[title];
-		std::set<int> member = channel.member;
-		if (member.find(cs) == member.end() ||
+  //to user
+  if (msgtarget[0] != '#') {
+    recipient = nickFdPair_[msgtarget];
+    msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
+    outMessages_[recipient].append(msg);
+  }
+  //to channel
+  else {
+    std::string title = channels_.find(msgtarget)->first;
+    Channel channel =  channels_[title];
+    std::set<int> member = channel.member;
+    if (member.find(cs) == member.end() ||
         (member.size() == 1 &&  *(member.begin()) == cs)) {
-			reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec, trailing); //404
-			return;
-		}
-		for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
-			recipient = *it;
-			if (recipient == cs)
-				continue;
-			msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
-			outMessages_[recipient].append(msg);
-		}
-	}
+      reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec, trailing); //404
+      return;
+    }
+    for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
+      recipient = *it;
+      if (recipient == cs)
+        continue;
+      msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
+      outMessages_[recipient].append(msg);
+    }
+  }
 }
 
 
