@@ -1,4 +1,4 @@
-#include "../MessageManager.hpp"
+#include "../../MessageManager.hpp"
 
 void MessageManager::PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
   if (paramsVec.size() != 0) {

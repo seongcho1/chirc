@@ -3,9 +3,9 @@ SRCS =	main.cpp MessageManager.cpp \
 				Commands/3.1ConnectionRegistration/NICK.cpp \
 				Commands/3.1ConnectionRegistration/USER.cpp \
 				Commands/3.3SendingMessages/PRIVMSG.cpp \
-				Commands/TESTMSG.cpp \
-				Commands/PUBLICMSG.cpp \
-				Commands/SELFMSG.cpp \
+				Commands/3.9Test/TESTMSG.cpp \
+				Commands/3.9Test/PUBLICMSG.cpp \
+				Commands/3.9Test/SELFMSG.cpp \
 				reply.cpp \
 
 OBJS = ${SRCS:.cpp=.o}

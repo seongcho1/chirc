@@ -1,4 +1,4 @@
-#include "../MessageManager.hpp"
+#include "../../MessageManager.hpp"
 
 
 void MessageManager::TESTMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
