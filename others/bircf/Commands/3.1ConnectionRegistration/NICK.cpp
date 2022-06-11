@@ -2,11 +2,6 @@
 
 void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 
-  if (users_[cs].authenticated < AUTH_LEVEL1) {
-    reply(cs, ERR_RESTRICTED, "NICK", paramsVec, trailing); //484
-    return;
-  }
-
   if (paramsVec.size() != 1 || !trailing.empty()) {
     reply(cs, ERR_NONICKNAMEGIVEN, "NICK", paramsVec, trailing); //431
     return;
@@ -32,7 +27,9 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
 
   if (isUniqueNick(cs, nick)) {
     users_[cs].authenticated |= AUTH_LEVEL2;
-    reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
+    // welcome msg after pass + nick + user
+    if (users_[cs].authenticated == AUTH_MASK)
+      reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
   }
   else {
     reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec, trailing); //433
@@ -82,7 +79,7 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.1.2
            ERR_NICKNAMEINUSE                  :433 half done
            ERR_NICKCOLLISION                  :436 not in the scope <-server to server
            ERR_UNAVAILRESOURCE                :437 ??
-           ERR_RESTRICTED                     :484 half done //when user mode "+r"
+           ERR_RESTRICTED                     :484 ?? //when user mode "+r"
 
    Examples:
 
