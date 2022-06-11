@@ -14,8 +14,10 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::strin
 
   if (*paramsVec.begin() == pass) {
     users_[cs].authenticated |= AUTH_LEVEL1;
-    //welcome msg will be sent after nick (+ user)
-    //outMessages_[cs].append("-- welcome [SOMEBODY], setup nickname please --\n");
+
+    if (users_[cs].authenticated == AUTH_MASK)
+      reply(cs, RPL_WELCOME, "PASS", paramsVec, trailing); //001
+
   }
   else
     outMessages_[cs].append("** WRONG PASSWORD! **\n");
