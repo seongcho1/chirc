@@ -15,7 +15,7 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::strin
 
   if (*paramsVec.begin() == pass) {
     users_[cs].authenticated |= AUTH_LEVEL1;
-    //welcome msg after nick/user??
+    //welcome msg will be sent after nick (+ user)
     //outMessages_[cs].append("-- welcome [SOMEBODY], setup nickname please --\n");
   }
   //else

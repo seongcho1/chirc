@@ -1,5 +1,5 @@
-#ifndef __MESSAGE_MANAGER_HPP__
-#define __MESSAGE_MANAGER_HPP__
+#ifndef __MESSAGE_MANAGER_H__
+#define __MESSAGE_MANAGER_H__
 
 #include "StringUtils.hpp"
 #include "Models.hpp"

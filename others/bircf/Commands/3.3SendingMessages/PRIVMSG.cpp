@@ -128,6 +128,12 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.3.1
 */
 
 /*
+host is my server
+server is another server which is connected to the host
+the terms (host, server) is out of scope
+*/
+
+/*
 What Is A Hostmask?
 When you connect to GeekShed, the server reads information from your client and sets a hostmask
 that is used to identify you on the network.
