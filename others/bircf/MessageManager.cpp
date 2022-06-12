@@ -94,6 +94,8 @@ void MessageManager::executeMessage(int cs, std::string message) {
         command.compare("NICK") != 0 &&
         command.compare("USER") != 0) {
       reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec, trailing); //451
+      paramsVec.insert(paramsVec.begin(), command);
+      reply(cs, ERR_UNKNOWNCOMMAND, "executeMessage", paramsVec, trailing); //421
       return;
     }
   }
