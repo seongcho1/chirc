@@ -61,6 +61,9 @@ std::vector<std::string> MessageManager::splitMessages(int cs, bool bSkipLast, b
 
 void MessageManager::executeMessage(int cs, std::string message) {
 
+  //remove front and back white spaces
+  SS::trim(message);
+
   //For a client, the only valid prefix is the registered nickname associated with the client.
   //If the case, delete the prefix to make it easy to split
   if ( users_[cs].authenticated == AUTH_MASK )
