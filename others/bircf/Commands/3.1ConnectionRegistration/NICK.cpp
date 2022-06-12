@@ -14,7 +14,11 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
   //}
 
   std::string nick = paramsVec[0];
-  if (nick.length() > NICK_MAX_LENGTH) {
+  if ( (nick.length() > NICK_MAX_LENGTH) ||
+       (SS::toUpper(nick).compare("ANONYMOUS") == 0) ||
+       SS::containExceptChar(nick, std::string(" ,*?!@.")) ||
+       nick[0] == '$' || //nick[0] == ':' || //: already filtered up there in 431
+       nick[0] == '#' ) { //if there are more channel type prefixes then put them here
     reply(cs, ERR_ERRONEUSNICKNAME, "NICK", paramsVec, trailing); //432
     return;
   }

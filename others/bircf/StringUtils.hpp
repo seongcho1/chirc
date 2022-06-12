@@ -99,12 +99,11 @@ public:
       size_t pos = 0;
       if ((pos = subject.find(exceptChar, 0)) != std::string::npos)
         return true;
-      pos = std::string(subject).find("\r", 0);
     }
     return false;
   }
 
-  static bool containExceptChar(std::vector<std::string> stringVec, std::string exceptChars) {
+  static bool containExceptChar(std::vector<std::string> stringVec, const std::string& exceptChars) {
     std::vector<std::string>::iterator it;
     bool  result;
     for (it = stringVec.begin(); it != stringVec.end(); ++it) {
