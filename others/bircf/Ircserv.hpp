@@ -6,17 +6,19 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <stack>
+#include <csignal>
 
 class Ircserv {
 public:
   int              port;
-  int              r;
+  // int              r;
   int              ircFd;
   fd_set           fdRead;
   fd_set           fdWrite;
-
+  struct timeval    selectInterval;
   MessageManager    messenger;
   std::stack<User>  timeout;
+  // std::stack<User>  quit;
   //std::stack<User>  passed;
 
   void              getOpt(int ac, char **av);
@@ -28,6 +30,15 @@ public:
   void              disposeCorpse();
 };
 
+// void sigIntHandler(int signum) {
+//   std::cout << "call sigIntHandler: " << signum << std::endl;
+//   (void)signum;
+// }
+
+// void sigQuitHandler(int signum) {
+//   std::cout << "call sigQuitHandler: " << signum << std::endl;
+//   (void)signum;
+// }
 
 void  Ircserv::getOpt(int ac, char **av) {
   switch (ac) {
@@ -41,6 +52,9 @@ void  Ircserv::getOpt(int ac, char **av) {
       std::cerr << "Usage: " << av[0] << " PORT(required) PASS(optional)" << std::endl;
       exit(1);
   }
+
+  // signal(SIGINT, sigIntHandler);
+  // signal(SIGQUIT, sigQuitHandler);
 }
 
 void	Ircserv::srvCreate(int port) {
@@ -62,6 +76,9 @@ void	Ircserv::srvCreate(int port) {
   X(-1, listen(s, 42), (char *)"listen");
 
   ircFd = s;
+
+  selectInterval.tv_sec = 1;			//3 second timeout
+  selectInterval.tv_usec = 0;		//0 micro second timeout
 }
 
 void	Ircserv::mainLoop() {
@@ -92,9 +109,6 @@ void	Ircserv::initFd() {
 }
 
 void	Ircserv::doSelect() {
-  // struct timeval timeout;
-  // timeout.tv_sec = 0;			//3 second timeout
-  // timeout.tv_usec = 100;		//0 micro second timeout
 
   int		max = ircFd;
   if (!messenger.users().empty()) {
@@ -102,17 +116,18 @@ void	Ircserv::doSelect() {
     max = urit->first;
   }
 
-  r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&timeout); //NULL, 0
-  // std::cout << "[select=" << e->r << "]" << std::endl;
+  // r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&loopInterval); //NULL, 0
+  // r = select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
+  select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
 }
 
 void	Ircserv::checkFd() {
-  if (r <= 0) return;
+  // if (r <= 0) return;
 
   //server
   if (FD_ISSET(ircFd, &fdRead)) {
     messenger.srvAccept(ircFd);
-    r--;
+    // r--;
   }
   //else if (FD_ISSET(e->ircFd, &e->fdWrite))
     //server-to-server
@@ -121,27 +136,30 @@ void	Ircserv::checkFd() {
   std::map<int, User>::iterator uit = messenger.users().begin();
   time_t now = time(NULL);
   for (; uit != messenger.users().end(); ++uit) {
-    if (uit->second.dead < now) {
+    if (uit->second.dead < now || uit->second.quit)
       timeout.push(uit->second);
-      continue;
+    else {
+      if (uit->second.alive < now)
+        messenger.ping(uit->first);
+
+      if (FD_ISSET(uit->first, &fdRead))
+        messenger.clientRead(uit->first);
+      
+      if (FD_ISSET(uit->first, &fdWrite))
+        messenger.clientWrite(uit->first);
     }
-
-    if (FD_ISSET(uit->first, &fdRead))
-      messenger.clientRead(uit->first);
-
-    if (FD_ISSET(uit->first, &fdWrite))
-      messenger.clientWrite(uit->first);
-
-    if (FD_ISSET(uit->first, &fdRead) || FD_ISSET(uit->first, &fdWrite))
-      r--;
-    if (r == 0) break;
+    // if (FD_ISSET(uit->first, &fdRead) || FD_ISSET(uit->first, &fdWrite))
+    //   r--;
+    // if (r == 0) break;
   }
 }
 
 void Ircserv::disposeCorpse() {
   while (timeout.size()) {
-    messenger.outMessages()[timeout.top().fd].append("timeout\n");
-    messenger.clientWrite(timeout.top().fd);
+    if (!timeout.top().quit) {
+      messenger.outMessages()[timeout.top().fd].append("timeout\n");
+      messenger.clientWrite(timeout.top().fd);
+    }
     messenger.kickUser(timeout.top().fd);
     timeout.pop();
   }

@@ -26,10 +26,16 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
   // }
 
   if (isUniqueNick(cs, nick)) {
+    bool auth = false;
+    if (users_[cs].authenticated != AUTH_MASK)
+      auth = true;
+
     users_[cs].authenticated |= AUTH_LEVEL2;
     // welcome msg after pass + nick + user
-    if (users_[cs].authenticated == AUTH_MASK)
+    if (users_[cs].authenticated == AUTH_MASK && auth) {
       reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
+      ping(cs);
+    }
   }
   else {
     reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec, trailing); //433

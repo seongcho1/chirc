@@ -5,6 +5,8 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PASS"] = &MessageManager::PASS;
   functionCallMap_["NICK"] = &MessageManager::NICK;
   functionCallMap_["USER"] = &MessageManager::USER;
+  
+  functionCallMap_["PONG"] = &MessageManager::PONG;
 
   functionCallMap_["QUIT"] = &MessageManager::QUIT;
   functionCallMap_["JOIN"] = &MessageManager::JOIN;
@@ -92,7 +94,9 @@ void MessageManager::executeMessage(int cs, std::string message) {
   if (users_[cs].authenticated < AUTH_MASK) {
     if (command.compare("PASS") != 0 &&
         command.compare("NICK") != 0 &&
-        command.compare("USER") != 0) {
+        command.compare("USER") != 0 &&
+        command.compare("QUIT") != 0) {
+
       reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec, trailing); //451
       paramsVec.insert(paramsVec.begin(), command);
       reply(cs, ERR_UNKNOWNCOMMAND, "executeMessage", paramsVec, trailing); //421
@@ -140,11 +144,16 @@ void MessageManager::srvAccept(int s) {
 
 void MessageManager::clientRead(int cs) {
   users_[cs].clientRead(inMessages_[cs]) ?
-    executeMessages(cs) : users_[cs].toDead(); /*kickUser(cs);*/
+    executeMessages(cs) : users_[cs].toQuit(); /*kickUser(cs);*/
 }
 
 void MessageManager::kickUser(int cs) {
   fdClean(cs); // del User *, inMessages_, out_commands
   close(cs);    // cleaning the table first, and then the table will be ready for another client
   std::cout << "client #" << cs << " gone away" << std::endl;
+}
+
+void MessageManager::ping(int cs) {
+  outMessages_[cs].append(PING_REQUEST).append(PONG_RESULT).append(NEWLINE);
+  users_[cs].alive = time(NULL) + TIMEOUT;
 }
