@@ -13,7 +13,7 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PART"] =        &MessageManager::PART;
   functionCallMap_["LIST"] =        &MessageManager::LIST;
   functionCallMap_["NAMES"] =       &MessageManager::NAMES;
-  // functionCallMap_["KICK"] =        &MessageManager::KICK;
+  functionCallMap_["KICK"] =        &MessageManager::KICK;
   // functionCallMap_["MODE"] =        &MessageManager::MODE;
   // functionCallMap_["INVITE"] =      &MessageManager::INVITE;
   // functionCallMap_["TOPIC"] =       &MessageManager::TOPIC;
@@ -162,4 +162,11 @@ void MessageManager::kickUser(int cs) {
 void MessageManager::ping(int cs) {
   outMessages_[cs].append(PING_REQUEST).append(PONG_RESULT).append(NEWLINE);
   users_[cs].alive = time(NULL) + TIMEOUT;
+}
+
+void MessageManager::announceToChannel(std::string title, std::string message) {
+  std::set<int>::iterator it = channels_[title].member.begin();
+  while (it != channels_[title].member.end()) {
+    outMessages_[*it++].append(message);
+  }
 }

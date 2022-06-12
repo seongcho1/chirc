@@ -1,8 +1,6 @@
 #include "../../MessageManager.hpp"
 
 void MessageManager::LIST(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-  
-std::cout << "call list\n";
 
   (void)trailing;
   // somethings;

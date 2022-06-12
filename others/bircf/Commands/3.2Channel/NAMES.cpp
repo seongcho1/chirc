@@ -2,8 +2,6 @@
 
 void MessageManager::NAMES(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 
-std::cout << "names list\n";
-
   (void)trailing;
   // somethings;
   // reply(cs, RPL_NAMREPLY, "NAMES", paramsVec, trailing);

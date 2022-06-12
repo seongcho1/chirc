@@ -24,7 +24,7 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
   //  reply(cs, ERR_ERRONEUSNICKNAME, "NICK", paramsVec, trailing); //432
   //  return;
   // }
-
+  std::string legacyNick = users_[cs].nick;
   if (isUniqueNick(cs, nick)) {
     bool auth = false;
     if (users_[cs].authenticated != AUTH_MASK)
@@ -51,6 +51,15 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
   //   //welcome msg after nick + user??
   //   reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
   // }
+
+  std::string message;
+  std::set<std::string>::iterator eit = users_[cs].engaged.begin();
+  while (eit != users_[cs].engaged.end()) {
+    message.clear();
+    message.append(legacyNick).append(" is now known as ").append(nick).append("\n");
+    announceToChannel(*eit++, message);
+  }
+  // announce to engaged channels [from nick to nick] ----------------------------------
 }
 
 bool MessageManager::isUniqueNick(int cs, std::string &nick) {

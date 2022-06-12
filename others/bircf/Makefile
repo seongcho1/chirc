@@ -7,6 +7,7 @@ SRCS =	main.cpp MessageManager.cpp \
 				Commands/3.2Channel/JOIN.cpp \
 				Commands/3.2Channel/PART.cpp \
 				Commands/3.2Channel/LIST.cpp \
+				Commands/3.2Channel/KICK.cpp \
 				Commands/3.2Channel/NAMES.cpp \
 				Commands/3.3SendingMessages/PRIVMSG.cpp \
 				Commands/3.9Test/TESTMSG.cpp \
