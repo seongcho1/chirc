@@ -70,7 +70,6 @@ public:
     return sourceVec;
   }
 
-
   //trim from left
   static std::string& ltrim(std::string& s, const char* t = " \t") { //\n\r\f\v")
     s.erase(0, s.find_first_not_of(t));
@@ -86,6 +85,25 @@ public:
   //trim from left & right
   static std::string& trim(std::string& s, const char* t = " \t") { //\n\r\f\v")
     return ltrim(rtrim(s, t), t);
+  }
+
+  static std::string& eraseFirstWord(std::string& subject, const std::string& longWord, const std::string& shortWord) {
+
+    size_t  prefix_length;
+    if(!subject.empty() && subject[0] == longWord[0] && subject[0] == shortWord[0] &&
+        ((prefix_length = subject.find(SPACE, 0)) != std::string::npos) ) {
+
+      std::string toErase;
+      if (prefix_length > shortWord.length())
+        toErase = std::string(longWord + " ");
+      else
+        toErase = std::string(shortWord + " ");
+      size_t pos = subject.find(toErase);
+      if (pos == 0)
+        subject.erase(pos, toErase.length());
+      SS::trim(subject);
+    }
+    return subject;
   }
 
   static std::string& replaceString(std::string& subject, const std::string& search, const std::string& replace) {

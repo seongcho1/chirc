@@ -5,7 +5,7 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PASS"] = &MessageManager::PASS;
   functionCallMap_["NICK"] = &MessageManager::NICK;
   functionCallMap_["USER"] = &MessageManager::USER;
-  
+
   functionCallMap_["PONG"] = &MessageManager::PONG;
 
   functionCallMap_["QUIT"] = &MessageManager::QUIT;
@@ -63,11 +63,8 @@ void MessageManager::executeMessage(int cs, std::string message) {
 
   //For a client, the only valid prefix is the registered nickname associated with the client.
   //If the case, delete the prefix to make it easy to split
-  if (users_[cs].authenticated == AUTH_MASK &&
-      !message.empty() && message[0] == ':') {
-    SS::ltrim(message, std::string(":" + users_[cs].nick + " ").c_str());
-    SS::trim(message);
-  }
+  if ( users_[cs].authenticated == AUTH_MASK )
+    SS::eraseFirstWord(message, std::string(":" + users_[cs].prefix()), std::string(":" + users_[cs].nick));
 
   std::string command_params, trailing;
   std::vector<std::string> command_params_trailing = SS::splitString(message, SPACE_COLON, false, false, true);
