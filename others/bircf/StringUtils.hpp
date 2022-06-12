@@ -167,39 +167,41 @@ public:
     return ss.str();
   }
 
-  static std::string  toUpper(std::string &s)
+  static std::string  toUpper(const std::string &s)
   {
-    for (std::size_t i = 0; i < s.size(); i++) {
+    std::string str(s);
 
-      s[i] = (std::toupper(s[i]));
+    for (std::size_t i = 0; i < str.size(); i++) {
+
+      str[i] = (std::toupper(str[i]));
 
       // 123:{ => 91:[
       // 124:| => 92:\
       // 125:} => 93:]
       // 94:^ => 126:~
-      switch(s[i]) {
+      switch(str[i]) {
 
-        case '{' : s[i] = '[';
+        case '{' : str[i] = '[';
               break;
-        case '|' : s[i] = '\\';
+        case '|' : str[i] = '\\';
               break;
-        case '}' : s[i] = ']';
+        case '}' : str[i] = ']';
               break;
-        case '^' : s[i] = '~';
+        case '^' : str[i] = '~';
               break;
         default:
               break;
       }
     }
 
-    //std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+    //std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 
     //int (*tu)(int) = toupper; // Select that particular overload
-    //std::transform(s.begin(),s.end(),s.begin(),tu );
+    //std::transform(str.begin(),str.end(),str.begin(),tu );
 
     //Since C++11, we could use a lambda:
-    //std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
-    return s;
+    //std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) { return std::toupper(c); });
+    return str;
   }
 
   static std::vector<std::string>  splitString(std::string &s, std::string delimiter,

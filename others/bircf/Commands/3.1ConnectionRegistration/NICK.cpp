@@ -29,6 +29,8 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
   //  return;
   // }
 
+  std::string currentPrefix = users_[cs].prefix();
+
   if (isUniqueNick(cs, nick)) {
     bool auth = false;
     if (users_[cs].authenticated != AUTH_MASK)
@@ -39,6 +41,12 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
     if (users_[cs].authenticated == AUTH_MASK && auth) {
       reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
       ping(cs);
+    }
+
+    //broadcast that currentPrefix changed his nick
+    if ( (users_[cs].authenticated == AUTH_MASK) && !currentPrefix.empty()) {
+      for (std::map<int, User>::iterator uit = users_.begin(); uit != users_.end(); ++uit)
+        outMessages_[uit->first].append(":" + currentPrefix + " NICK " + nick).append(NEWLINE);
     }
   }
   else {
