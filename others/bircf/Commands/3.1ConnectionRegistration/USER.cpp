@@ -30,7 +30,7 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
       reply(cs, RPL_WELCOME, "USER", paramsVec, trailing); //001
       ping(cs);
     }
-  }
+  //}
 }
 
 /*
