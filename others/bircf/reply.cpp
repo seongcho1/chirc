@@ -62,6 +62,19 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
 
     //work end
 
+    // not defined begin
+    case RPL_LISTSTART           :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 321
+    case RPL_LIST                :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 322
+    case RPL_LISTEND             :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 323
+    case RPL_NAMREPLY            :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 353
+    case RPL_ENDOFNAMES          :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 366
+    // not defined end
+
 
     //401    =  <nickname> :No such nick/channel
     case  ERR_NOSUCHNICK         :  sVec.push_back("<nickname>");      rVec.push_back(paramsVec[0]);
