@@ -71,6 +71,12 @@
     "functional": "cpp",
     "iterator": "cpp",
     "utility": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "*.tcc": "cpp",
+    "csignal": "cpp",
+    "memory_resource": "cpp",
+    "numeric": "cpp",
+    "random": "cpp",
+    "fstream": "cpp"
   }
 }

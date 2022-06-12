@@ -13,6 +13,8 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
   //  return;
   //}
 
+  //See section 2.3.1 for details on valid nicknames.
+  // if (nick[0] is numeric or special or error in nick) {
   std::string nick = paramsVec[0];
   if ( (nick.length() > NICK_MAX_LENGTH) ||
        (SS::toUpper(nick).compare("ANONYMOUS") == 0) ||
@@ -23,13 +25,7 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
     return;
   }
 
-  //See section 2.3.1 for details on valid nicknames.
-  // if (nick[0] is numeric or special or error in nick) {
-  //  reply(cs, ERR_ERRONEUSNICKNAME, "NICK", paramsVec, trailing); //432
-  //  return;
-  // }
-
-  std::string currentPrefix = users_[cs].prefix();
+  std::string legacyPrefix = users_[cs].prefix();
 
   if (isUniqueNick(cs, nick)) {
     bool auth = false;
@@ -42,27 +38,29 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
       reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
       ping(cs);
     }
-
+    /*
     //broadcast that currentPrefix changed his nick
-    if ( (users_[cs].authenticated == AUTH_MASK) && !currentPrefix.empty()) {
+    if ( (users_[cs].authenticated == AUTH_MASK) && !legacyPrefix.empty()) {
       for (std::map<int, User>::iterator uit = users_.begin(); uit != users_.end(); ++uit)
-        outMessages_[uit->first].append(":" + currentPrefix + " NICK " + nick).append(NEWLINE);
+        outMessages_[uit->first].append(":" + legacyPrefix + " NICK " + nick).append(NEWLINE);
     }
+    */
   }
   else {
     reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec, trailing); //433
   }
 
-  // if (nickFdPair_.find(nick) != nickFdPair_.end()) {
-  //   reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec, trailing); //433
-  //   return;
-  // }
-
-  // if (isUniqueNick(cs, nick)) {
-  //   users_[cs].authenticated |= AUTH_LEVEL2;
-  //   //welcome msg after nick + user??
-  //   reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
-  // }
+  //to avoid duplicated  announce, get unique users from all channels the user is engaged
+  //then  announce to the users list ???
+  if ( (users_[cs].authenticated == AUTH_MASK) && !legacyPrefix.empty()) {
+    std::string message;
+    std::set<std::string>::iterator eit = users_[cs].engaged.begin();
+    message.append(":" + legacyPrefix + " NICK " + nick).append(NEWLINE);
+    while (eit != users_[cs].engaged.end()) {
+      announceToChannel(*eit++, message);
+    }
+  }
+  // announce to engaged channels [from nick to nick] ----------------------------------
 }
 
 bool MessageManager::isUniqueNick(int cs, std::string &nick) {

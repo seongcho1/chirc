@@ -50,6 +50,10 @@ private:
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
   void  TESTMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
   void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, std::string trailing);
+  void  announceToChannel(std::string title, std::string message);
+
+  std::vector<std::string> namesVec(std::set<int> fds);
+  std::string namesVec_TEST(std::set<int> fds);
 
   MessageManager(MessageManager const &) 						{}
   MessageManager &operator=(MessageManager const &) { return *this; }
