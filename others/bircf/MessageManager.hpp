@@ -52,6 +52,7 @@ private:
   void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, std::string trailing);
 
   std::vector<std::string> namesVec(std::set<int> fds);
+  std::string namesVec_TEST(std::set<int> fds);
 
   MessageManager(MessageManager const &) 						{}
   MessageManager &operator=(MessageManager const &) { return *this; }
