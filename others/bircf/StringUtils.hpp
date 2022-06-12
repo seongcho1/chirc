@@ -14,7 +14,9 @@
 #define SPACE         " "
 #define SPACE_COLON   " :"
 #define COMMA         ","
-
+#define NUL           "\0"
+#define CR            "\r"
+#define CR_NUL        "\r\0"
 
 class SS {
 public:
@@ -88,6 +90,32 @@ public:
     return ltrim(rtrim(s, t), t);
   }
 
+  static bool containExceptChar(std::string& subject, const std::string& exceptChars) {
+    if (subject.empty())
+      return false;
+    for (size_t i = 0; i < exceptChars.length(); ++i) {
+      std::string exceptChar;
+      exceptChar.push_back(exceptChars[i]);
+      size_t pos = 0;
+      if ((pos = subject.find(exceptChar, 0)) != std::string::npos)
+        return true;
+      pos = std::string(subject).find("\r", 0);
+    }
+    return false;
+  }
+
+  static bool containExceptChar(std::vector<std::string> stringVec, std::string exceptChars) {
+    std::vector<std::string>::iterator it;
+    bool  result;
+    for (it = stringVec.begin(); it != stringVec.end(); ++it) {
+      result = containExceptChar(*it, exceptChars);
+      if (result)
+        return result;
+    }
+    return false;
+  }
+
+
   static std::string& eraseFirstWord(std::string& subject, const std::string& longWord, const std::string& shortWord) {
 
     size_t  prefix_length;
@@ -127,6 +155,11 @@ public:
     return subject;
   }
 
+  static bool isNumber(const std::string& s) {
+      std::string::const_iterator it = s.begin();
+      while (it != s.end() && std::isdigit(*it)) ++it;
+      return !s.empty() && it == s.end();
+  }
 
   template <typename T>
   static std::string  toString ( T number ) {

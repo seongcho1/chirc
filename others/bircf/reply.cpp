@@ -29,7 +29,8 @@ int    MessageManager::initReplies(std::string configFile) {
     key = SS::trim(valueVec[0]);
     value = SS::trim(valueVec[1]);
 
-    replies_[std::stoi(key)] = value;
+    // replies_[std::stoi(key)] = value; //c++11
+    replies_[atoi(key.c_str())] = value;
   }
   return 0;
 }
