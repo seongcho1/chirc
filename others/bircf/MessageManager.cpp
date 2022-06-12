@@ -2,20 +2,20 @@
 #include <sys/stat.h>
 
 void MessageManager::registerFunctions() {
-  functionCallMap_["PASS"] = &MessageManager::PASS;
-  functionCallMap_["NICK"] = &MessageManager::NICK;
-  functionCallMap_["USER"] = &MessageManager::USER;
+  functionCallMap_["PASS"] =        &MessageManager::PASS;
+  functionCallMap_["NICK"] =        &MessageManager::NICK;
+  functionCallMap_["USER"] =        &MessageManager::USER;
 
-  functionCallMap_["PONG"] = &MessageManager::PONG;
+  functionCallMap_["PONG"] =        &MessageManager::PONG;
 
-  functionCallMap_["QUIT"] = &MessageManager::QUIT;
-  functionCallMap_["JOIN"] = &MessageManager::JOIN;
-  functionCallMap_["PART"] = &MessageManager::PART;
+  functionCallMap_["QUIT"] =        &MessageManager::QUIT;
+  functionCallMap_["JOIN"] =        &MessageManager::JOIN;
+  functionCallMap_["PART"] =        &MessageManager::PART;
 
-  functionCallMap_["PRIVMSG"] =	&MessageManager::PRIVMSG;
-  functionCallMap_["SELFMSG"] =	&MessageManager::SELFMSG;
-  functionCallMap_["PUBLICMSG"] =	&MessageManager::PUBLICMSG;
-  functionCallMap_["TESTMSG"] =	&MessageManager::TESTMSG;
+  functionCallMap_["PRIVMSG"] =     &MessageManager::PRIVMSG;
+  functionCallMap_["SELFMSG"] =     &MessageManager::SELFMSG;
+  functionCallMap_["PUBLICMSG"] =   &MessageManager::PUBLICMSG;
+  functionCallMap_["TESTMSG"] =     &MessageManager::TESTMSG;
 }
 
 MessageManager::~MessageManager() {
