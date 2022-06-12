@@ -1,5 +1,4 @@
 #include "../../MessageManager.hpp"
-#include <sstream>
 
 void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::string trailing) {
 

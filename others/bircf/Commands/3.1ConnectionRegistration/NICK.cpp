@@ -54,9 +54,8 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
 
   std::string message;
   std::set<std::string>::iterator eit = users_[cs].engaged.begin();
+  message.append(legacyNick).append(" is now known as ").append(nick).append("\n");
   while (eit != users_[cs].engaged.end()) {
-    message.clear();
-    message.append(legacyNick).append(" is now known as ").append(nick).append("\n");
     announceToChannel(*eit++, message);
   }
   // announce to engaged channels [from nick to nick] ----------------------------------
