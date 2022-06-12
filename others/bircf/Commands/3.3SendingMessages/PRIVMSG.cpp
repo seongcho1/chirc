@@ -1,7 +1,7 @@
 #include "../../MessageManager.hpp"
 #include <cassert>
 
-void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+void  MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
   if (paramsVec.size() != 1) {
     reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec, trailing); //411
     return;
@@ -12,13 +12,32 @@ void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::st
     return;
   }
   std::string msgtarget = paramsVec[0];
-  if (msgtarget[0] != '#' &&
-    nickFdPair_.find(msgtarget) == nickFdPair_.end()) {
+  std::vector<std::string> msgtoVec = SS::splitString(msgtarget, COMMA);
+
+  // if (msgtoVec.size() > XX) {
+  //   reply(cs, ERR_TOOMANYTARGETS, "PRIVMSG", paramsVec, trailing); //407
+  //   return;
+  // }
+
+  std::vector<std::string>::iterator it;
+  for(it = msgtoVec.begin(); it != msgtoVec.end(); ++it) {
+    std::string msgto = *it;
+    PRIVMSGHelper(cs, msgto, trailing);
+  }
+
+}
+
+void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std::string& trailing) {
+  std::vector<std::string> paramsVec;
+  paramsVec.push_back(msgto);
+
+  if (msgto[0] != '#' &&
+    nickFdPair_.find(msgto) == nickFdPair_.end()) {
     reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
     return;
   }
-  if (msgtarget[0]  == '#' &&
-    ( msgtarget.length() == 1 || channels_.find(msgtarget) == channels_.end()) ) {
+  if (msgto[0]  == '#' &&
+    ( msgto.length() == 1 || channels_.find(msgto) == channels_.end()) ) {
     reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
     return;
   }
@@ -30,14 +49,14 @@ void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::st
   std::string msg;
 
   //to user
-  if (msgtarget[0] != '#') {
-    recipient = nickFdPair_[msgtarget];
-    msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
+  if (msgto[0] != '#') {
+    recipient = nickFdPair_[msgto];
+    msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgto  + " :").append(trailing).append(NEWLINE);
     outMessages_[recipient].append(msg);
   }
   //to channel
   else {
-    std::string title = channels_.find(msgtarget)->first;
+    std::string title = channels_.find(msgto)->first;
     Channel channel =  channels_[title];
     std::set<int> member = channel.member;
     if (member.find(cs) == member.end() ||
@@ -49,10 +68,12 @@ void MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::st
       recipient = *it;
       if (recipient == cs)
         continue;
-      msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgtarget  + " :").append(trailing).append(NEWLINE);
+      msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgto  + " :").append(trailing).append(NEWLINE);
       outMessages_[recipient].append(msg);
     }
   }
+
+
 }
 
 
@@ -82,7 +103,7 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.3.1
         ERR_CANNOTSENDTOCHAN            :404 done
         ERR_NOTOPLEVEL                  :not in the scope <-server to server
         ERR_WILDTOPLEVEL                :not in the scope <-server to server
-        ERR_TOOMANYTARGETS              :
+        ERR_TOOMANYTARGETS              :407 how many is too many???
         ERR_NOSUCHNICK                  :401 done
         RPL_AWAY                        :
 

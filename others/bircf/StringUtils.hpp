@@ -13,6 +13,7 @@
 #define NEWLINE       "\n"
 #define SPACE         " "
 #define SPACE_COLON   " :"
+#define COMMA         ","
 
 
 class SS {

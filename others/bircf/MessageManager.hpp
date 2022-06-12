@@ -45,6 +45,7 @@ private:
   void  TOPIC(int cs, std::vector<std::string> paramsVec, std::string);
 
   void  PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
+  void  PRIVMSGHelper(int cs, const std::string& msgto, const std::string& trailing);
   void  SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
   void  TESTMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
