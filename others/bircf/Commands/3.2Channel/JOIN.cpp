@@ -14,15 +14,14 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec, std::strin
   std::vector<std::string>::iterator it = paramsVec.begin();
   while (it != paramsVec.end()) {
 
+    if (channels_.find(*it) == channels_.end()) {
+      channels_[*it] = Channel();
+      channels_[*it].title = *paramsVec.begin();
+      channels_[*it].topic = trailing;
+      channels_[*it].channelCreator = cs;
+    }
+
     if (channels_[*it].member.find(cs) == channels_[*it].member.end()) {
-
-      if (channels_.find(*it) == channels_.end()) {
-        channels_[*it] = Channel();
-        channels_[*it].title = *paramsVec.begin();
-        channels_[*it].topic = trailing;
-        channels_[*it].channelCreator = cs;
-      }
-
       users_[cs].invited.erase(*it);
 
       std::set<int>::iterator mit = channels_[*it].member.begin();
@@ -33,7 +32,7 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec, std::strin
       channels_[*it].member.insert(cs);
       users_[cs].engaged.insert(*it);
     }
-
+    
     ++it;
   }
 }
