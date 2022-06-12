@@ -14,7 +14,9 @@
 #define SPACE         " "
 #define SPACE_COLON   " :"
 #define COMMA         ","
-
+#define NUL           "\0"
+#define CR            "\r"
+#define CR_NUL        "\r\0"
 
 class SS {
 public:
@@ -88,6 +90,31 @@ public:
     return ltrim(rtrim(s, t), t);
   }
 
+  static bool containExceptChar(std::string& subject, const std::string& exceptChars) {
+    if (subject.empty())
+      return false;
+    for (size_t i = 0; i < exceptChars.length(); ++i) {
+      std::string exceptChar;
+      exceptChar.push_back(exceptChars[i]);
+      size_t pos = 0;
+      if ((pos = subject.find(exceptChar, 0)) != std::string::npos)
+        return true;
+    }
+    return false;
+  }
+
+  static bool containExceptChar(std::vector<std::string> stringVec, const std::string& exceptChars) {
+    std::vector<std::string>::iterator it;
+    bool  result;
+    for (it = stringVec.begin(); it != stringVec.end(); ++it) {
+      result = containExceptChar(*it, exceptChars);
+      if (result)
+        return result;
+    }
+    return false;
+  }
+
+
   static std::string& eraseFirstWord(std::string& subject, const std::string& longWord, const std::string& shortWord) {
 
     size_t  prefix_length;
@@ -127,6 +154,11 @@ public:
     return subject;
   }
 
+  static bool isNumber(const std::string& s) {
+      std::string::const_iterator it = s.begin();
+      while (it != s.end() && std::isdigit(*it)) ++it;
+      return !s.empty() && it == s.end();
+  }
 
   template <typename T>
   static std::string  toString ( T number ) {
@@ -135,39 +167,41 @@ public:
     return ss.str();
   }
 
-  static std::string  toUpper(std::string &s)
+  static std::string  toUpper(const std::string &s)
   {
-    for (std::size_t i = 0; i < s.size(); i++) {
+    std::string str(s);
 
-      s[i] = (std::toupper(s[i]));
+    for (std::size_t i = 0; i < str.size(); i++) {
+
+      str[i] = (std::toupper(str[i]));
 
       // 123:{ => 91:[
       // 124:| => 92:\
       // 125:} => 93:]
       // 94:^ => 126:~
-      switch(s[i]) {
+      switch(str[i]) {
 
-        case '{' : s[i] = '[';
+        case '{' : str[i] = '[';
               break;
-        case '|' : s[i] = '\\';
+        case '|' : str[i] = '\\';
               break;
-        case '}' : s[i] = ']';
+        case '}' : str[i] = ']';
               break;
-        case '^' : s[i] = '~';
+        case '^' : str[i] = '~';
               break;
         default:
               break;
       }
     }
 
-    //std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+    //std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 
     //int (*tu)(int) = toupper; // Select that particular overload
-    //std::transform(s.begin(),s.end(),s.begin(),tu );
+    //std::transform(str.begin(),str.end(),str.begin(),tu );
 
     //Since C++11, we could use a lambda:
-    //std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
-    return s;
+    //std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) { return std::toupper(c); });
+    return str;
   }
 
   static std::vector<std::string>  splitString(std::string &s, std::string delimiter,

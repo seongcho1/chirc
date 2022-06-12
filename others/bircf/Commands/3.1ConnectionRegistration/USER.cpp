@@ -7,13 +7,24 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec, std::strin
     return;
   }
 
+  //<realname> needs to allow space, so use trailing first, then push_back it to paramsVec
+  if (!trailing.empty()) {
+    paramsVec.push_back(trailing);
+    trailing.clear();
+  }
+
   if (paramsVec.size() != 4 || !trailing.empty()) {
     reply(cs, ERR_NEEDMOREPARAMS, "USER", paramsVec, trailing); //461
-    outMessages_[cs].append("** Usage: [USER <user_name> <host> <not use> <real_name>] **\n");
+    outMessages_[cs].append("** Usage: [USER <user> <mode> <unused> <realname>] **\n");
     return;
   }
 
-  //params check here? <host> check?? <not use> check??
+  //<mode> should be a numeric
+  if (!SS::isNumber(paramsVec[1])) {
+    reply(cs, ERR_NEEDMOREPARAMS, "USER :The <mode> parameter should be a numeric", paramsVec, trailing); //461
+    outMessages_[cs].append("** Usage: USER <user> <mode> <unused> <realname> **\n");
+    return;
+  }
 
   User &user = users_[cs];
   std::vector<std::string>::iterator it = paramsVec.begin();

@@ -136,7 +136,7 @@ int main() {
   //c.executeCommand("PRIVMSG");
 
   //clientWriteTest();
-  splitSstringTest();
+  //splitSstringTest();
   //toUpperTest();
   //matchStringTest();
   //trimStringTest();
