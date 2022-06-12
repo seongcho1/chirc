@@ -20,7 +20,8 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::strin
 
   }
   else
-    outMessages_[cs].append("** WRONG PASSWORD! **\n");
+    reply(cs, ERR_PASSWDMISMATCH, "PASS", paramsVec, trailing); //464
+
 }
 
 

@@ -91,6 +91,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
 
   if (paramsVec.empty())
     return;
+
   // get the commandName which is the first element in the argsVec
   command = SS::toUpper(paramsVec.front());
   // then remove the first element and the rest should be args
@@ -113,7 +114,17 @@ void MessageManager::executeMessage(int cs, std::string message) {
   //the command parameters (maximum of fifteen including trailing)
   if ( (paramsVec.size() > 15 && trailing.empty()) ||
        (paramsVec.size() > 14 && !trailing.empty()) ) {
-    reply(cs, ERR_NEEDMOREPARAMS, "executeMessage", paramsVec, trailing); //461 too many parameters
+    reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Too Many Parameters"), paramsVec, trailing); //461 too many parameters
+    return;
+  }
+
+  // paramsVec elements need to follow nospcrlfcl rule
+  // LF, SPACE, COLON is already filtered.
+  // it can be done by checking CR and NUL
+  // CR ctrl+V, ctrl+M can be checked
+  // NUL ?? how can we check NUL ??
+  if (SS::containExceptChar(paramsVec, CR)) {
+    reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Use nospcrlfcl Parameters"), paramsVec, trailing); //461 Use nospcrlfcl parameters
     return;
   }
 
