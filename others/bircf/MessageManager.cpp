@@ -108,7 +108,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
   //the command parameters (maximum of fifteen including trailing)
   if ( (paramsVec.size() > 15 && trailing.empty()) ||
        (paramsVec.size() > 14 && !trailing.empty()) ) {
-    reply(cs, ERR_NEEDMOREPARAMS, ":Too Many Parameters", paramsVec, trailing); //461 too many parameters
+    reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Too Many Parameters"), paramsVec, trailing); //461 too many parameters
     return;
   }
 
@@ -118,7 +118,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
   // CR ctrl+V, ctrl+M can be checked
   // NUL ?? how can we check NUL ??
   if (SS::containExceptChar(paramsVec, CR)) {
-    reply(cs, ERR_NEEDMOREPARAMS, ":Not nospcrlfcl Parameters", paramsVec, trailing); //461 not nospcrlfcl parameters
+    reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Use nospcrlfcl Parameters"), paramsVec, trailing); //461 Use nospcrlfcl parameters
     return;
   }
 
