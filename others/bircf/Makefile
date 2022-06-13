@@ -10,6 +10,7 @@ SRCS =	main.cpp MessageManager.cpp \
 				Commands/3.2Channel/KICK.cpp \
 				Commands/3.2Channel/NAMES.cpp \
 				Commands/3.2Channel/TOPIC.cpp \
+				Commands/3.2Channel/INVITE.cpp \
 				Commands/3.3SendingMessages/PRIVMSG.cpp \
 				Commands/3.9Test/TESTMSG.cpp \
 				Commands/3.9Test/PUBLICMSG.cpp \

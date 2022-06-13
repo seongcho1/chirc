@@ -73,6 +73,7 @@ public:
   time_t dead;
   time_t alive;
   std::set<std::string> engaged;
+  std::set<std::string> invited;
 
   User() {}
   User(int const &fd, std::string const &host, char auth) :
