@@ -5,7 +5,7 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
   std::cout << "params.size=" << paramsVec.size() << std::endl;
 
   if (paramsVec.size() < 1) {
-    reply(cs, ERR_NEEDMOREPARAMS, "TOPIC", paramsVec); //401
+    reply(cs, ERR_NEEDMOREPARAMS, "TOPIC", paramsVec); //461
     return;
   }
 
@@ -14,13 +14,6 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     outMessages_[cs].append("TOPIC: ").append(channels_[paramsVec[0]].topic).append("\n");
     return;
   }
-
-  //check if channel exist first
-  // if ( paramsVec[0][0] != '#' ||
-  //      (channels_.find(paramsVec[0]) == channels_.end()) ) {
-  //   reply(cs, ERR_NOSUCHCHANNEL, "TOPIC", paramsVec); //403
-  //   return;
-  // }
 
   if (paramsVec[0][0] != '#' ||
       users_[cs].engaged.find(paramsVec[0]) == users_[cs].engaged.end()) {
@@ -57,8 +50,7 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.2.4
 
    Numeric Replies:
 
-           ERR_NEEDMOREPARAMS         :401 done
-           ERR_NOSUCHCHANNEL          :403 done
+           ERR_NEEDMOREPARAMS         :461 done
            ERR_NOTONCHANNEL           :442 done
            RPL_NOTOPIC                :331
            RPL_TOPIC                  :332
