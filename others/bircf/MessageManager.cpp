@@ -188,32 +188,40 @@ void MessageManager::announceToChannel(int cs, std::string title, std::string me
   std::set<int>::iterator it = channels_[title].member.begin();
   while (it != channels_[title].member.end()) {
     if (cs != *it)
-      outMessages_[*it++].append(message);
+      outMessages_[*it++].append(message).append(NEWLINE);
   }
 }
 
-void MessageManager::announceToChannel(int cs, std::string title, Commands command, std::string message) {
-  // std::set<int>::iterator memberit = channels_[title].member.begin();
+// bool MessageManager::announceToChannel(int cs, std::string title, Commands command, std::string message) {
+//   // std::set<int>::iterator memberit = channels_[title].member.begin();
 
-std::vector<std::string> TEMP;
+// std::vector<std::string> TEMP;
 
-  switch (command) {
+//   switch (command) {
     
-    case E_TOPIC :
-      if (channels_[title].isMode('t') &&
-          channels_[title].channelOperators.find(cs) != channels_[title].channelOperators.end()) {
-        TEMP.push_back(title);
-        reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", TEMP);
-        return;
-      }
-      channels_[title].topic = message;
-      announceToChannel(cs, title, message);
-      return;
+//     case E_TOPIC :
+//       if (channels_[title].isMode('t') &&
+//           channels_[title].channelOperators.find(cs) != channels_[title].channelOperators.end()) {
+//         TEMP.push_back(title);
+//         reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", TEMP);
+//         return false;
+//       }
+//       channels_[title].topic = message;
+//       announceToChannel(cs, title, message);
+//       return true;
 
-    // case 
-    default:
-      break;
-  }
+//     // case 
+//     default:
+//       break;
+//   }
+// }
+
+void MessageManager::announceToSelf(int cs, std::string message) {
+  outMessages_[cs].append(message).append(NEWLINE);
+}
+
+void MessageManager::announceOneUser(int cs, std::string message) {
+  outMessages_[cs].append(message).append(NEWLINE);
 }
 
 void MessageManager::announceToUser(int cs, std::string message) {
