@@ -24,9 +24,8 @@
 
 #define RPL_WHOWASUSER                       314
 
+// #define RPL_LISTSTART                     321  //Obsolete. Not used.
 
-
-#define RPL_LISTSTART                        321  //
 #define RPL_LIST                             322  //
 #define RPL_LISTEND                          323  //
 

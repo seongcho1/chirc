@@ -64,8 +64,13 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
     //work end
 
     // not defined begin
-    case RPL_LISTSTART           :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
-                                    break;  // 321
+
+    //321   = Obsolete. Not used.
+    // case RPL_LISTSTART        :  break;  // 321
+
+
+
+
     case RPL_LIST                :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
                                     break;  // 322
     case RPL_LISTEND             :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
