@@ -33,6 +33,7 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
   }
 
   channels_[channel].setMode(mode);
+  announceToChannel(channel, "Mode: " + channels_[channel].currentMode() + "\n");
 }
 
 void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {

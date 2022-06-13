@@ -243,6 +243,8 @@ public:
       }
     }
 
+    std::cout <<"[sS]" << "start=" << pos_start << ", end=" << pos_end << std::endl;
+
     //if bCutOnce is true, the result always have two (empty) elements
     //if (bCutOnce && result.size() == 0)
     //  result.push_back(std::string());
