@@ -25,8 +25,7 @@
 #define RPL_WHOWASUSER                       314
 
 // #define RPL_LISTSTART                     321  //Obsolete. Not used.
-
-#define RPL_LIST                             322  //
+// #define RPL_LIST                          322  //coding in LIST.cpp directly
 #define RPL_LISTEND                          323  //
 
 #define RPL_NAMREPLY                         353  //

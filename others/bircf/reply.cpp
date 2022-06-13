@@ -49,7 +49,7 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
   switch (code) {
 
     //001   = Welcome to the <network> Network, <nick>[!<user>@<host>]
-    case  RPL_WELCOME            :  sVec.push_back("<network>");   rVec.push_back("FT_IRC"); //server's property
+    case  RPL_WELCOME             : sVec.push_back("<network>");   rVec.push_back("FT_IRC"); //server's property
                                     if (!users_[cs].user.empty()){
                                       sVec.push_back("<nick>[!<user>@<host>]");
                                       rVec.push_back(std::string(users_[cs].nick + "!" + users_[cs].user + "@" + users_[cs].host));
@@ -59,6 +59,7 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
                                     }
                                     break;  //001
 
+
     //work start
 
     //work end
@@ -67,12 +68,14 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
 
     //321   = Obsolete. Not used.
     // case RPL_LISTSTART        :  break;  // 321
+    //322   = <channel> <# visible> :<topic>
+    // case RPL_LIST             :  break;  // 322
 
 
 
 
-    case RPL_LIST                :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
-                                    break;  // 322
+
+
     case RPL_LISTEND             :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
                                     break;  // 323
     case RPL_NAMREPLY            :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);

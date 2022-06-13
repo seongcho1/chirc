@@ -2,8 +2,6 @@
 
 void MessageManager::LIST(int cs, std::vector<std::string> paramsVec) {
 
-  // reply(cs, RPL_LISTSTART, "LIST", paramsVec);
-  outMessages_[cs].append("[LIST BEGIN]\n");
   if (paramsVec.size()) {
     std::vector<std::string>::iterator it = paramsVec.begin();
     while (it != paramsVec.end()) {
@@ -16,8 +14,8 @@ void MessageManager::LIST(int cs, std::vector<std::string> paramsVec) {
   else {
     std::map<std::string, Channel>::iterator it = channels_.begin();
     while (it != channels_.end()) {
-      // reply(cs, RPL_LIST, "LIST", paramsVec);
-      outMessages_[cs].append("[").append(it->second.title).append("]:[").append(it->second.topic).append("]\n");
+      //322 RPL_LIST string format "<channel> <# visible> :<topic>"
+      outMessages_[cs].append(it->second.title).append(" <# visible> :").append(it->second.topic).append(NEWLINE);
       ++it;
     }
   }
