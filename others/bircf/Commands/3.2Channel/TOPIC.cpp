@@ -15,7 +15,6 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-
   //check if channel exist first
   if ( paramsVec[0][0] != '#' ||
        (channels_.find(paramsVec[0]) == channels_.end()) ) {
@@ -33,10 +32,11 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  std::string topic;
-  std::vector<std::string>::iterator pit = ++paramsVec.begin();
-  while (pit != paramsVec.end())
-    topic.append(*pit++).append(" ");
+  std::string topic = paramsVec[1];
+  // std::vector<std::string>::iterator pit = ++paramsVec.begin();
+  // while (pit != paramsVec.end())
+  //   topic.append(*pit++).append(" ");
+
   channels_[*paramsVec.begin()].topic = topic;
 
   topic = users_[cs].nick + " has set topic: " + topic + "\n";

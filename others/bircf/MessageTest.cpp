@@ -51,7 +51,7 @@ int splitSstringTest() {
 
   int i;
   std::string a1 = "\n\n\naaa\nbbb\nccc\nddd";
-  std::string a2 = "aaa :";
+  std::string a2 = "";
 
 /*
   std::vector<std::string> avec1 = SS::splitString(a1, NEWLINE, true, true);
@@ -65,9 +65,11 @@ int splitSstringTest() {
   std::cout << std::endl << "a1=(" << a1 << ")" << std::endl;
 
 */
-  std::vector<std::string> avec2 = SS::splitString(a2, SPACE_COLON, false, false, true);
+  //std::vector<std::string> avec2 = SS::splitString(a2, SPACE_COLON, false, false, true);
 
-  std::cout << "vec size=" << avec2.size() << std::endl;
+  std::vector<std::string> avec2 = SS::splitString(a2, SPACE);
+
+  std::cout << "vec size=" << avec2.size() << " " << avec2.empty() << std::endl;
   i = 0;
   while (i < (int) avec2.size()) {
     std::cout << "(" << avec2[i] << ")->";

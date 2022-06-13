@@ -82,30 +82,30 @@ void MessageManager::executeMessage(int cs, std::string message) {
   std::string command_params, trailing;
   std::vector<std::string> command_params_trailing = SS::splitString(message, SPACE_COLON, false, false, true);
 
-  //now SS::splitString(message, SPACE_COLON, false, false, true) always returns two (empty) elements
-  if ( (command_params_trailing.size() != 2)  ||
-       (command_params_trailing[0].empty() && command_params_trailing[1].empty()) )
+
+
+  // it will do stop (return;) for the following cases
+  // " :bbb"    returns (), (bbb)       <- won't happen because of SS::trim(message) -> ":bbb"
+  // " :"       returns (),()           <- won't happen because of SS::trim(message) -> ":"
+  // NULL       returns NULL            <- won't happen because splitMessages() would not pass a null message
+  // guard up anyway
+  if ( command_params_trailing.empty()  ||
+       (command_params_trailing.size() == 2 && command_params_trailing[0].empty()) )
     return;
 
   command_params = command_params_trailing[0];
-  trailing = command_params_trailing[1];
 
   std::string command;
   std::vector<std::string> paramsVec = SS::splitString(command_params, SPACE);
-
-  if (paramsVec.empty())
-    return;
 
   // get the commandName which is the first element in the argsVec
   command = SS::toUpper(paramsVec.front());
   // then remove the first element and the rest should be args
   paramsVec.erase(paramsVec.begin());
 
-  //if trailing exists, it will be the last element of paramsVec
-  if (!trailing.empty()) {
-    paramsVec.push_back(trailing);
-    trailing.clear();
-  }
+  //if (empty) trailing exists, it will be the last element of paramsVec
+  if (command_params_trailing.size() == 2)
+    paramsVec.push_back(command_params_trailing[1]);
 
   //if not registered yet, only three following commands are usable
   if (users_[cs].authenticated < AUTH_MASK) {

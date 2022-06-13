@@ -243,13 +243,19 @@ public:
       }
     }
 
-    std::cout <<"[sS]" << "start=" << pos_start << ", end=" << pos_end << std::endl;
+    // make empty trailing
+    // "aaa"      returns (aaa)
+    // "aaa :bbb" returns (aaa), (bbb)
+    // "aaa :"    returns (aaa), ()
+    // " :bbb"    returns (), (bbb)
+    // " :"       returns (),()
+    // NULL       returns NULL
 
-    //if bCutOnce is true, the result always have two (empty) elements
-    //if (bCutOnce && result.size() == 0)
-    //  result.push_back(std::string());
-    //if (bCutOnce && result.size() == 1)
-    //  result.push_back(std::string());
+    if ( bCutOnce && pos_end != std::string::npos &&
+         (pos_start - pos_end == delim_len) && result.size() == 1) {
+      result.push_back(std::string());
+    }
+
 
     return result;
   }
