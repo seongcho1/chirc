@@ -24,32 +24,32 @@ private:
   std::map<std::string, int>      nickFdPair_;
   std::map<int, std::string>      replies_;
 
-	typedef void(MessageManager::*FuncPtr)(int cs, std::vector<std::string> paramsVec, std::string trailing);
+	typedef void(MessageManager::*FuncPtr)(int cs, std::vector<std::string> paramsVec);
 
   std::map<std::string, FuncPtr>	functionCallMap_;
   int   initReplies(std::string configFile = "./reply.cfg");
   void  registerFunctions();
-  void  PASS(int cs, std::vector<std::string> paramsVec, std::string);
-  void  NICK(int cs, std::vector<std::string> paramsVec, std::string);
-  void  USER(int cs, std::vector<std::string> paramsVec, std::string);
-  void  PONG(int cs, std::vector<std::string>, std::string trailing);
+  void  PASS(int cs, std::vector<std::string> paramsVec);
+  void  NICK(int cs, std::vector<std::string> paramsVec);
+  void  USER(int cs, std::vector<std::string> paramsVec);
+  void  PONG(int cs, std::vector<std::string> paramsVec);
 
-  void  QUIT(int cs, std::vector<std::string>, std::string);
-  void  JOIN(int cs, std::vector<std::string> paramsVec, std::string);
-  void  PART(int cs, std::vector<std::string> paramsVec, std::string);
-  void  LIST(int cs, std::vector<std::string> paramsVec, std::string);
-  void  NAMES(int cs, std::vector<std::string> paramsVec, std::string);
-  void  KICK(int cs, std::vector<std::string> paramsVec, std::string);
-  void  MODE(int cs, std::vector<std::string> paramsVec, std::string);
-  void  INVITE(int cs, std::vector<std::string> paramsVec, std::string);
-  void  TOPIC(int cs, std::vector<std::string> paramsVec, std::string);
+  void  QUIT(int cs, std::vector<std::string> paramsVec);
+  void  JOIN(int cs, std::vector<std::string> paramsVec);
+  void  PART(int cs, std::vector<std::string> paramsVec);
+  void  LIST(int cs, std::vector<std::string> paramsVec);
+  void  NAMES(int cs, std::vector<std::string> paramsVec);
+  void  KICK(int cs, std::vector<std::string> paramsVec);
+  void  MODE(int cs, std::vector<std::string> paramsVec);
+  void  INVITE(int cs, std::vector<std::string> paramsVec);
+  void  TOPIC(int cs, std::vector<std::string> paramsVec);
 
-  void  PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
-  void  PRIVMSGHelper(int cs, const std::string& msgto, const std::string& trailing);
-  void  SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
-  void  PUBLICMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
-  void  TESTMSG(int cs, std::vector<std::string> paramsVec, std::string trailing);
-  void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, std::string trailing);
+  void  PRIVMSG(int cs, std::vector<std::string> paramsVec);
+  void  PRIVMSGHelper(int cs, const std::string& msgto, const std::string& msg);
+  void  SELFMSG(int cs, std::vector<std::string> paramsVec);
+  void  PUBLICMSG(int cs, std::vector<std::string> paramsVec);
+  void  TESTMSG(int cs, std::vector<std::string> paramsVec);
+  void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec);
   void  announceToChannel(std::string title, std::string message);
 
   std::vector<std::string> namesVec(std::set<int> fds);

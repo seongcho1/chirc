@@ -1,12 +1,12 @@
 #include "../../MessageManager.hpp"
 
 
-void MessageManager::TESTMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+void MessageManager::TESTMSG(int cs, std::vector<std::string> paramsVec) {
   if (paramsVec.size() == 0) {
-	  reply(cs, ERR_NEEDMOREPARAMS, "TESTMSG", paramsVec, trailing);
+	  reply(cs, ERR_NEEDMOREPARAMS, "TESTMSG", paramsVec);
     return;
   }
-  if (trailing.length() == 0) {
+  if (paramsVec[0].length() == 0) {
     // do something with errcode errcode:errstr map
     return;
   }
@@ -16,6 +16,6 @@ void MessageManager::TESTMSG(int cs, std::vector<std::string> paramsVec, std::st
     return;
   }
 
-  trailing = std::string("[from myself, " + SS::toString(cs) + "]").append(trailing).append(NEWLINE);
-  outMessages_[cs].append(trailing);
+  std::string message = std::string("[from myself, " + SS::toString(cs) + "]").append(paramsVec[0]).append(NEWLINE);
+  outMessages_[cs].append(message);
 }

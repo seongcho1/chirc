@@ -32,10 +32,10 @@ MessageManager::~MessageManager() {
 
 void MessageManager::fdClean(int cs) {
   if (users_.find(cs) != users_.end()) {
-    PART(cs, std::vector<std::string>(users_[cs].engaged.begin(), users_[cs].engaged.end()), "");
+    PART(cs, std::vector<std::string>(users_[cs].engaged.begin(), users_[cs].engaged.end()));
     // std::set<std::string>::iterator it = users_[cs].engaged.begin();
     // while (it != users_[cs].engaged.end()) {
-    //   PART(cs, std::vector<std::string>(users_[cs].engaged.begin(), users_[cs].engaged.end()), "");
+    //   PART(cs, std::vector<std::string>(users_[cs].engaged.begin(), users_[cs].engaged.end()));
     //   channels_[*it++].leave(cs);
     // }
     nickFdPair_.erase(users_[cs].nick);
@@ -97,6 +97,12 @@ void MessageManager::executeMessage(int cs, std::string message) {
   // then remove the first element and the rest should be args
   paramsVec.erase(paramsVec.begin());
 
+  //if trailing exists, it will be the last element of paramsVec
+  if (!trailing.empty()) {
+    paramsVec.push_back(trailing);
+    trailing.clear();
+  }
+
   //if not registered yet, only three following commands are usable
   if (users_[cs].authenticated < AUTH_MASK) {
     if (command.compare("PASS") != 0 &&
@@ -104,17 +110,16 @@ void MessageManager::executeMessage(int cs, std::string message) {
         command.compare("USER") != 0 &&
         command.compare("QUIT") != 0) {
 
-      reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec, trailing); //451
+      reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec); //451
       paramsVec.insert(paramsVec.begin(), command);
-      reply(cs, ERR_UNKNOWNCOMMAND, "executeMessage", paramsVec, trailing); //421
+      reply(cs, ERR_UNKNOWNCOMMAND, "executeMessage", paramsVec); //421
       return;
     }
   }
 
   //the command parameters (maximum of fifteen including trailing)
-  if ( (paramsVec.size() > 15 && trailing.empty()) ||
-       (paramsVec.size() > 14 && !trailing.empty()) ) {
-    reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Too Many Parameters"), paramsVec, trailing); //461 too many parameters
+  if (paramsVec.size() > 15) {
+    reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Too Many Parameters"), paramsVec); //461 too many parameters
     return;
   }
 
@@ -124,16 +129,16 @@ void MessageManager::executeMessage(int cs, std::string message) {
   // CR ctrl+V, ctrl+M can be checked
   // NUL ?? how can we check NUL ??
   if (SS::containExceptChar(paramsVec, CR)) {
-    reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Use nospcrlfcl Parameters"), paramsVec, trailing); //461 Use nospcrlfcl parameters
+    reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Use nospcrlfcl Parameters"), paramsVec); //461 Use nospcrlfcl parameters
     return;
   }
 
   std::map<std::string, FuncPtr>::iterator it = functionCallMap_.find(command);
   if (it != functionCallMap_.end())
-    (this->*functionCallMap_[command])(cs, paramsVec, trailing);
+    (this->*functionCallMap_[command])(cs, paramsVec);
   else {
     paramsVec.insert(paramsVec.begin(), command);
-    reply(cs, ERR_UNKNOWNCOMMAND, "executeMessage", paramsVec, trailing); //421
+    reply(cs, ERR_UNKNOWNCOMMAND, "executeMessage", paramsVec); //421
   }
 
 }

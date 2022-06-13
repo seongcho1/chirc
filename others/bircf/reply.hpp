@@ -23,9 +23,13 @@
 #define RPL_WHOISCHANNELS                    319
 
 #define RPL_WHOWASUSER                       314
+
+
+
 #define RPL_LISTSTART                        321  //
 #define RPL_LIST                             322  //
 #define RPL_LISTEND                          323  //
+
 #define RPL_NAMREPLY                         353  //
 #define RPL_ENDOFNAMES                       366  //
 #define RPL_ENDOFWHOWAS                      369

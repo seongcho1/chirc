@@ -1,14 +1,14 @@
 #include "../../MessageManager.hpp"
 
-void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+void MessageManager::PASS(int cs, std::vector<std::string> paramsVec) {
 
   if (users_[cs].authenticated & AUTH_LEVEL1) {
-    reply(cs, ERR_ALREADYREGISTRED, "PASS", paramsVec, trailing); //462
+    reply(cs, ERR_ALREADYREGISTRED, "PASS", paramsVec); //462
     return;
   }
 
-  if (paramsVec.size() != 1 || !trailing.empty()) {
-    reply(cs, ERR_NEEDMOREPARAMS, "PASS", paramsVec, trailing); //461
+  if (paramsVec.size() != 1) {
+    reply(cs, ERR_NEEDMOREPARAMS, "PASS", paramsVec); //461
     return;
   }
 
@@ -16,11 +16,11 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec, std::strin
     users_[cs].authenticated |= AUTH_LEVEL1;
 
     if (users_[cs].authenticated == AUTH_MASK)
-      reply(cs, RPL_WELCOME, "PASS", paramsVec, trailing); //001
+      reply(cs, RPL_WELCOME, "PASS", paramsVec); //001
 
   }
   else
-    reply(cs, ERR_PASSWDMISMATCH, "PASS", paramsVec, trailing); //464
+    reply(cs, ERR_PASSWDMISMATCH, "PASS", paramsVec); //464
 
 }
 
