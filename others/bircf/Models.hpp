@@ -53,16 +53,18 @@ The user creating a channel automatically becomes channel operator
 */
 class Channel {
 public:
-  unsigned int mode;
   std::string title;
   std::string topic;
+  unsigned int mode;
   // int channelCreator;
   std::set<int> channelOperators;
   std::set<int> channelSpeaker;
   std::set<int> member;
 
   Channel() {}
-  Channel(std::string &title) : title(title)  {}
+  Channel(std::string &title) : 
+    title(title),
+    mode(0) {}
 
   bool leave(int fd) {
     channelOperators.erase(fd);
@@ -70,7 +72,7 @@ public:
     return member.erase(fd); 
   }
   
-  std::string currentMode(void)               {
+  std::string currentMode(void) {
     std::string result;
     for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
       if (((mode >> i) & 1))
@@ -99,7 +101,7 @@ public:
       else if (*it == '-') {
         add = false;
       }
-      else if ('a' <= *it && *it <= 'z' && USER_MODE_FLAGS[*it - 'a'] != '0') {
+      else if ('a' <= *it && *it <= 'z' && CHANNEL_MODE_FLAGS[*it - 'a'] != '0') {
         if (add)
           this->mode |= 1 << (*it - 'a');
         else
@@ -140,7 +142,7 @@ public:
   void toQuit(void)                 { quit = true; }
   void keepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
-  bool clientRead(std::string &buffer)    {
+  bool clientRead(std::string &buffer) {
     char read[BUF_SIZE + 1];
     int r = recv(fd, read, BUF_SIZE + 1, 0);
 
@@ -154,7 +156,7 @@ public:
     return true;
   }
 
-  void clientWrite(std::string &message)  {
+  void clientWrite(std::string &message) {
     if (message.empty())
       return;
 

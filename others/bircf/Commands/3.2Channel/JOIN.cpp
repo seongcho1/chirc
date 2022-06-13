@@ -15,8 +15,8 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
   while (it != paramsVec.end()) {
 
     if (channels_.find(*it) == channels_.end()) {
-      channels_[*it] = Channel();
-      channels_[*it].title = *paramsVec.begin();
+      channels_[*it] = Channel(*paramsVec.begin());
+      // channels_[*it].title = *paramsVec.begin();
       channels_[*it].channelOperators.insert(cs);
     }
 
