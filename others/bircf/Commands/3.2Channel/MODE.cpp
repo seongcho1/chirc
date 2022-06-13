@@ -23,7 +23,7 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
   }
 
   if (paramsVec.size() < 2) {
-    outMessages_[cs].append("Mode: ").append(channels_[channel].currentMode()).append("\n");
+    outMessages_[cs].append("Mode: ").append(channels_[channel].currentMode(CHANNEL_MODE_FLAGS)).append("\n");
     return;
   }
 
@@ -32,8 +32,8 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  channels_[channel].setMode(mode);
-  announceToChannel(channel, "Mode: " + channels_[channel].currentMode() + "\n");
+  channels_[channel].setMode(mode, CHANNEL_MODE_FLAGS);
+  announceToChannel(ircfd, channel, "Mode: " + channels_[channel].currentMode(CHANNEL_MODE_FLAGS));
 }
 
 void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
@@ -50,13 +50,13 @@ void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
   }
 
   if (paramsVec.size() < 2) {
-    outMessages_[cs].append("Mode: ").append(users_[fd].currentMode()).append("\n");
+    outMessages_[cs].append("Mode: ").append(users_[fd].currentMode(USER_MODE_FLAGS)).append("\n");
     return;
   }
 
   if (fd == cs) {
-    users_[cs].setMode(mode);
-    outMessages_[cs].append("Mode: ").append(users_[fd].currentMode()).append("\n");
+    users_[cs].setMode(mode, USER_MODE_FLAGS);
+    outMessages_[cs].append("Mode: ").append(users_[fd].currentMode(USER_MODE_FLAGS)).append("\n");
   }
   else {
     outMessages_[cs].append("You are not OP\n");

@@ -46,53 +46,44 @@ enum CreateOption {
   AS_CREATOR,  // !
 };
 
+enum Commands {
+  E_INVITE,
+  E_JOIN,
+  E_KICK,
+  E_LIST,
+  E_MODE,
+  E_NAMES,
+  E_TOPIC,
+  E_MODERATED,
+};
+
 /*
 The user creating a channel automatically becomes channel operator
    with the notable exception of channels which name is prefixed by the
    character '+'
 */
-class Channel {
+class BaseModel {
 public:
-  std::string title;
-  std::string topic;
   unsigned int mode;
-  // int channelCreator;
-  std::set<int> channelOperators;
-  std::set<int> channelSpeaker;
-  std::set<int> member;
-
-  Channel() {}
-  Channel(std::string &title) : 
-    title(title),
-    mode(0) {}
-
-  bool leave(int fd) {
-    channelOperators.erase(fd);
-    channelSpeaker.erase(fd);
-    return member.erase(fd); 
-  }
   
-  std::string currentMode(void) {
+  std::string currentMode(std::string filter) {
     std::string result;
     for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
       if (((mode >> i) & 1))
-        result += CHANNEL_MODE_FLAGS[i];
+        result += filter[i];
     }
     if (result.size() > 0)
       result = "+" + result;
     return result;
   }
 
-  // void userMode(std::string mode, int member) {
-
-  // }
-
   bool isMode(char flag) {
     return (mode >> (flag - 'a') & 1);
   }
 
-  void setMode(std::string mode) {
+  bool setMode(std::string mode, std::string filter) {
     std::string::iterator it = mode.begin();
+    unsigned int bitmap = this->mode;
     bool add = false;
     while (it != mode.end()) {
       if (*it == '+') {
@@ -101,25 +92,97 @@ public:
       else if (*it == '-') {
         add = false;
       }
-      else if ('a' <= *it && *it <= 'z' && CHANNEL_MODE_FLAGS[*it - 'a'] != '0') {
+      else if ('a' <= *it && *it <= 'z' && filter[*it - 'a'] != '0') {
         if (add)
-          this->mode |= 1 << (*it - 'a');
+          bitmap |= 1 << (*it - 'a');
         else
-          this->mode &= ~(1 << (*it - 'a'));
+          bitmap &= ~(1 << (*it - 'a'));
       }
       ++it;
     }
+    
+    return isChanged(this->mode, bitmap);
+  }
+
+  bool isChanged(unsigned int &to, unsigned int const &from) {
+    if (to == from)
+      return false;
+    to = from;
+    return true;
   }
 };
 
-class User {
+class Channel : public BaseModel {
+public:
+  std::string title;
+  std::string topic;
+  // unsigned int mode;
+  // int channelCreator;
+  std::set<int> channelOperators;
+  std::set<int> channelSpeaker;
+  std::set<int> member;
+
+  Channel() {}
+  Channel(std::string &title) : 
+    title(title) { BaseModel::mode = 0; }
+
+  bool leave(int fd) {
+    channelOperators.erase(fd);
+    channelSpeaker.erase(fd);
+    return member.erase(fd); 
+  }
+  
+  // std::string currentMode(void) {
+  //   std::string result;
+  //   for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
+  //     if (((mode >> i) & 1))
+  //       result += CHANNEL_MODE_FLAGS[i];
+  //   }
+  //   if (result.size() > 0)
+  //     result = "+" + result;
+  //   return result;
+  // }
+
+  // void userMode(std::string mode, int member) {
+
+  // }
+
+  // bool isMode(char flag) {
+  //   return (mode >> (flag - 'a') & 1);
+  // }
+
+  // bool setMode(std::string mode) {
+  //   std::string::iterator it = mode.begin();
+  //   unsigned int bitmap = this->mode;
+  //   bool add = false;
+  //   while (it != mode.end()) {
+  //     if (*it == '+') {
+  //       add = true;
+  //     }
+  //     else if (*it == '-') {
+  //       add = false;
+  //     }
+  //     else if ('a' <= *it && *it <= 'z' && CHANNEL_MODE_FLAGS[*it - 'a'] != '0') {
+  //       if (add)
+  //         bitmap |= 1 << (*it - 'a');
+  //       else
+  //         bitmap &= ~(1 << (*it - 'a'));
+  //     }
+  //     ++it;
+  //   }
+    
+  //   return isChanged(this->mode, bitmap);
+  // }
+};
+
+class User : public BaseModel {
 public:
   int fd;
   std::string nick;
   std::string user;
   std::string real;
   std::string host;
-  unsigned int mode;
+  // unsigned int mode;
   char authenticated;
   bool waitPong;
   bool quit;
@@ -132,11 +195,11 @@ public:
   User(int const &fd, std::string const &host, char auth) :
     fd(fd),
     host(host),
-    mode(0),
+    // mode(0),
     authenticated(auth),
     quit(false),
     dead(time(NULL) + WAIT_TIME),
-    alive(time(NULL) + TIMEOUT) {}
+    alive(time(NULL) + TIMEOUT) { BaseModel::mode = 0; }
   bool isAlive(void)                { return time(NULL) < alive; }
   bool isDead(void)                 { return dead < time(NULL); }
   void toQuit(void)                 { quit = true; }
@@ -179,40 +242,43 @@ public:
     return nick;
   }
 
-  std::string currentMode(void) {
-    std::string result;
-    for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
-      if (((mode >> i) & 1))
-        result += USER_MODE_FLAGS[i];
-    }
-    if (result.size() > 0)
-      result = "+" + result;
-    return result;
-  }
+  // std::string currentMode(void) {
+  //   std::string result;
+  //   for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
+  //     if (((mode >> i) & 1))
+  //       result += USER_MODE_FLAGS[i];
+  //   }
+  //   if (result.size() > 0)
+  //     result = "+" + result;
+  //   return result;
+  // }
 
-  bool isMode(char flag) {
-    return (mode >> (flag - 'a') & 1);
-  }
+  // bool isMode(char flag) {
+  //   return (mode >> (flag - 'a') & 1);
+  // }
 
-  void setMode(std::string mode) {
-    std::string::iterator it = mode.begin();
-    bool add = false;
-    while (it != mode.end()) {
-      if (*it == '+') {
-        add = true;
-      }
-      else if (*it == '-') {
-        add = false;
-      }
-      else if ('a' <= *it && *it <= 'z' && USER_MODE_FLAGS[*it - 'a'] != '0') {
-        if (add)
-          this->mode |= 1 << (*it - 'a');
-        else
-          this->mode &= ~(1 << (*it - 'a'));
-      }
-      ++it;
-    }
-  }
+  // bool setMode(std::string mode) {
+  //   std::string::iterator it = mode.begin();
+  //   unsigned int bitmap = this->mode;
+  //   bool add = false;
+  //   while (it != mode.end()) {
+  //     if (*it == '+') {
+  //       add = true;
+  //     }
+  //     else if (*it == '-') {
+  //       add = false;
+  //     }
+  //     else if ('a' <= *it && *it <= 'z' && CHANNEL_MODE_FLAGS[*it - 'a'] != '0') {
+  //       if (add)
+  //         bitmap |= 1 << (*it - 'a');
+  //       else
+  //         bitmap &= ~(1 << (*it - 'a'));
+  //     }
+  //     ++it;
+  //   }
+    
+  //   return isChanged(this->mode, bitmap);
+  // }
 };
 
 #endif

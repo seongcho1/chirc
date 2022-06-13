@@ -49,12 +49,13 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
   // then  announce to the users list ???
   if ( (users_[cs].authenticated == AUTH_MASK) && !legacyPrefix.empty()) {
     std::string message;
-    std::set<std::string>::iterator eit = users_[cs].engaged.begin();
+    // std::set<std::string>::iterator eit = users_[cs].engaged.begin();
     // :WiZ!jto@tolsun.oulu.fi NICK Kilroy  ; Server telling that WiZ changed his nickname to Kilroy.
-    message.append(":" + legacyPrefix + " NICK " + nick).append(NEWLINE);
-    while (eit != users_[cs].engaged.end()) {
-      announceToChannel(*eit++, message);
-    }
+    message.append(":" + legacyPrefix + " NICK " + nick);
+    announceToUser(ircfd, message);
+    // while (eit != users_[cs].engaged.end()) {
+    //   announceToChannel(*eit++, message);
+    // }
   }
   // announce to engaged channels [from nick to nick] ----------------------------------
 }

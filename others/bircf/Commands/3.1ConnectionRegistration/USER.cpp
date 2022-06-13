@@ -1,7 +1,6 @@
 #include "../../MessageManager.hpp"
 
 void MessageManager::USER(int cs, std::vector<std::string> paramsVec) {
-
   if (users_[cs].authenticated & AUTH_LEVEL3) {
     reply(cs, ERR_ALREADYREGISTRED, "USER", paramsVec); //462
     return;
