@@ -1,8 +1,8 @@
 #include "../../MessageManager.hpp"
 
-void MessageManager::MODE(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+void MessageManager::MODE(int cs, std::vector<std::string> paramsVec) {
   if (paramsVec.size() < 1) {
-    reply(cs, ERR_NEEDMOREPARAMS, "MODE", paramsVec, trailing);
+    reply(cs, ERR_NEEDMOREPARAMS, "MODE", paramsVec);
     return;
   }
 
@@ -18,7 +18,7 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
   std::string mode = *(++paramsVec.begin());
 
   if (channels_.find(channel) == channels_.end()) {
-    reply(cs, ERR_NOSUCHCHANNEL, "MODE", paramsVec, "");
+    reply(cs, ERR_NOSUCHCHANNEL, "MODE", paramsVec);
     return;
   }
 
@@ -28,11 +28,12 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
   }
 
   if (channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
-    reply(cs, ERR_CHANOPRIVSNEEDED, "MODE", paramsVec, "");
+    reply(cs, ERR_CHANOPRIVSNEEDED, "MODE", paramsVec);
     return;
   }
 
   channels_[channel].setMode(mode);
+  announceToChannel(channel, "Mode: " + channels_[channel].currentMode() + "\n");
 }
 
 void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
@@ -41,7 +42,7 @@ void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
   int fd;
 
   if (nickFdPair_.find(nick) == nickFdPair_.end()) {
-    reply(cs, ERR_NOSUCHNICK, "MODE", paramsVec, "");
+    reply(cs, ERR_NOSUCHNICK, "MODE", paramsVec);
     return;
   }
   else {
