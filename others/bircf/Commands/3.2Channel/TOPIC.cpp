@@ -3,24 +3,32 @@
 void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
 
   if (paramsVec.size() < 1) {
-    reply(cs, ERR_NEEDMOREPARAMS, "TOPIC", paramsVec);
+    reply(cs, ERR_NEEDMOREPARAMS, "TOPIC", paramsVec); //401
     return;
   }
 
   if (paramsVec.size() < 2) {
+    //reply(cs, RPL_TOPIC, "TOPIC", paramsVec); //332
     outMessages_[cs].append("TOPIC: ").append(channels_[*paramsVec.begin()].topic).append("\n");
+    return;
+  }
+
+  //check if channel exist first
+  if ( paramsVec[0][0] != '#' ||
+       (channels_.find(paramsVec[0]) == channels_.end()) ) {
+    reply(cs, ERR_NOSUCHCHANNEL, "TOPIC", paramsVec); //403
     return;
   }
 
   if (channels_[*paramsVec.begin()].channelCreator != cs &&
       channels_[*paramsVec.begin()].channelOperators.find(cs) == channels_[*paramsVec.begin()].channelOperators.end()) {
     // reply(cs, ERR_BADCHANMASK, "KICK", paramsVec);
-    reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec);
+    reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec); //482
     return;
   }
 
   if (users_[cs].engaged.find(*paramsVec.begin()) == users_[cs].engaged.end()) {
-    reply(cs, ERR_NOTONCHANNEL, "TOPIC", paramsVec);
+    reply(cs, ERR_NOTONCHANNEL, "TOPIC", paramsVec); //442
     return;
   }
 
@@ -52,12 +60,13 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.2.4
 
    Numeric Replies:
 
-           ERR_NEEDMOREPARAMS
-           ERR_NOTONCHANNEL
-           RPL_NOTOPIC
-           RPL_TOPIC
-           ERR_CHANOPRIVSNEEDED
-           ERR_NOCHANMODES
+           ERR_NEEDMOREPARAMS         :401 done
+           ERR_NOSUCHCHANNEL          :403 done
+           ERR_NOTONCHANNEL           :442 done
+           RPL_NOTOPIC                :331
+           RPL_TOPIC                  :332
+           ERR_CHANOPRIVSNEEDED       :482 done
+           ERR_NOCHANMODES            :477
 
    Examples:
 

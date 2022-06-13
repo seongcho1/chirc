@@ -225,7 +225,7 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
     //481    =  :Permission Denied- You are not an IRC operator
     case  ERR_NOPRIVILEGES       :  break;  //481
     //482    =  <channel> :You are not channel operator
-    case  ERR_CHANOPRIVSNEEDED   :  // sVec.push_back("<channel>");  rVec.push_back(??);                    ???
+    case  ERR_CHANOPRIVSNEEDED   :  sVec.push_back("<channel>");  rVec.push_back(paramsVec[0]);
                                     break;  //482
     //483    =  :You can not kill a server!
     case  ERR_CANTKILLSERVER     :  break;  //483

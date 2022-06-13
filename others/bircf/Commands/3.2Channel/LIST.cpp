@@ -47,8 +47,8 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.2.6
 
            ERR_TOOMANYMATCHES
            ERR_NOSUCHSERVER
-           RPL_LIST
-           RPL_LISTEND
+           RPL_LIST               :322
+           RPL_LISTEND            :323
 
    Examples:
 
