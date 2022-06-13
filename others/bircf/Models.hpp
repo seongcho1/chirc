@@ -20,6 +20,11 @@
 #define WAIT_TIME 30
 #define PING_REQUEST "PING :"
 #define PONG_RESULT "FT_IRC"
+#define MODE_FLAGS_MAP_SIZE     26
+#define MODE_FALGS_MAP          "abcdefghijklmnopqrstuvwxyz"
+#define USER_MODE_FLAGS         "00000000i00000000000000000"
+#define CHANNEL_MODE_FLAGS      "ab000000i0klmn0p00st000000"
+#define CHANNEL_USER_MODE_FLAGS "00000000000000o000000v0000"
 
 #define AUTH_LEVEL1 0x1 // pass
 #define AUTH_LEVEL2 0x2 // nick
@@ -48,16 +53,61 @@ The user creating a channel automatically becomes channel operator
 */
 class Channel {
 public:
-  int mode;
+  unsigned int mode;
   std::string title;
   std::string topic;
-  int channelCreator;
+  // int channelCreator;
   std::set<int> channelOperators;
+  std::set<int> channelSpeaker;
   std::set<int> member;
 
   Channel() {}
   Channel(std::string &title) : title(title)  {}
-  bool leave(int fd)                          { return member.erase(fd); }
+
+  bool leave(int fd) {
+    channelOperators.erase(fd);
+    channelSpeaker.erase(fd);
+    return member.erase(fd); 
+  }
+  
+  std::string currentMode(void)               {
+    std::string result;
+    for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
+      if (((mode >> i) & 1))
+        result += CHANNEL_MODE_FLAGS[i];
+    }
+    if (result.size() > 0)
+      result = "+" + result;
+    return result;
+  }
+
+  // void userMode(std::string mode, int member) {
+
+  // }
+
+  bool isMode(char flag) {
+    return (mode >> (flag - 'a') & 1);
+  }
+
+  void setMode(std::string mode) {
+    std::string::iterator it = mode.begin();
+    bool add = false;
+    while (it != mode.end()) {
+      if (*it == '+') {
+        add = true;
+      }
+      else if (*it == '-') {
+        add = false;
+      }
+      else if ('a' <= *it && *it <= 'z' && USER_MODE_FLAGS[*it - 'a'] != '0') {
+        if (add)
+          this->mode |= 1 << (*it - 'a');
+        else
+          this->mode &= ~(1 << (*it - 'a'));
+      }
+      ++it;
+    }
+  }
 };
 
 class User {
@@ -67,6 +117,7 @@ public:
   std::string user;
   std::string real;
   std::string host;
+  unsigned int mode;
   char authenticated;
   bool waitPong;
   bool quit;
@@ -79,6 +130,7 @@ public:
   User(int const &fd, std::string const &host, char auth) :
     fd(fd),
     host(host),
+    mode(0),
     authenticated(auth),
     quit(false),
     dead(time(NULL) + WAIT_TIME),
@@ -123,6 +175,41 @@ public:
     else if (user.length() && host.length())
 	    return std::string(nick + "!" + user + "@" + host);
     return nick;
+  }
+
+  std::string currentMode(void) {
+    std::string result;
+    for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
+      if (((mode >> i) & 1))
+        result += USER_MODE_FLAGS[i];
+    }
+    if (result.size() > 0)
+      result = "+" + result;
+    return result;
+  }
+
+  bool isMode(char flag) {
+    return (mode >> (flag - 'a') & 1);
+  }
+
+  void setMode(std::string mode) {
+    std::string::iterator it = mode.begin();
+    bool add = false;
+    while (it != mode.end()) {
+      if (*it == '+') {
+        add = true;
+      }
+      else if (*it == '-') {
+        add = false;
+      }
+      else if ('a' <= *it && *it <= 'z' && USER_MODE_FLAGS[*it - 'a'] != '0') {
+        if (add)
+          this->mode |= 1 << (*it - 'a');
+        else
+          this->mode &= ~(1 << (*it - 'a'));
+      }
+      ++it;
+    }
   }
 };
 

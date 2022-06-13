@@ -28,8 +28,7 @@ void MessageManager::KICK(int cs, std::vector<std::string> paramsVec, std::strin
     return;
   }
 
-  if (channels_[*paramsVec.begin()].channelCreator != cs &&
-      channels_[*paramsVec.begin()].channelOperators.find(cs) == channels_[*paramsVec.begin()].channelOperators.end()) {
+  if (channels_[*paramsVec.begin()].channelOperators.find(cs) == channels_[*paramsVec.begin()].channelOperators.end()) {
     // reply(cs, ERR_BADCHANMASK, "KICK", paramsVec, trailing);
     reply(cs, ERR_CHANOPRIVSNEEDED, "KICK", paramsVec, trailing);
     return;

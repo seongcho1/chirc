@@ -21,6 +21,7 @@ void MessageManager::PART(int cs, std::vector<std::string> paramsVec, std::strin
     }
     else {
       outMessages_[cs].append("leaves room [" + *it + "]\n");
+      channels_[*it].leave(cs);
 
       if (channels_[*it].member.size() == 0) {
         channels_.erase(*it);
