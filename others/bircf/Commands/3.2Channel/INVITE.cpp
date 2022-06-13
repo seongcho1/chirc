@@ -33,11 +33,8 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-std::cout << "cr = " << channels_[channel].channelCreator << std::endl;
-
-  if (channels_[channel].channelCreator != cs &&
-      channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
-    reply(cs, ERR_CHANOPRIVSNEEDED, "INVITE", paramsVec);
+  if (channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
+    reply(cs, ERR_CHANOPRIVSNEEDED, "INVITE", paramsVec, trailing);
     return;
   }
 

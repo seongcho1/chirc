@@ -20,9 +20,7 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  if (channels_[*paramsVec.begin()].channelCreator != cs &&
-      channels_[*paramsVec.begin()].channelOperators.find(cs) == channels_[*paramsVec.begin()].channelOperators.end()) {
-    // reply(cs, ERR_BADCHANMASK, "KICK", paramsVec);
+  if (channels_[*paramsVec.begin()].channelOperators.find(cs) == channels_[*paramsVec.begin()].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec); //482
     return;
   }
@@ -37,10 +35,9 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
   while (pit != paramsVec.end())
     topic.append(*pit++).append(" ");
   channels_[*paramsVec.begin()].topic = topic;
-
-  std::string message;
-  message.append(users_[cs].nick).append(" has set topic: ").append(topic).append("\n");
-  announceToChannel(*paramsVec.begin(), message);
+  
+  topic = users_[cs].nick + " has set topic: " + topic + "\n";
+  announceToChannel(*paramsVec.begin(), topic);
 }
 
 

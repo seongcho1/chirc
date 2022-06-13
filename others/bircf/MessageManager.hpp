@@ -51,6 +51,8 @@ private:
   void  TESTMSG(int cs, std::vector<std::string> paramsVec);
   void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec);
   void  announceToChannel(std::string title, std::string message);
+  void  modeChannel(int cs, std::vector<std::string> paramsVec);
+  void  modeUser(int cs, std::vector<std::string> paramsVec);
 
   std::vector<std::string> namesVec(std::set<int> fds);
   std::string namesVec_TEST(std::set<int> fds);

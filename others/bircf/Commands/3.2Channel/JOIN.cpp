@@ -17,8 +17,7 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
     if (channels_.find(*it) == channels_.end()) {
       channels_[*it] = Channel();
       channels_[*it].title = *paramsVec.begin();
-      //channels_[*it].topic = trailing;  //seongcho: join command can not deal with topic
-      channels_[*it].channelCreator = cs;
+      channels_[*it].channelOperators.insert(cs);
     }
 
     if (channels_[*it].member.find(cs) == channels_[*it].member.end()) {

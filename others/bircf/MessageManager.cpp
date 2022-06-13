@@ -14,7 +14,7 @@ void MessageManager::registerFunctions() {
   functionCallMap_["LIST"] =        &MessageManager::LIST;
   functionCallMap_["NAMES"] =       &MessageManager::NAMES;
   functionCallMap_["KICK"] =        &MessageManager::KICK;
-  // functionCallMap_["MODE"] =        &MessageManager::MODE;
+  functionCallMap_["MODE"] =        &MessageManager::MODE;
   functionCallMap_["INVITE"] =      &MessageManager::INVITE;
   functionCallMap_["TOPIC"] =       &MessageManager::TOPIC;
 

@@ -156,10 +156,12 @@ void	Ircserv::checkFd() {
 
 void Ircserv::disposeCorpse() {
   while (timeout.size()) {
+    
     if (!timeout.top().quit) {
       messenger.outMessages()[timeout.top().fd].append("timeout\n");
       messenger.clientWrite(timeout.top().fd);
     }
+
     messenger.kickUser(timeout.top().fd);
     timeout.pop();
   }
