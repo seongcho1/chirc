@@ -50,7 +50,9 @@ private:
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec);
   void  TESTMSG(int cs, std::vector<std::string> paramsVec);
   void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec);
-  void  announceToChannel(std::string title, std::string message);
+  void  announceToChannel(int cs, std::string title, std::string message);
+  void  announceToChannel(int cs, std::string title, Commands command, std::string message);
+  void  announceToUser(int cs, std::string message);
   void  modeChannel(int cs, std::vector<std::string> paramsVec);
   void  modeUser(int cs, std::vector<std::string> paramsVec);
 
@@ -69,6 +71,7 @@ public:
   ~MessageManager();
   void	fdClean(int cs);
   std::string                 pass;
+  int                         ircfd;
 
   std::map<int, User>         &users()            { return users_; }
   // std::map<int, User>       &authenticates()   { return reqAuthenticates_; }

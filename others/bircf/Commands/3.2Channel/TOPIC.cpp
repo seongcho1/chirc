@@ -39,8 +39,8 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     topic.append(*pit++).append(" ");
   channels_[*paramsVec.begin()].topic = topic;
 
-  topic = users_[cs].nick + " has set topic: " + topic + "\n";
-  announceToChannel(*paramsVec.begin(), topic);
+  topic = users_[cs].nick + " has set topic: " + topic;
+  announceToChannel(ircfd, *paramsVec.begin(), topic);
 }
 
 

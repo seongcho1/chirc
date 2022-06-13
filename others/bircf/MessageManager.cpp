@@ -184,9 +184,48 @@ void MessageManager::ping(int cs) {
   users_[cs].alive = time(NULL) + TIMEOUT;
 }
 
-void MessageManager::announceToChannel(std::string title, std::string message) {
+void MessageManager::announceToChannel(int cs, std::string title, std::string message) {
   std::set<int>::iterator it = channels_[title].member.begin();
   while (it != channels_[title].member.end()) {
-    outMessages_[*it++].append(message);
+    if (cs != *it)
+      outMessages_[*it++].append(message);
+  }
+}
+
+void MessageManager::announceToChannel(int cs, std::string title, Commands command, std::string message) {
+  // std::set<int>::iterator memberit = channels_[title].member.begin();
+
+std::vector<std::string> TEMP;
+
+  switch (command) {
+    
+    case E_TOPIC :
+      if (channels_[title].isMode('t') &&
+          channels_[title].channelOperators.find(cs) != channels_[title].channelOperators.end()) {
+        TEMP.push_back(title);
+        reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", TEMP);
+        return;
+      }
+      channels_[title].topic = message;
+      announceToChannel(cs, title, message);
+      return;
+
+    // case 
+    default:
+      break;
+  }
+}
+
+void MessageManager::announceToUser(int cs, std::string message) {
+  std::set<std::string>::iterator engagedit = users_[cs].engaged.begin();
+  std::set<int> friendly;
+
+  while (engagedit != users_[cs].engaged.end()) {
+    friendly.insert(channels_[*engagedit].member.begin(), channels_[*engagedit].member.end());
+    ++engagedit;
+  }
+
+  for (std::set<int>::iterator it = friendly.begin(); it != friendly.end(); ++it) {
+    outMessages_[*it].append(message).append(NEWLINE);
   }
 }

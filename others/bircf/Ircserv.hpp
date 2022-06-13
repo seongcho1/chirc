@@ -76,6 +76,7 @@ void	Ircserv::srvCreate(int port) {
   X(-1, listen(s, 42), (char *)"listen");
 
   ircFd = s;
+  messenger.ircfd = ircFd;
 
   selectInterval.tv_sec = 1;			//3 second timeout
   selectInterval.tv_usec = 0;		//0 micro second timeout
