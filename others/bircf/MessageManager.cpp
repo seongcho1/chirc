@@ -75,6 +75,10 @@ void MessageManager::executeMessage(int cs, std::string message) {
   if ( users_[cs].authenticated == AUTH_MASK )
     SS::eraseFirstWord(message, std::string(":" + users_[cs].prefix()), std::string(":" + users_[cs].nick));
 
+
+  //trailing can be a empty string, so if a string have a colon, it will have two elements, second one is empty one
+  //if a string does not contain a colon it will have only one element
+
   std::string command_params, trailing;
   std::vector<std::string> command_params_trailing = SS::splitString(message, SPACE_COLON, false, false, true);
 

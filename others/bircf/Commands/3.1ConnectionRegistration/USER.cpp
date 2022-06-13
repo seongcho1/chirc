@@ -9,7 +9,7 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec) {
 
   if (paramsVec.size() != 4) {
     reply(cs, ERR_NEEDMOREPARAMS, "USER", paramsVec); //461
-    outMessages_[cs].append("** Usage: [USER <user> <mode> <unused> <realname>] **\n");
+    outMessages_[cs].append("** Usage: USER <user> <mode> <unused> <realname> **\n");
     return;
   }
 

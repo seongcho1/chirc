@@ -2,6 +2,8 @@
 
 void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
 
+  std::cout << "params.size=" << paramsVec.size() << std::endl;
+
   if (paramsVec.size() < 1) {
     reply(cs, ERR_NEEDMOREPARAMS, "TOPIC", paramsVec); //401
     return;
@@ -12,6 +14,7 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     outMessages_[cs].append("TOPIC: ").append(channels_[*paramsVec.begin()].topic).append("\n");
     return;
   }
+
 
   //check if channel exist first
   if ( paramsVec[0][0] != '#' ||
@@ -35,7 +38,7 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
   while (pit != paramsVec.end())
     topic.append(*pit++).append(" ");
   channels_[*paramsVec.begin()].topic = topic;
-  
+
   topic = users_[cs].nick + " has set topic: " + topic + "\n";
   announceToChannel(*paramsVec.begin(), topic);
 }

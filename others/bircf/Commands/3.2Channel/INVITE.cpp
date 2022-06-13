@@ -34,14 +34,14 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
   }
 
   if (channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
-    reply(cs, ERR_CHANOPRIVSNEEDED, "INVITE", paramsVec, trailing);
+    reply(cs, ERR_CHANOPRIVSNEEDED, "INVITE", paramsVec);
     return;
   }
 
   users_[nickfdit->second].invited.insert(channel);
-  // reply(cs, RPL_INVITING, "INVITE", paramsVec, trailing);
+  // reply(cs, RPL_INVITING, "INVITE", paramsVec);
   outMessages_[cs].append("inviting ").append(nickfdit->first).append(" to #").append(channel).append("\n");
-  // reply(cs, RPL_AWAY, "INVITE", paramsVec, trailing);
+  // reply(cs, RPL_AWAY, "INVITE", paramsVec);
   outMessages_[nickfdit->second].append(users_[cs].nick).append(" invite you to #").append(channel).append("\n");
 }
 

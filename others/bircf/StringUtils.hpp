@@ -207,17 +207,17 @@ public:
   static std::vector<std::string>  splitString(std::string &s, std::string delimiter,
                                               bool bSkipLast = false,
                                               bool bClearProcessedString = false,
-                                              bool bCutOnceMakeTwo = false) {
+                                              bool bCutOnce = false) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     std::string token;
     std::vector<std::string> result;
     int i = 0;
-    if (s.empty() && !bCutOnceMakeTwo)
+    if (s.empty() && !bCutOnce)
       return result;
 
     while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
       token = s.substr(pos_start, pos_end - pos_start); //+ delimiter.length());
-      if ( (bCutOnceMakeTwo && i == 0 && token.empty()) ||
+      if ( (bCutOnce && i == 0 && token.empty()) ||
            (!token.empty()) ) {
         result.push_back(token);  //in case of vector
         i++;
@@ -229,7 +229,7 @@ public:
       }
 
       pos_start = pos_end + delim_len;
-      if (bCutOnceMakeTwo)
+      if (bCutOnce)
         break;
     }
 
@@ -243,11 +243,11 @@ public:
       }
     }
 
-    //if bCutOnceMakeTwo is true, the result always have two (empty) elements
-    if (bCutOnceMakeTwo && result.size() == 0)
-      result.push_back(std::string());
-    if (bCutOnceMakeTwo && result.size() == 1)
-      result.push_back(std::string());
+    //if bCutOnce is true, the result always have two (empty) elements
+    //if (bCutOnce && result.size() == 0)
+    //  result.push_back(std::string());
+    //if (bCutOnce && result.size() == 1)
+    //  result.push_back(std::string());
 
     return result;
   }

@@ -64,6 +64,7 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
     outMessages_[recipient].append(message);
   }
   //to channel
+  //seongcho: need to check channel modes
   else {
     std::string title = channels_.find(msgto)->first;
     Channel channel =  channels_[title];
@@ -73,6 +74,7 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
       reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec); //404
       return;
     }
+
     for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
       recipient = *it;
       if (recipient == cs)

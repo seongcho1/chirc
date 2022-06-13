@@ -51,7 +51,8 @@ int splitSstringTest() {
 
   int i;
   std::string a1 = "\n\n\naaa\nbbb\nccc\nddd";
-  std::string a2 = "";
+  std::string a2 = "aaa :";
+
 /*
   std::vector<std::string> avec1 = SS::splitString(a1, NEWLINE, true, true);
 
@@ -134,9 +135,8 @@ int main() {
 
   //MessageManager c;
   //c.executeCommand("PRIVMSG");
-
   //clientWriteTest();
-  //splitSstringTest();
+  splitSstringTest();
   //toUpperTest();
   //matchStringTest();
   //trimStringTest();
