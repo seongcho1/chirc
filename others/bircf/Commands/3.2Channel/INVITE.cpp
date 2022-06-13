@@ -4,8 +4,10 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
 
   if (paramsVec.size() == 0) {
     std::set<std::string>::iterator invited = users_[cs].invited.begin();
+    outMessages_[cs].append("invited: ");
     while (invited != users_[cs].invited.end())
-      outMessages_[cs].append("invited: ").append(*invited++).append("\n");
+      outMessages_[cs].append(*invited++).append(" ");
+    outMessages_[cs].append(NEWLINE);
     outMessages_[cs].append("End of INVITE list\n");
     return;
   }
@@ -33,16 +35,15 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  if (channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
+  if (channels_[channel].isMode('i') &&
+      channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "INVITE", paramsVec);
     return;
   }
 
   users_[nickfdit->second].invited.insert(channel);
-  // reply(cs, RPL_INVITING, "INVITE", paramsVec);
-  outMessages_[cs].append("inviting ").append(nickfdit->first).append(" to #").append(channel).append("\n");
-  // reply(cs, RPL_AWAY, "INVITE", paramsVec);
-  outMessages_[nickfdit->second].append(users_[cs].nick).append(" invite you to #").append(channel).append("\n");
+  announceToSelf(cs, std::string().append("inviting ").append(nickfdit->first).append(" to #").append(channel));
+  announceToSelf(nickfdit->second, std::string().append(users_[cs].nick).append(" invite you to #").append(channel));
 }
 
 /*

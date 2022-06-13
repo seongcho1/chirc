@@ -33,7 +33,7 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
   }
 
   channels_[channel].setMode(mode, CHANNEL_MODE_FLAGS);
-  announceToChannel(ircfd, channel, "Mode: " + channels_[channel].currentMode(CHANNEL_MODE_FLAGS));
+  announceToChannel(ircfd, channel, "Mode: " + channels_[channel].currentMode(CHANNEL_MODE_FLAGS).append("\n"));
 }
 
 void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {

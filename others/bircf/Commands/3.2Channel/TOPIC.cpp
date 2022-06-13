@@ -11,36 +11,33 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
 
   if (paramsVec.size() < 2) {
     //reply(cs, RPL_TOPIC, "TOPIC", paramsVec); //332
-    outMessages_[cs].append("TOPIC: ").append(channels_[*paramsVec.begin()].topic).append("\n");
+    outMessages_[cs].append("TOPIC: ").append(channels_[paramsVec[0]].topic).append("\n");
     return;
   }
 
   //check if channel exist first
-  if ( paramsVec[0][0] != '#' ||
-       (channels_.find(paramsVec[0]) == channels_.end()) ) {
-    reply(cs, ERR_NOSUCHCHANNEL, "TOPIC", paramsVec); //403
-    return;
-  }
+  // if ( paramsVec[0][0] != '#' ||
+  //      (channels_.find(paramsVec[0]) == channels_.end()) ) {
+  //   reply(cs, ERR_NOSUCHCHANNEL, "TOPIC", paramsVec); //403
+  //   return;
+  // }
 
-  if (channels_[*paramsVec.begin()].channelOperators.find(cs) == channels_[*paramsVec.begin()].channelOperators.end()) {
-    reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec); //482
-    return;
-  }
-
-  if (users_[cs].engaged.find(*paramsVec.begin()) == users_[cs].engaged.end()) {
+  if (paramsVec[0][0] != '#' ||
+      users_[cs].engaged.find(paramsVec[0]) == users_[cs].engaged.end()) {
     reply(cs, ERR_NOTONCHANNEL, "TOPIC", paramsVec); //442
     return;
   }
 
-  std::string topic = paramsVec[1];
-  // std::vector<std::string>::iterator pit = ++paramsVec.begin();
-  // while (pit != paramsVec.end())
-  //   topic.append(*pit++).append(" ");
+  if (channels_[paramsVec[0]].isMode('t') &&
+      channels_[paramsVec[0]].channelOperators.find(cs) != channels_[paramsVec[0]].channelOperators.end()) {
+    reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec);
+  }
 
-  channels_[*paramsVec.begin()].topic = topic;
+  std::string topic = paramsVec[1];
+  channels_[paramsVec[0]].topic = topic;
 
   topic = users_[cs].nick + " has set topic: " + topic;
-  announceToChannel(ircfd, *paramsVec.begin(), topic);
+  announceToChannel(ircfd, paramsVec[0], topic);
 }
 
 
