@@ -1,7 +1,7 @@
 #include "../../MessageManager.hpp"
 
-void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-  
+void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
+
   if (paramsVec.size() == 0) {
     std::set<std::string>::iterator invited = users_[cs].invited.begin();
     while (invited != users_[cs].invited.end())
@@ -11,7 +11,7 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec, std::str
   }
 
   if (paramsVec.size() < 2) {
-    reply(cs, ERR_NEEDMOREPARAMS, "INVITE", paramsVec, trailing);
+    reply(cs, ERR_NEEDMOREPARAMS, "INVITE", paramsVec);
     return;
   }
 
@@ -19,17 +19,17 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec, std::str
   std::map<std::string, int>::iterator nickfdit = nickFdPair_.find(*paramsVec.begin());
 
   if (nickfdit == nickFdPair_.end()) {
-    reply(cs, ERR_NOSUCHNICK, "INVITE", paramsVec, trailing);
+    reply(cs, ERR_NOSUCHNICK, "INVITE", paramsVec);
     return;
   }
 
   if (users_[cs].engaged.find(channel) == users_[cs].engaged.end()) {
-    reply(cs, ERR_NOTONCHANNEL, "INVITE", paramsVec, trailing);
+    reply(cs, ERR_NOTONCHANNEL, "INVITE", paramsVec);
     return;
   }
 
   if (users_[nickfdit->second].engaged.find(channel) != users_[nickfdit->second].engaged.end()) {
-    reply(cs, ERR_USERONCHANNEL, "INVITE", paramsVec, trailing);
+    reply(cs, ERR_USERONCHANNEL, "INVITE", paramsVec);
     return;
   }
 
@@ -44,3 +44,42 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec, std::str
   // reply(cs, RPL_AWAY, "INVITE", paramsVec, trailing);
   outMessages_[nickfdit->second].append(users_[cs].nick).append(" invite you to #").append(channel).append("\n");
 }
+
+/*
+https://datatracker.ietf.org/doc/html/rfc2812#section-3.2.7
+3.2.7 Invite message
+
+      Command: INVITE
+   Parameters: <nickname> <channel>
+
+   The INVITE command is used to invite a user to a channel.  The
+   parameter <nickname> is the nickname of the person to be invited to
+   the target channel <channel>.  There is no requirement that the
+   channel the target user is being invited to must exist or be a valid
+   channel.  However, if the channel exists, only members of the channel
+   are allowed to invite other users.  When the channel has invite-only
+   flag set, only channel operators may issue INVITE command.
+
+   Only the user inviting and the user being invited will receive
+   notification of the invitation.  Other channel members are not
+   notified.  (This is unlike the MODE changes, and is occasionally the
+   source of trouble for users.)
+
+   Numeric Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
+           ERR_NOTONCHANNEL                ERR_USERONCHANNEL
+           ERR_CHANOPRIVSNEEDED
+           RPL_INVITING                    RPL_AWAY
+
+   Examples:
+
+   :Angel!wings@irc.org INVITE Wiz #Dust
+
+                                   ; Message to WiZ when he has been
+                                   invited by user Angel to channel
+                                   #Dust
+
+   INVITE Wiz #Twilight_Zone       ; Command to invite WiZ to
+                                   #Twilight_zone
+*/

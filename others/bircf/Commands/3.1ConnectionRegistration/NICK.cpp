@@ -1,15 +1,15 @@
 #include "../../MessageManager.hpp"
 
-void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::string trailing) {
+void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
 
-  if (paramsVec.size() != 1 || !trailing.empty()) {
-    reply(cs, ERR_NONICKNAMEGIVEN, "NICK", paramsVec, trailing); //431
+  if (paramsVec.size() != 1) {
+    reply(cs, ERR_NONICKNAMEGIVEN, "NICK", paramsVec); //431
     return;
   }
 
 	// get user's mode string???
   // if(users_.find(cs) !== users_.end() && users_[cs].getMode().find('r') != std::string::npos)
-  //  reply(cs, ERR_RESTRICTED, "NICK", paramsVec, trailing); //484
+  //  reply(cs, ERR_RESTRICTED, "NICK", paramsVec); //484
   //  return;
   //}
 
@@ -19,9 +19,10 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
   if ( (nick.length() > NICK_MAX_LENGTH) ||
        (SS::toUpper(nick).compare("ANONYMOUS") == 0) ||
        SS::containExceptChar(nick, std::string(" ,*?!@.")) ||
+       //!isalpha(nick[0]) || //need to check first
        nick[0] == '$' || //nick[0] == ':' || //: already filtered up there in 431
        nick[0] == '#' ) { //if there are more channel type prefixes then put them here
-    reply(cs, ERR_ERRONEUSNICKNAME, "NICK", paramsVec, trailing); //432
+    reply(cs, ERR_ERRONEUSNICKNAME, "NICK", paramsVec); //432
     return;
   }
 
@@ -35,26 +36,21 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec, std::strin
     users_[cs].authenticated |= AUTH_LEVEL2;
     // welcome msg after pass + nick + user
     if (users_[cs].authenticated == AUTH_MASK && auth) {
-      reply(cs, RPL_WELCOME, "NICK", paramsVec, trailing); //001
+      reply(cs, RPL_WELCOME, "NICK", paramsVec); //001
       ping(cs);
     }
-    /*
-    //broadcast that currentPrefix changed his nick
-    if ( (users_[cs].authenticated == AUTH_MASK) && !legacyPrefix.empty()) {
-      for (std::map<int, User>::iterator uit = users_.begin(); uit != users_.end(); ++uit)
-        outMessages_[uit->first].append(":" + legacyPrefix + " NICK " + nick).append(NEWLINE);
-    }
-    */
-  }
-  else {
-    reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec, trailing); //433
+
+  } else {
+    reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec); //433
   }
 
-  //to avoid duplicated  announce, get unique users from all channels the user is engaged
-  //then  announce to the users list ???
+  // seongcho: to avoid duplicated  announce,
+  // get unique users from all channels the user is engaged
+  // then  announce to the users list ???
   if ( (users_[cs].authenticated == AUTH_MASK) && !legacyPrefix.empty()) {
     std::string message;
     std::set<std::string>::iterator eit = users_[cs].engaged.begin();
+    // :WiZ!jto@tolsun.oulu.fi NICK Kilroy  ; Server telling that WiZ changed his nickname to Kilroy.
     message.append(":" + legacyPrefix + " NICK " + nick).append(NEWLINE);
     while (eit != users_[cs].engaged.end()) {
       announceToChannel(*eit++, message);

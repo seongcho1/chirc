@@ -1,58 +1,67 @@
 #include "../../MessageManager.hpp"
 #include <cassert>
 
-void  MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-  if (paramsVec.size() != 1) {
-    reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec, trailing); //411
+void  MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec) {
+
+  if (paramsVec.size() > 2) {
+    reply(cs, ERR_NEEDMOREPARAMS, "PASS", paramsVec); //461
     return;
   }
-  assert(!paramsVec.empty());
-  if (trailing.length() == 0) {
-    reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec, trailing); //412
+
+  if ( paramsVec.size() == 1 ||
+       (paramsVec.size() == 2 && paramsVec[1].empty()) ) {
+    reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec); //412
+    return;
+  }
+
+  if ( paramsVec.size() == 0 ||
+       (paramsVec.size() == 1 && paramsVec[0].empty()) ) {
+    reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec); //411
     return;
   }
   std::string msgtarget = paramsVec[0];
+  std::string msg = paramsVec[1];
   std::vector<std::string> msgtoVec = SS::splitString(msgtarget, COMMA);
 
   // if (msgtoVec.size() > XX) {
-  //   reply(cs, ERR_TOOMANYTARGETS, "PRIVMSG", paramsVec, trailing); //407
+  //   reply(cs, ERR_TOOMANYTARGETS, "PRIVMSG", paramsVec); //407
   //   return;
   // }
 
   std::vector<std::string>::iterator it;
   for(it = msgtoVec.begin(); it != msgtoVec.end(); ++it) {
     std::string msgto = *it;
-    PRIVMSGHelper(cs, msgto, trailing);
+    PRIVMSGHelper(cs, msgto, msg);
   }
 
 }
 
-void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std::string& trailing) {
+void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std::string& msg) {
   std::vector<std::string> paramsVec;
   paramsVec.push_back(msgto);
 
   if (msgto[0] != '#' &&
     nickFdPair_.find(msgto) == nickFdPair_.end()) {
-    reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
+    reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec); //401
     return;
   }
   if (msgto[0]  == '#' &&
     ( msgto.length() == 1 || channels_.find(msgto) == channels_.end()) ) {
-    reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec, trailing); //401
+    reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec); //401
     return;
   }
 
+  //seongcho: dealing with an operator is out of scope
   //if cs is an operator, cs can use wildcards (*, ?)
   //SS::matchStringVector(usersVec, pattern) then, usersVec only keeps memebers matched the pattern
 
   int recipient;
-  std::string msg;
+  std::string message = std::string(":" + prefix(cs) + " PRIVMSG " + msgto  + " :").append(msg).append(NEWLINE);
 
   //to user
   if (msgto[0] != '#') {
     recipient = nickFdPair_[msgto];
-    msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgto  + " :").append(trailing).append(NEWLINE);
-    outMessages_[recipient].append(msg);
+    outMessages_[recipient].append(message);
   }
   //to channel
   else {
@@ -61,15 +70,14 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
     std::set<int> member = channel.member;
     if (member.find(cs) == member.end() ||
         (member.size() == 1 &&  *(member.begin()) == cs)) {
-      reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec, trailing); //404
+      reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec); //404
       return;
     }
     for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
       recipient = *it;
       if (recipient == cs)
         continue;
-      msg = std::string(":" + prefix(cs) + " PRIVMSG " + msgto  + " :").append(trailing).append(NEWLINE);
-      outMessages_[recipient].append(msg);
+      outMessages_[recipient].append(message);
     }
   }
 

@@ -35,13 +35,13 @@ int    MessageManager::initReplies(std::string configFile) {
   return 0;
 }
 
-void  MessageManager::reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, std::string trailing) {
+void  MessageManager::reply(int cs, int code, std::string command, std::vector<std::string> paramsVec) {
 
   std::map<int, std::string>::iterator it = replies_.find(code);
   if (it == replies_.end()) {
     return;
   }
-  (void)trailing;
+
   std::string msg = it->second;
   std::vector<std::string>      sVec;
   std::vector<std::string>      rVec;
@@ -49,7 +49,7 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
   switch (code) {
 
     //001   = Welcome to the <network> Network, <nick>[!<user>@<host>]
-    case  RPL_WELCOME            :  sVec.push_back("<network>");          rVec.push_back("ircserv"); //server's property
+    case  RPL_WELCOME            :  sVec.push_back("<network>");   rVec.push_back("FT_IRC"); //server's property
                                     if (!users_[cs].user.empty()){
                                       sVec.push_back("<nick>[!<user>@<host>]");
                                       rVec.push_back(std::string(users_[cs].nick + "!" + users_[cs].user + "@" + users_[cs].host));
@@ -225,7 +225,7 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
     //481    =  :Permission Denied- You are not an IRC operator
     case  ERR_NOPRIVILEGES       :  break;  //481
     //482    =  <channel> :You are not channel operator
-    case  ERR_CHANOPRIVSNEEDED   :  // sVec.push_back("<channel>");  rVec.push_back(??);                    ???
+    case  ERR_CHANOPRIVSNEEDED   :  sVec.push_back("<channel>");  rVec.push_back(paramsVec[0]);
                                     break;  //482
     //483    =  :You can not kill a server!
     case  ERR_CANTKILLSERVER     :  break;  //483

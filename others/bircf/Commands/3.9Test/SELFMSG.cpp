@@ -1,11 +1,11 @@
 #include "../../MessageManager.hpp"
 
-void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec, std::string trailing) {
-  if (paramsVec.size() != 0) {
+void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec) {
+  if (paramsVec.size() == 0) {
     // do something with errcode errcode:errstr map
     return;
   }
-  if (trailing.length() == 0) {
+  if (paramsVec[0].length() == 0) {
     // do something with errcode errcode:errstr map
     return;
   }
@@ -15,6 +15,6 @@ void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec, std::st
     return;
   }
 
-  trailing = std::string("[from myself, " + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(trailing).append(NEWLINE);
-  outMessages_[cs].append(trailing);
+  std::string message = std::string("[from myself, " + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(paramsVec[0]).append(NEWLINE);
+  outMessages_[cs].append(message);
 }
