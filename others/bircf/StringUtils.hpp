@@ -219,6 +219,10 @@ public:
       token = s.substr(pos_start, pos_end - pos_start); //+ delimiter.length());
       if ( (bCutOnce && i == 0 && token.empty()) ||
            (!token.empty()) ) {
+
+        //if token's last char is '\r' then drop it
+        if (token[token.length()-1] == '\r')
+          token.pop_back();
         result.push_back(token);  //in case of vector
         i++;
       }
