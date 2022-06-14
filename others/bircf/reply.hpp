@@ -26,6 +26,9 @@
 
 #define RPL_WHOWASUSER                       314
 
+#define RPL_ENDOFWHOWAS                      369
+
+
 // #define RPL_LISTSTART                     321  //Obsolete. Not used.
 // #define RPL_LIST                          322  //coding in LIST.cpp directly
 #define RPL_LISTEND                          323
@@ -42,12 +45,18 @@
 #define RPL_EXCEPTLIST                       348
 #define RPL_ENDOFEXCEPTLIST                  349
 
+#define RPL_VERSION                          351
+#define RPL_WHOREPLY                         352
+
+#define RPL_ENDOFWHO                         315
+
+#define RPL_NAMREPLY                         353
+
+#define RPL_ENDOFNAMES                       366
 
 
 
-#define RPL_NAMREPLY                         353  //
-#define RPL_ENDOFNAMES                       366  //
-#define RPL_ENDOFWHOWAS                      369
+
 
 
 #define ERR_NOSUCHNICK                       401

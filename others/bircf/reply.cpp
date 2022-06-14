@@ -58,11 +58,63 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
                                     break;  //001
 
 
-    //work start
+    /*
 
-    //work end
+    //002   = Your host is <servername>, running version <version>
+    case RPL_YOURHOST                         002
 
-    // not defined begin
+    //003   = This server was created <datetime>
+    case RPL_CREATED                          003
+
+    //004   = <servername> <version> <available user modes> <available channel modes>
+    case RPL_MYINFO                           004
+
+    //005   = Try server <server name>, port <port number>
+    case RPL_BOUNCE                           005
+
+
+    //302   = :<reply list>
+    case RPL_USERHOST                         302
+
+    //303   = :<nick list>
+    case RPL_ISON                             303
+
+
+    //301   = <nick> :<away message>
+    case RPL_AWAY                             301
+
+    //305   = :You are no longer marked as being away
+    case RPL_UNAWAY                           305
+
+    //306   = :You have been marked as being away
+    case RPL_NOWAWAY                          306
+
+    //311   = <nick> <user> <host> * :<real name>
+    case RPL_WHOISUSER                        311
+
+    //312   = <nick> <server> :<server info>
+    case RPL_WHOISSERVER                      312
+
+    //313   = <nick> :is an IRC operator
+    case RPL_WHOISOPERATOR                    313
+
+    //317   = <nick> <integer> :seconds idle
+    case RPL_WHOISIDLE                        317
+
+    //318   = <nick> :End of WHOIS list
+    case RPL_ENDOFWHOIS                       318
+
+    //319   = <nick> :*  <@/+> <channel>
+    case RPL_WHOISCHANNELS                    319
+
+    //314   = <nick> <user> <host> * :<real name>
+    case RPL_WHOWASUSER                       314
+
+    //369   = <nick> :End of WHOWAS
+    case RPL_ENDOFWHOWAS                      369
+
+    */
+
 
     //321   = Obsolete. Not used.
     // case RPL_LISTSTART        :  break;  // 321
@@ -114,35 +166,38 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
                                     break;  // 348
 
     //349   = <channel> :End of channel exception list
-/*
-    case RPL_INVITELIST          :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
-                                    break;  // 347
+    case RPL_ENDOFEXCEPTLIST     :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 349
+
+    //351   = <version>.<debuglevel> <server> :<comments>
+    case RPL_VERSION             :  sVec.push_back("<version>");      rVec.push_back("1");
+                                    sVec.push_back("<debuglevel>");   rVec.push_back("001");
+                                    sVec.push_back("<server>");       rVec.push_back("FT_IRC");
+                                    sVec.push_back("<comments>");     rVec.push_back("42");
+                                    break;  // 351
 
 
+    //352   =     <channel> <user> <host> <server> <nick> ( "H" / "G" > ["*"] [ ( "@" / "+" ) ] :<hopcount> <real name>
+    // case RPL_WHOREPL            :break  //352
 
-       348    RPL_EXCEPTLIST
-              "<channel> <exceptionmask>"
-       349    RPL_ENDOFEXCEPTLIST
-              "<channel> :End of channel exception list"
+    //315   = <name> :End of WHO list
+    case RPL_ENDOFWHO            :  sVec.push_back("<name>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 315
 
+    //353   = ( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
+    // case RPL_NAMREPLY            :break  //353
 
-
-#         - When listing the 'exception masks' for a given channel,
-#           a server is required to send the list back using the
-#           RPL_EXCEPTLIST and RPL_ENDOFEXCEPTLIST messages.  A
-#           separate RPL_EXCEPTLIST is sent for each active mask.
-#           After the masks have been listed (or if none present)
-#           a RPL_ENDOFEXCEPTLIST MUST be sent.
-*/
-
-
-
-//working here
-
-    case RPL_NAMREPLY            :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
-                                    break;  // 353
-    case RPL_ENDOFNAMES          :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
+    //366   = <channel> :End of NAMES list
+    case RPL_ENDOFNAMES          :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
                                     break;  // 366
+
+
+
+
+
+    //working here
+
+
     // not defined end
 
 
