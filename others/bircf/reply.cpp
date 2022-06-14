@@ -73,14 +73,12 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
     // case RPL_LISTSTART        :  break;  // 321
     //322   = <channel> <# visible> :<topic>
     // case RPL_LIST             :  break;  // 322
+    //323   = :End of LIST
+    case RPL_LISTEND             :  break;  // 323
 
 
+//working here
 
-
-
-
-    case RPL_LISTEND             :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
-                                    break;  // 323
     case RPL_NAMREPLY            :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
                                     break;  // 353
     case RPL_ENDOFNAMES          :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
@@ -259,7 +257,7 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
   }
 
   SS::replaceString(msg, sVec, rVec);
-  msg = std::string("").append(msg).append(NEWLINE);
+  msg = std::string(":FT_IRC " + SS::toString(code, 3) + " " + users_[cs].nick + " ").append(msg).append(NEWLINE);
   outMessages_[cs].append(msg);
 }
 

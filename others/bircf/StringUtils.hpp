@@ -167,6 +167,15 @@ public:
     return ss.str();
   }
 
+  template <typename T>
+  static std::string  toString ( T number, size_t nRightZeros) {
+    std::string result = toString(number);
+    while (result.size() < nRightZeros)
+      result = std::string("0").append(result);
+    return result;
+  }
+
+
   static std::string  toUpper(const std::string &s)
   {
     std::string str(s);
