@@ -35,11 +35,11 @@ int    MessageManager::initReplies(std::string configFile) {
   return 0;
 }
 
-void  MessageManager::reply(int cs, int code, std::string command, std::vector<std::string> paramsVec) {
+std::string  MessageManager::reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, bool bDirectDelivery) {
 
   std::map<int, std::string>::iterator it = replies_.find(code);
   if (it == replies_.end()) {
-    return;
+    return std::string();
   }
 
   std::string msg = it->second;
@@ -105,9 +105,11 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
     case  ERR_WASNOSUCHNICK      :  sVec.push_back("<nickname>");      rVec.push_back(paramsVec[0]);
                                     break;  //406
     //407    =  <target> :<error code> recipients. <abort message>
-    case  ERR_TOOMANYTARGETS     :  // sVec.push_back("<target>");      rVec.push_back(users_[cs].nick);        ???
-                                    sVec.push_back("<error code>");    rVec.push_back(SS::toString(code));
-                                    // sVec.push_back("<abort message>");rVec.push_back(trailing);              ???
+    //PRIVMSG   <target> :Duplicate recipients. No message delivered"
+    //JOIN      ???
+    case  ERR_TOOMANYTARGETS     :  sVec.push_back("<target>");        rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<error code> recipients. <abort message>");
+                                    rVec.push_back(paramsVec[1]);
                                     break;  //407
     //408    =  <service name> :No such service
     case  ERR_NOSUCHSERVICE      :  // sVec.push_back("<service name>");  rVec.push_back(??);                    ???
@@ -258,7 +260,11 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
 
   SS::replaceString(msg, sVec, rVec);
   msg = std::string(":FT_IRC " + SS::toString(code, 3) + " " + users_[cs].nick + " ").append(msg).append(NEWLINE);
-  outMessages_[cs].append(msg);
+
+  if (bDirectDelivery)
+    outMessages_[cs].append(msg);
+
+  return msg;
 }
 
 

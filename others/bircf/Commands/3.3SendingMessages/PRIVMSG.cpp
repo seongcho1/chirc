@@ -18,10 +18,14 @@ void  MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec) {
   std::string msg = paramsVec[1];
   std::vector<std::string> msgtoVec = SS::splitString(msgtarget, COMMA);
 
-  // if (msgtoVec.size() > XX) {
-  //   reply(cs, ERR_TOOMANYTARGETS, "PRIVMSG", paramsVec); //407
-  //   return;
-  // }
+  //duplicated msgto
+  std::string duplicatedMsgtos = SS::duplicateWordString(msgtoVec);
+  if (duplicatedMsgtos.length()) {
+    paramsVec[0] = duplicatedMsgtos;
+    paramsVec[1] = "Duplicate recipients. No message delivered";
+    reply(cs, ERR_TOOMANYTARGETS, "PRIVMSG", paramsVec); //407
+    return;
+  }
 
   std::vector<std::string>::iterator it;
   for(it = msgtoVec.begin(); it != msgtoVec.end(); ++it) {
@@ -108,7 +112,7 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.3.1
         ERR_CANNOTSENDTOCHAN            :404 done
         ERR_NOTOPLEVEL                  :413 not in the scope <-server to server
         ERR_WILDTOPLEVEL                :414 not in the scope <-server to server
-        ERR_TOOMANYTARGETS              :407 how many is too many???
+        ERR_TOOMANYTARGETS              :407 done how many is too many??? go with 15
         ERR_NOSUCHNICK                  :401 done
         RPL_AWAY                        :
 
