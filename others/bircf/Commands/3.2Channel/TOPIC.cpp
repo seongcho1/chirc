@@ -24,6 +24,7 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
   if (channels_[paramsVec[0]].isMode('t') &&
       channels_[paramsVec[0]].channelOperators.find(cs) != channels_[paramsVec[0]].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec);
+    return;
   }
 
   std::string topic = paramsVec[1];

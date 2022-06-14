@@ -15,9 +15,12 @@ void MessageManager::PASS(int cs, std::vector<std::string> paramsVec) {
   if (*paramsVec.begin() == pass) {
     users_[cs].authenticated |= AUTH_LEVEL1;
 
-    if (users_[cs].authenticated == AUTH_MASK)
-      reply(cs, RPL_WELCOME, "PASS", paramsVec); //001
-
+  //  The PASS command is used to set a 'connection password'.  The
+  //  optional password can and MUST be set before any attempt to register
+  //  the connection is made.  Currently this requires that user send a
+  //  PASS command before sending the NICK/USER combination.
+    // if (users_[cs].authenticated == AUTH_MASK)
+    //   reply(cs, RPL_WELCOME, "PASS", paramsVec); //001
   }
   else
     reply(cs, ERR_PASSWDMISMATCH, "PASS", paramsVec); //464

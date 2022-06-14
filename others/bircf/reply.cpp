@@ -48,6 +48,9 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
 
   switch (code) {
 
+    case 0                       :  sVec.push_back("<...>"); rVec.push_back(paramsVec[0]);
+                                    break; // TEST 0
+
     //001   = Welcome to the <network> Network, <nick>[!<user>@<host>]
     case  RPL_WELCOME             : sVec.push_back("<network>");   rVec.push_back("FT_IRC"); //server's property
                                     if (!users_[cs].user.empty()){

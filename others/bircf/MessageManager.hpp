@@ -16,7 +16,6 @@
 class MessageManager {
 
 private:
-  // std::map<int, User>          reqAuthenticates_;
   std::map<int, User>             users_;
   std::map<int, std::string>      inMessages_;
   std::map<int, std::string>      outMessages_;
@@ -32,6 +31,7 @@ private:
   void  PASS(int cs, std::vector<std::string> paramsVec);
   void  NICK(int cs, std::vector<std::string> paramsVec);
   void  USER(int cs, std::vector<std::string> paramsVec);
+  void  PING(int cs, std::vector<std::string> paramsVec);
   void  PONG(int cs, std::vector<std::string> paramsVec);
 
   void  QUIT(int cs, std::vector<std::string> paramsVec);
@@ -50,16 +50,13 @@ private:
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec);
   void  TESTMSG(int cs, std::vector<std::string> paramsVec);
   void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec);
-  void  announceToChannel(int cs, std::string title, std::string message);
-  // bool  announceToChannel(int cs, std::string title, Commands command, std::string message);
+  void  announceToChannel(int cs, std::string title, std::string message, bool all = false);
   void  announceToUser(int cs, std::string message);
   void  announceOneUser(int cs, std::string message);
   void  announceToSelf(int cs, std::string message);
   void  modeChannel(int cs, std::vector<std::string> paramsVec);
   void  modeUser(int cs, std::vector<std::string> paramsVec);
-
-  std::vector<std::string> namesVec(std::set<int> fds);
-  std::string namesVec_TEST(std::set<int> fds);
+  std::string channelMemberToString(std::string channel);
 
   MessageManager(MessageManager const &) 						{}
   MessageManager &operator=(MessageManager const &) { return *this; }
@@ -76,7 +73,6 @@ public:
   int                         ircfd;
 
   std::map<int, User>         &users()            { return users_; }
-  // std::map<int, User>       &authenticates()   { return reqAuthenticates_; }
   std::map<int, std::string>  &inMessages()       { return inMessages_; }
   std::map<int, std::string>  &outMessages()      { return outMessages_; }
   std::size_t                 inSize() const      { return inMessages_.size(); }
@@ -87,13 +83,10 @@ public:
   void                        executeMessage(int cs, std::string message);
   void                        srvAccept(int s);
   void                        clientRead(int cs);
-  // void                     authRead(int cs);
-  // void                     authWrite(int cs)	{ reqAuthenticates_[cs].authWrite(outMessages_[cs]); }
   void                        clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
   void                        kickUser(int cs);
   bool                        isUniqueNick(int cs, std::string &nick);
   void                        ping(int cs);
-  // User                     &anyUser(int cs);
   std::string                 prefix(int cs) { return users_[cs].prefix(); }
 };
 

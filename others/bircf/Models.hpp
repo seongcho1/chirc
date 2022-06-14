@@ -17,14 +17,20 @@
 // #define TIMEOUT 300
 #define TIMEOUT 300
 // #define WAIT_TIME 30
-#define WAIT_TIME 30
+#define WAIT_TIME 3000
+#define CHANNEL_MEMBER_LIMIT 32
+#define USER_ENGAGED_LIMIT 32
 #define PING_REQUEST "PING :"
 #define PONG_RESULT "FT_IRC"
-#define MODE_FLAGS_MAP_SIZE     26
-#define MODE_FALGS_MAP          "abcdefghijklmnopqrstuvwxyz"
-#define USER_MODE_FLAGS         "00000000i00000000000000000"
-#define CHANNEL_MODE_FLAGS      "00000000i0klmn0p000t000000" // imnptkl
-#define CHANNEL_USER_MODE_FLAGS "00000000000000o000000v0000"
+
+#define MODE_FLAGS_MAP_SIZE 26
+#define MODE_LENGTH   3
+#define CHN_M_A_FLAGS "00000000i0klmn0p000t000000"
+#define CHN_M_FLAGS   "imnpt"
+#define CHN_M_P_FLAGS "kl"
+#define CHN_M_U_FLAGS "ov"
+#define USR_M_A_FLAGS "00000000i00000000000000000"
+#define USR_M_FLAGS   "i"
 
 #define AUTH_LEVEL1 0x1 // pass
 #define AUTH_LEVEL2 0x2 // nick
@@ -38,13 +44,13 @@
 #define MIN(a,b)					((a > b) ? b : a)
 
 
-// following CHANNEL_PREFIX sequence (MUST)
-enum CreateOption {
-  NORMAL,   // #
-  LOCAL,    // &
-  NO_MODES,  // +
-  AS_CREATOR,  // !
-};
+// // following CHANNEL_PREFIX sequence (MUST)
+// enum CreateOption {
+//   NORMAL,   // #
+//   LOCAL,    // &
+//   NO_MODES,  // +
+//   AS_CREATOR,  // !
+// };
 
 /*
 The user creating a channel automatically becomes channel operator
@@ -54,8 +60,11 @@ The user creating a channel automatically becomes channel operator
 class BaseModel {
 public:
   unsigned int mode;
+  int limit;
   
   std::string currentMode(std::string filter) {
+
+std::cout << "filter = " << filter << std::endl;
     std::string result;
     for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
       if (((mode >> i) & 1))
@@ -70,26 +79,13 @@ public:
     return (mode >> (flag - 'a') & 1);
   }
 
-  bool setMode(std::string mode, std::string filter) {
-    std::string::iterator it = mode.begin();
+  bool setMode(bool add, char mode) {
     unsigned int bitmap = this->mode;
-    bool add = false;
-    while (it != mode.end()) {
-      if (*it == '+') {
-        add = true;
-      }
-      else if (*it == '-') {
-        add = false;
-      }
-      else if ('a' <= *it && *it <= 'z' && filter[*it - 'a'] != '0') {
-        if (add)
-          bitmap |= 1 << (*it - 'a');
-        else
-          bitmap &= ~(1 << (*it - 'a'));
-      }
-      ++it;
-    }
-    
+    if (add)
+      bitmap |= 1 << (mode - 'a');
+    else
+      bitmap &= ~(1 << (mode - 'a'));
+
     return isChanged(this->mode, bitmap);
   }
 
@@ -101,25 +97,40 @@ public:
   }
 };
 
+
+
 class Channel : public BaseModel {
 public:
   std::string title;
   std::string topic;
+  std::string key;
   // int channelCreator;
   std::set<int> channelOperators;
   std::set<int> channelSpeaker;
   std::set<int> member;
 
   Channel() {}
-  Channel(std::string &title) : 
-    title(title) { BaseModel::mode = 0; }
+  Channel(int cs, std::string &title) : 
+    title(title),
+    topic(),
+    key() {
+      BaseModel::mode = 0;
+      channelOperators.insert(cs);
+      member.insert(cs);
+    }
 
   bool leave(int fd) {
     channelOperators.erase(fd);
     channelSpeaker.erase(fd);
     return member.erase(fd); 
   }
+
+  bool isOper(int fd) {
+    return channelOperators.find(fd) != channelOperators.end();
+  }
 };
+
+
 
 class User : public BaseModel {
 public:
@@ -160,6 +171,8 @@ public:
 
     read[r] = 0;
     buffer.append(read);
+std::cout << ">> " << buffer;
+SS::charPrint(buffer);
     return true;
   }
 
@@ -168,6 +181,7 @@ public:
       return;
 
     unsigned long endset, offset = 0;
+std::cout << "<< " << message;
     while (offset < message.length()) {
       endset = MIN(BUF_SIZE, message.length() - offset);
       send(fd, message.c_str() + offset, endset, 0);
