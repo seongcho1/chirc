@@ -29,6 +29,15 @@
 // #define RPL_LISTSTART                     321  //Obsolete. Not used.
 // #define RPL_LIST                          322  //coding in LIST.cpp directly
 #define RPL_LISTEND                          323
+#define RPL_UNIQOPIS                         325
+#define RPL_CHANNELMODEIS                    324
+
+#define RPL_NOTOPIC                          331
+#define RPL_TOPIC                            332
+
+#define RPL_INVITING                         341
+
+
 
 #define RPL_NAMREPLY                         353  //
 #define RPL_ENDOFNAMES                       366  //

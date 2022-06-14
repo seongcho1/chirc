@@ -53,13 +53,8 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
 
     //001   = Welcome to the <network> Network, <nick>[!<user>@<host>]
     case  RPL_WELCOME             : sVec.push_back("<network>");   rVec.push_back("FT_IRC"); //server's property
-                                    if (!users_[cs].user.empty()){
                                       sVec.push_back("<nick>[!<user>@<host>]");
                                       rVec.push_back(std::string(users_[cs].nick + "!" + users_[cs].user + "@" + users_[cs].host));
-                                    } else {
-                                      sVec.push_back("<nick>[!<user>@<host>]");
-                                      rVec.push_back(users_[cs].nick);
-                                    }
                                     break;  //001
 
 
@@ -75,6 +70,31 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
     // case RPL_LIST             :  break;  // 322
     //323   = :End of LIST
     case RPL_LISTEND             :  break;  // 323
+
+    //325   = <channel> <nickname>
+    case RPL_UNIQOPIS            :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<nickname>");     rVec.push_back("get it from the channel");   //??
+                                    break;  // 325
+
+    //324   = <channel> <mode> <mode params>
+    case RPL_CHANNELMODEIS       :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<mode>");         rVec.push_back(channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS));   //??
+                                    sVec.push_back("<mode params>");  rVec.push_back("get it from the channel");   //??
+                                    break;  // 324
+
+    //331   = <channel> :No topic is set
+    case RPL_NOTOPIC             :  break;  // 331
+    //332   = <channel> :<topic>
+    case RPL_TOPIC               :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<topic>");        rVec.push_back(channels_[paramsVec[0]].topic);   //??
+                                    break;  // 332
+
+    //341   = <channel> <nick>
+    case RPL_INVITING            :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<nick>");         rVec.push_back(users_[cs].nick);                 //??
+                                    break;  // 341
+
+
 
 
 //working here
