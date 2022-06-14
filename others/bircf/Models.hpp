@@ -22,19 +22,15 @@
 #define USER_ENGAGED_LIMIT 32
 #define PING_REQUEST "PING :"
 #define PONG_RESULT "FT_IRC"
-// #define MODE_FALGS_MAP         "abcdefghijklmnopqrstuvwxyz"
-// #define USER_MODE_FLAGS           "00000000i00000000000000000"
-// #define CHANNEL_MODE_FLAGS_ALL    "00000000i0klmn0p000t000000" // imnptkl
-// #define CHANNEL_MODE_FLAGS        "00000000i000mn0p0000000000" // imnp
-// #define CHANNEL_MODE_PARAM_FLAGS  "0000000000kl0000000t000000" // tkl
-// #define CHANNEL_MODE_ALL          "+-imnptklov"
+
 #define MODE_FLAGS_MAP_SIZE 26
 #define MODE_LENGTH   3
 #define CHN_M_A_FLAGS "00000000i0klmn0p000t000000"
 #define CHN_M_FLAGS   "imnpt"
 #define CHN_M_P_FLAGS "kl"
 #define CHN_M_U_FLAGS "ov"
-// #define CHANNEL_USER_MODE_FLAGS   "00000000000000o000000v0000"
+#define USR_M_A_FLAGS "00000000i00000000000000000"
+#define USR_M_FLAGS   "i"
 
 #define AUTH_LEVEL1 0x1 // pass
 #define AUTH_LEVEL2 0x2 // nick
@@ -48,13 +44,13 @@
 #define MIN(a,b)					((a > b) ? b : a)
 
 
-// following CHANNEL_PREFIX sequence (MUST)
-enum CreateOption {
-  NORMAL,   // #
-  LOCAL,    // &
-  NO_MODES,  // +
-  AS_CREATOR,  // !
-};
+// // following CHANNEL_PREFIX sequence (MUST)
+// enum CreateOption {
+//   NORMAL,   // #
+//   LOCAL,    // &
+//   NO_MODES,  // +
+//   AS_CREATOR,  // !
+// };
 
 /*
 The user creating a channel automatically becomes channel operator
@@ -82,29 +78,6 @@ std::cout << "filter = " << filter << std::endl;
   bool isMode(char flag) {
     return (mode >> (flag - 'a') & 1);
   }
-
-  // bool setMode(std::string mode, std::string filter) {
-  //   std::string::iterator it = mode.begin();
-  //   unsigned int bitmap = this->mode;
-  //   bool add = false;
-  //   while (it != mode.end()) {
-  //     if (*it == '+') {
-  //       add = true;
-  //     }
-  //     else if (*it == '-') {
-  //       add = false;
-  //     }
-  //     else if ('a' <= *it && *it <= 'z' && filter[*it - 'a'] != '0') {
-  //       if (add)
-  //         bitmap |= 1 << (*it - 'a');
-  //       else
-  //         bitmap &= ~(1 << (*it - 'a'));
-  //     }
-  //     ++it;
-  //   }
-    
-  //   return isChanged(this->mode, bitmap);
-  // }
 
   bool setMode(bool add, char mode) {
     unsigned int bitmap = this->mode;
@@ -199,6 +172,7 @@ public:
     read[r] = 0;
     buffer.append(read);
 std::cout << ">> " << buffer;
+SS::charPrint(buffer);
     return true;
   }
 

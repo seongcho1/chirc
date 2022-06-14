@@ -6,19 +6,56 @@ void MessageManager::MODE(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  std::string channel = paramsVec[0];
+  std::string whatis = *paramsVec.begin();
+  if (whatis[0] == '#')
+    modeChannel(cs, paramsVec);
+  else
+    modeUser(cs, paramsVec);
+}
 
-  if (channels_.find(channel) == channels_.end()) {
+void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
+  if (paramsVec.size() < 2) {
+    reply(cs, ERR_NEEDMOREPARAMS, "MODE", paramsVec);
+    return;
+  }
+
+  if (users_[cs].nick != paramsVec[0]) {
+    // O (server oper) only
+    return;
+  }
+
+  if (paramsVec[1][0] == '-' || paramsVec[1][0] == '+') {
+    // not match param
+    return;
+  }
+
+  if (paramsVec[1][0] == '-' && paramsVec[1][1] == 'i') {
+    users_[cs].setMode(false, 'i');
+    // RPL_UMODEIS
+    announceToSelf(cs, "i am visible");
+  }
+
+  if (paramsVec[1][0] == '+' && paramsVec[1][1] == 'i') {
+    users_[cs].setMode(true, 'i');
+    // RPL_UMODEIS
+    announceToSelf(cs, "i am invisible");
+  }
+}
+
+void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
+  // std::string channel = paramsVec[0];
+
+  if (channels_.find(paramsVec[0]) == channels_.end()) {
     reply(cs, ERR_NOSUCHCHANNEL, "MODE", paramsVec);
     return;
   }
 
   if (paramsVec.size() < 2) {
-    outMessages_[cs].append("Mode: ").append(channels_[channel].currentMode(CHN_M_A_FLAGS)).append("\n");
+    outMessages_[cs].append("Mode: ").append(channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS)).append("\n");
     return;
   }
 
-  if (channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
+  if (channels_[paramsVec[0]].channelOperators.find(cs) == channels_[paramsVec[0]].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "MODE", paramsVec);
     return;
   }
@@ -44,37 +81,42 @@ void MessageManager::MODE(int cs, std::vector<std::string> paramsVec) {
     msg += "-+"[add];
     msg += *mit;
     if (SS::compare(*mit, CHN_M_FLAGS)) {
-      channels_[channel].setMode(add, *mit);
-      announceToChannel(cs, channel, msg, true);
+      channels_[paramsVec[0]].setMode(add, *mit);
+      // RPL_CHANNELMODEIS
+      announceToChannel(cs, paramsVec[0], msg, true);
     }
     else if (!paramOnce && *mit == 'k' && 2 < (int)paramsVec.size()) {
-      channels_[channel].setMode(add, *mit);
-      channels_[channel].key = paramsVec[2];
-      announceToChannel(cs, channel, msg.append(" ").append(paramsVec[2]), true);
+      channels_[paramsVec[0]].setMode(add, *mit);
+      channels_[paramsVec[0]].key = paramsVec[2];
+      // RPL_CHANNELMODEIS
+      announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;
     }
     else if (!paramOnce && *mit == 'l' && 2 < (int)paramsVec.size()) {
-      channels_[channel].setMode(add, *mit);
-      channels_[channel].limit = atoi(paramsVec[2].c_str());
-      announceToChannel(cs, channel, msg.append(" ").append(paramsVec[2]), true);
+      channels_[paramsVec[0]].setMode(add, *mit);
+      channels_[paramsVec[0]].limit = atoi(paramsVec[2].c_str());
+      // RPL_CHANNELMODEIS
+      announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;
     }
     else if (!paramOnce && *mit == 'v' && 2 < (int)paramsVec.size()) {
-      channels_[channel].setMode(add, *mit);
+      channels_[paramsVec[0]].setMode(add, *mit);
       if (add)
-        channels_[channel].channelSpeaker.insert(nickFdPair_.find(paramsVec[2])->second);
+        channels_[paramsVec[0]].channelSpeaker.insert(nickFdPair_.find(paramsVec[2])->second);
       else
-        channels_[channel].channelSpeaker.erase(nickFdPair_.find(paramsVec[2])->second);
-      announceToChannel(cs, channel, msg.append(" ").append(paramsVec[2]), true);
+        channels_[paramsVec[0]].channelSpeaker.erase(nickFdPair_.find(paramsVec[2])->second);
+      // RPL_CHANNELMODEIS
+      announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;
     }
     else if (!paramOnce && *mit == 'o' && 2 < (int)paramsVec.size()) {
-      channels_[channel].setMode(add, *mit);
+      channels_[paramsVec[0]].setMode(add, *mit);
       if (add)
-        channels_[channel].channelOperators.insert(nickFdPair_.find(paramsVec[2])->second);
+        channels_[paramsVec[0]].channelOperators.insert(nickFdPair_.find(paramsVec[2])->second);
       else
-        channels_[channel].channelOperators.erase(nickFdPair_.find(paramsVec[2])->second);
-      announceToChannel(cs, channel, msg.append(" ").append(paramsVec[2]), true);
+        channels_[paramsVec[0]].channelOperators.erase(nickFdPair_.find(paramsVec[2])->second);
+      // RPL_CHANNELMODEIS
+      announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;
     }
 
