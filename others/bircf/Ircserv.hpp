@@ -64,7 +64,8 @@ void	Ircserv::srvCreate(int port) {
   int                 yes = 1;
 
   pe = (struct protoent*)Xv(NULL, getprotobyname("tcp"), (char *)"getprotobyname");
-  s = X(-1, socket(PF_INET, SOCK_STREAM, pe->p_proto), (char *)"socket");
+  // s = X(-1, socket(PF_INET, SOCK_STREAM, pe->p_proto), (char *)"socket");
+  s = X(-1, socket(AF_INET, SOCK_STREAM, pe->p_proto), (char *)"socket");
 
   X(-1, setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)), (char *)"setsockopt");
   X(-1, fcntl(s, F_SETFL, O_NONBLOCK), (char *)"fcntl");
@@ -72,7 +73,8 @@ void	Ircserv::srvCreate(int port) {
   sin.sin_family = AF_INET;
   sin.sin_addr.s_addr = INADDR_ANY;
   sin.sin_port = htons(port);
-  X(-1, bind(s, (struct sockaddr*)&sin, sizeof(sin)), (char *)"bind");
+  // X(-1, bind(s, (struct sockaddr*)&sin, sizeof(sin)), (char *)"bind");
+  X(-1, bind(s, (sockaddr*)&sin, sizeof(sin)), (char *)"bind");
   X(-1, listen(s, 42), (char *)"listen");
 
   ircFd = s;

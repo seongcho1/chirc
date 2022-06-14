@@ -1,6 +1,13 @@
 #include "../../MessageManager.hpp"
 
-void MessageManager::QUIT(int cs, std::vector<std::string>) {
+void MessageManager::QUIT(int cs, std::vector<std::string> paramsVec) {
+  
+  if (paramsVec.size()) {
+    std::string lastMessage;
+    for (int i = 0; i < (int)paramsVec.size(); ++i)
+      lastMessage.append(paramsVec[i]).append(" ");
+    announceToNeighbors(cs, lastMessage);
+  }
   users_[cs].toQuit();
 }
 

@@ -4,12 +4,20 @@ void MessageManager::NAMES(int cs, std::vector<std::string> paramsVec) {
   // reply(cs, RPL_NAMREPLY, "NAMES", paramsVec);
 
   if (paramsVec.size()) {
-    std::vector<std::string>::iterator it = paramsVec.begin();
-    while (it != paramsVec.end()) {
+    
+    std::vector<std::string> chn = SS::splitString(paramsVec[0], COMMA);
 
-      std::map<std::string, Channel>::iterator cit = channels_.find(*it);
 
-      if (cit != channels_.end())
+    std::vector<std::string>::iterator it = chn.begin();
+    while (it != chn.end()) {
+
+      // std::map<std::string, Channel>::iterator cit = channels_.find(*it);
+      // if (cit != channels_.end()) {
+      if (channels_.find(*it) != channels_.end()) {
+        announceOneUser(cs, std::string(":" + users_[cs].systemPrefix() + " " + SS::toString(RPL_NAMREPLY) + " " + users_[cs].nick + " = " + *it + " :" + channelMemberToString(*it)));
+        announceOneUser(cs, std::string(":" + users_[cs].systemPrefix() + " " + SS::toString(RPL_ENDOFNAMES) + " " + users_[cs].nick + " " + *it + " :End of NAMES list"));
+      }
+
         // outMessages_[cs].append("[").append(channelMemberToString(paramsVec[0])).append("]\n"); 
         reply(cs, RPL_NAMREPLY, "NAMES", paramsVec);
       ++it;
@@ -25,6 +33,11 @@ void MessageManager::NAMES(int cs, std::vector<std::string> paramsVec) {
   }
   reply(cs, RPL_ENDOFNAMES, "NAMES", paramsVec);
 }
+
+
+    // announceOneUser(cs, std::string(":" + users_[cs].systemPrefix() + " " + SS::toString(RPL_NAMREPLY) + " " + users_[cs].nick + " = " + chn[i] + " :" + channelMemberToString(chn[i])));
+    // announceOneUser(cs, std::string(":" + users_[cs].systemPrefix() + " " + SS::toString(RPL_ENDOFNAMES) + " " + users_[cs].nick + " " + chn[i] + " :End of NAMES list"));
+
 
 // std::vector<std::string> MessageManager::namesVec(std::set<int> fds) {
 //   std::set<int>::iterator si = fds.begin();

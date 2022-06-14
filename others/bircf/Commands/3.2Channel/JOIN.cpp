@@ -61,13 +61,11 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
 // You have joined the channel
 // kello has joined (~kello@freenode-ca7.4sl.2765s3.IP)
 // kello has changed mode: +s
-    // announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyPrefix()).append(" NICK ").append(nick), true);
-    // reply(cs, RPL_TOPIC, "TOPIC", paramsVec);
-    // announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].prefix()).append(" has joined (").append(users_[cs].prefix()).append(")"));
-    // announceOneUser(cs, std::string().append(":").append(users_[cs].prefix()).append(" ").append(users_[cs].nick).append(" = ").append(chn[i]).append(" :").append(channelMemberToString(chn[i])));
-    announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].systemPrefix()).append(" ").append(users_[cs].nick).append(" has joined (").append(users_[cs].prefix()).append(")"));
-    announceOneUser(cs, std::string().append(":").append(users_[cs].systemPrefix()).append(" ").append(SS::toString(RPL_NAMREPLY)).append(" ").append(users_[cs].nick).append(" = ").append(chn[i]).append(" :").append(channelMemberToString(chn[i])));
-    announceOneUser(cs, std::string().append(":").append(users_[cs].systemPrefix()).append(" ").append(SS::toString(RPL_ENDOFNAMES)).append(" ").append(users_[cs].nick).append(" ").append(chn[i]).append(" :").append(channelMemberToString(chn[i])));
+    announceToChannel(cs, chn[i], std::string(":" + users_[cs].prefix() + " JOIN " + chn[i]), true);
+
+    std::vector<std::string> names;
+    names.push_back(chn[i]);
+    NAMES(cs, names);
   }
 }
 
