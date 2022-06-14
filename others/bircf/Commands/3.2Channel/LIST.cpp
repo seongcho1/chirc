@@ -4,6 +4,9 @@ void MessageManager::LIST(int cs, std::vector<std::string> paramsVec) {
 
   // ** RPL_LISTSTART
   if (paramsVec.size()) {
+
+    //<channel> *( "," <channel> )
+    //split paramsVec[0] with COMMA first
     std::vector<std::string>::iterator it = paramsVec.begin();
     while (it != paramsVec.end()) {
       if (channels_.find(*it) != channels_.end()) {
@@ -21,13 +24,23 @@ void MessageManager::LIST(int cs, std::vector<std::string> paramsVec) {
     std::map<std::string, Channel>::iterator it = channels_.begin();
     while (it != channels_.end()) {
       //322 RPL_LIST   string format "<channel> <# visible> :<topic>"
-      outMessages_[cs].append(it->second.title).append(" <# visible> :").append(it->second.topic).append(NEWLINE); // ** RPL_LIST
+      //322 RPL_LIST string format "<channel> <# visible> :<topic>"
+      //format to send to reply -> #42irc 1 :[+nt] :<topic>
+      // reply(cs, RPL_LIST, "LIST", paramsVec);
+      outMessages_[cs].append(it->second.title).append(" <# visible> :").append(it->second.topic).append(NEWLINE);
       ++it;
     }
   }
+
   reply(cs, RPL_LISTEND, "LIST", paramsVec);
 }
 
+/*
+
+
+
+
+*/
 
 /*
 https://datatracker.ietf.org/doc/html/rfc2812#section-3.2.6
@@ -48,7 +61,7 @@ https://datatracker.ietf.org/doc/html/rfc2812#section-3.2.6
    Numeric Replies:
 
            ERR_TOOMANYMATCHES
-           ERR_NOSUCHSERVER
+           ERR_NOSUCHSERVER       :402 not in the scope <-server to server
            RPL_LIST               :322
            RPL_LISTEND            :323
 

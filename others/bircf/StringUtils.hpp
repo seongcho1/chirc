@@ -6,11 +6,13 @@
 #include <sstream>
 // #include <cerrno>
 #include <vector>
+#include <list>
+#include <map>
 #include <algorithm>
 #include <string>
 #include <cassert>
 
-#define NEWLINE       "\n"
+#define NEWLINE       "\r\n"
 #define SPACE         " "
 #define SPACE_COLON   " :"
 #define COMMA         ","
@@ -115,6 +117,42 @@ public:
     return false;
   }
 
+  static std::string join(const std::string_view& separator, const std::list<std::string>& c) {
+    std::stringstream ss;
+
+    bool add_separator = false;
+    std::list<std::string>::const_iterator it;
+    for (it = c.begin(); it != c.end(); ++it) {
+        if (add_separator) ss << separator;
+        ss << *it;
+        add_separator = true;
+    }
+    return ss.str();
+  }
+
+  static std::list<std::string> duplicateWordList(const std::vector<std::string>& words) {
+      std::map<std::string, int> temp;
+      std::list<std::string> ret;
+      for (std::vector<std::string>::const_iterator iter = words.begin(); iter != words.end(); ++iter) {
+          temp[*iter] += 1;
+          // only add the word to our return list on the second copy
+          // (first copy doesn't count, third and later copies have already been handled)
+          if (temp[*iter] == 2) {
+              ret.push_back(*iter);
+          }
+      }
+      ret.sort();
+      return ret;
+  }
+
+  static std::string duplicateWordString(const std::vector<std::string>& words) {
+    std::string result;
+    std::list<std::string> duplicated;
+
+    duplicated = duplicateWordList(words);
+    result = join(", ", duplicated);
+    return result;
+  }
 
   static std::string& eraseFirstWord(std::string& subject, const std::string& longWord, const std::string& shortWord) {
 
@@ -168,6 +206,15 @@ public:
     return ss.str();
   }
 
+  template <typename T>
+  static std::string  toString ( T number, size_t nRightZeros) {
+    std::string result = toString(number);
+    while (result.size() < nRightZeros)
+      result = std::string("0").append(result);
+    return result;
+  }
+
+
   static std::string  toUpper(const std::string &s)
   {
     std::string str(s);
@@ -217,13 +264,11 @@ public:
       return result;
 
     while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+
       token = s.substr(pos_start, pos_end - pos_start); //+ delimiter.length());
       if ( (bCutOnce && i == 0 && token.empty()) ||
            (!token.empty()) ) {
 
-        //if token's last char is '\r' then drop it
-        if (token[token.length()-1] == '\r')
-          token.pop_back();
         result.push_back(token);  //in case of vector
         i++;
       }

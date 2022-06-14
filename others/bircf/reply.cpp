@@ -35,11 +35,11 @@ int    MessageManager::initReplies(std::string configFile) {
   return 0;
 }
 
-void  MessageManager::reply(int cs, int code, std::string command, std::vector<std::string> paramsVec) {
+std::string  MessageManager::reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, bool bDirectDelivery) {
 
   std::map<int, std::string>::iterator it = replies_.find(code);
   if (it == replies_.end()) {
-    return;
+    return std::string();
   }
 
   std::string msg = it->second;
@@ -68,14 +68,37 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
     // case RPL_LISTSTART        :  break;  // 321
     //322   = <channel> <# visible> :<topic>
     // case RPL_LIST             :  break;  // 322
+    //323   = :End of LIST
+    case RPL_LISTEND             :  break;  // 323
+
+    //325   = <channel> <nickname>
+    case RPL_UNIQOPIS            :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<nickname>");     rVec.push_back("get it from the channel");   //??
+                                    break;  // 325
+
+    //324   = <channel> <mode> <mode params>
+    case RPL_CHANNELMODEIS       :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<mode>");         rVec.push_back(channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS));   //??
+                                    sVec.push_back("<mode params>");  rVec.push_back("get it from the channel");   //??
+                                    break;  // 324
+
+    //331   = <channel> :No topic is set
+    case RPL_NOTOPIC             :  break;  // 331
+    //332   = <channel> :<topic>
+    case RPL_TOPIC               :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<topic>");        rVec.push_back(channels_[paramsVec[0]].topic);   //??
+                                    break;  // 332
+
+    //341   = <channel> <nick>
+    case RPL_INVITING            :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<nick>");         rVec.push_back(users_[cs].nick);                 //??
+                                    break;  // 341
 
 
 
 
+//working here
 
-
-    case RPL_LISTEND             :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
-                                    break;  // 323
     case RPL_NAMREPLY            :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
                                     break;  // 353
     case RPL_ENDOFNAMES          :  sVec.push_back("<...>");      rVec.push_back(paramsVec[0]);
@@ -102,9 +125,11 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
     case  ERR_WASNOSUCHNICK      :  sVec.push_back("<nickname>");      rVec.push_back(paramsVec[0]);
                                     break;  //406
     //407    =  <target> :<error code> recipients. <abort message>
-    case  ERR_TOOMANYTARGETS     :  // sVec.push_back("<target>");      rVec.push_back(users_[cs].nick);        ???
-                                    sVec.push_back("<error code>");    rVec.push_back(SS::toString(code));
-                                    // sVec.push_back("<abort message>");rVec.push_back(trailing);              ???
+    //PRIVMSG   <target> :Duplicate recipients. No message delivered"
+    //JOIN      ???
+    case  ERR_TOOMANYTARGETS     :  sVec.push_back("<target>");        rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<error code> recipients. <abort message>");
+                                    rVec.push_back(paramsVec[1]);
                                     break;  //407
     //408    =  <service name> :No such service
     case  ERR_NOSUCHSERVICE      :  // sVec.push_back("<service name>");  rVec.push_back(??);                    ???
@@ -254,10 +279,12 @@ void  MessageManager::reply(int cs, int code, std::string command, std::vector<s
   }
 
   SS::replaceString(msg, sVec, rVec);
-  msg = std::string("").append(msg).append(NEWLINE);
-  outMessages_[cs].append(msg);
+  msg = std::string(":FT_IRC " + SS::toString(code, 3) + " " + users_[cs].nick + " ").append(msg).append(NEWLINE);
 
-  // return msg;
+  if (bDirectDelivery)
+    outMessages_[cs].append(msg);
+
+  return msg;
 }
 
 
