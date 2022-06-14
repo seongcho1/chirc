@@ -7,59 +7,67 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  if (USER_ENGAGED_LIMIT <= users_[cs].engaged.size()) {
+  if (users_[cs].limit <= (int)users_[cs].engaged.size()) {
     reply(cs, ERR_TOOMANYCHANNELS, "JOIN", paramsVec);
     return;
   }
 
-  std::vector<std::string> channels = SS::splitString(paramsVec[0], COMMA);
+  std::vector<std::string> chn = SS::splitString(paramsVec[0], COMMA);
   std::vector<std::string> keys;
-  std::vector<std::string>::iterator it = channels.begin();
+  // std::vector<std::string>::iterator it = chn.begin();
 
   if (1 < paramsVec.size())
     keys = SS::splitString(paramsVec[1], COMMA);
 
-  for (int i = 0; i < (int)channels.size(); ++i) {
-    if (channels_.find(*it) == channels_.end()) {
-      channels_[*it] = Channel(cs, *it);
-      users_[cs].engaged.insert(*it);
+  for (int i = 0; i < (int)chn.size(); ++i) {
+    if (channels_.find(chn[i]) == channels_.end()) {
+      channels_[chn[i]] = Channel(cs, chn[i]);
+      users_[cs].engaged.insert(chn[i]);
 
       if (i < (int)keys.size() && keys[i] != "") {
-        channels_[*it].key = keys[i];
-        channels_[*it].setMode(true, 'k');
+        channels_[chn[i]].key = keys[i];
+        channels_[chn[i]].setMode(true, 'k');
+        announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].prefix()).append(" has changed mode : +k"));
         // std::string s = "+k";
         // MODE(cs, SS::splitString(s, ""));
       }
 
-SS::charPrint(*it);
-
     }
     else {
-      if (channels_[*it].member.find(cs) == channels_[*it].member.end()) {
-        if (channels_[*it].isMode('k') && ((int)keys.size() <= i || channels_[*it].key != keys[i])) {
+      if (channels_[chn[i]].member.find(cs) == channels_[chn[i]].member.end()) {
+        if (channels_[chn[i]].isMode('k') && ((int)keys.size() <= i || channels_[chn[i]].key != keys[i])) {
           reply(cs, ERR_BADCHANNELKEY, "JOIN", paramsVec);
           continue;
         }
 
-        if (CHANNEL_MEMBER_LIMIT <= channels_[*it].member.size()) {
+        // if (CHANNEL_MEMBER_LIMIT <= channels_[*it].member.size()) {
+        if (channels_[chn[i]].limit <= (int)channels_[chn[i]].member.size()) {
           reply(cs, ERR_CHANNELISFULL, "JOIN", paramsVec);
           continue;
         }
 
-        if (channels_[*it].isMode('i') &&
-            users_[cs].invited.find(*it) == users_[cs].invited.end()) {
+        if (channels_[chn[i]].isMode('i') &&
+            users_[cs].invited.find(chn[i]) == users_[cs].invited.end()) {
           reply(cs, ERR_INVITEONLYCHAN, "JOIN", paramsVec);
           continue;
         }
 
-        channels_[*it].member.insert(cs);
-        users_[cs].engaged.insert(*it);
-        users_[cs].invited.erase(*it);
+        channels_[chn[i]].member.insert(cs);
+        users_[cs].engaged.insert(chn[i]);
+        users_[cs].invited.erase(chn[i]);
       }
     }
-    announceToChannel(cs, channels[i], std::string().append("join [").append(users_[cs].nick).append("]"));
-    reply(cs, TEST, "JOIN", channels); // display topic
-    reply(cs, TEST, "JOIN", channels); // display memberlist include me.
+
+// You have joined the channel
+// kello has joined (~kello@freenode-ca7.4sl.2765s3.IP)
+// kello has changed mode: +s
+    // announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyPrefix()).append(" NICK ").append(nick), true);
+    // reply(cs, RPL_TOPIC, "TOPIC", paramsVec);
+    // announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].prefix()).append(" has joined (").append(users_[cs].prefix()).append(")"));
+    // announceOneUser(cs, std::string().append(":").append(users_[cs].prefix()).append(" ").append(users_[cs].nick).append(" = ").append(chn[i]).append(" :").append(channelMemberToString(chn[i])));
+    announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].systemPrefix()).append(" ").append(users_[cs].nick).append(" has joined (").append(users_[cs].prefix()).append(")"));
+    announceOneUser(cs, std::string().append(":").append(users_[cs].systemPrefix()).append(" ").append(SS::toString(RPL_NAMREPLY)).append(" ").append(users_[cs].nick).append(" = ").append(chn[i]).append(" :").append(channelMemberToString(chn[i])));
+    announceOneUser(cs, std::string().append(":").append(users_[cs].systemPrefix()).append(" ").append(SS::toString(RPL_ENDOFNAMES)).append(" ").append(users_[cs].nick).append(" ").append(chn[i]).append(" :").append(channelMemberToString(chn[i])));
   }
 }
 

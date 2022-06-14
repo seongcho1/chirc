@@ -21,8 +21,9 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  if (channels_[paramsVec[0]].isMode('t') &&
-      channels_[paramsVec[0]].channelOperators.find(cs) != channels_[paramsVec[0]].channelOperators.end()) {
+  // if (channels_[paramsVec[0]].isMode('t') &&
+  //     channels_[paramsVec[0]].channelOperators.find(cs) != channels_[paramsVec[0]].channelOperators.end()) {
+  if (channels_[paramsVec[0]].unableFlag(cs, 't')) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec);
     return;
   }
@@ -31,7 +32,7 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
   channels_[paramsVec[0]].topic = topic;
 
   topic = users_[cs].nick + " has set topic: " + topic;
-  announceToChannel(ircfd, paramsVec[0], topic);
+  announceToChannel(ircfd, paramsVec[0], topic);  // RPL_TOPIC // RPL_NOTOPIC
 }
 
 

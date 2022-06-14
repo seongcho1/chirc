@@ -7,26 +7,17 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-	// get user's mode string???
-  // if(users_.find(cs) !== users_.end() && users_[cs].getMode().find('r') != std::string::npos)
-  //  reply(cs, ERR_RESTRICTED, "NICK", paramsVec); //484
-  //  return;
-  //}
-
   //See section 2.3.1 for details on valid nicknames.
   // if (nick[0] is numeric or special or error in nick) {
   std::string nick = paramsVec[0];
   if ( (nick.length() > NICK_MAX_LENGTH) ||
        (SS::toUpper(nick).compare("ANONYMOUS") == 0) ||
-       SS::containExceptChar(nick, std::string(" ,*?!@.")) ||
-       !isalpha(nick[0]) || //https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1
-       nick[0] == '$' || nick[0] == ':' ||
-       nick[0] == '#' || nick[0] == '&' || nick[0] == '+' || nick[0] == '!') {
+       !SS::isNickChar(nick)) {
     reply(cs, ERR_ERRONEUSNICKNAME, "NICK", paramsVec); //432
     return;
   }
 
-  std::string legacyPrefix = users_[cs].prefix();
+  char authStatus = users_[cs].authenticated;
 
   if (isUniqueNick(cs, nick)) {
     bool auth = false;
@@ -40,33 +31,32 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
       ping(cs);
     }
 
-  } else {
+    if (authStatus == AUTH_MASK)
+      announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyPrefix()).append(" NICK ").append(nick), true);
+  } 
+  else {
     reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec); //433
+    return;
   }
 
   // seongcho: to avoid duplicated  announce,
   // get unique users from all channels the user is engaged
   // then  announce to the users list ???
-  if ( (users_[cs].authenticated == AUTH_MASK) && !legacyPrefix.empty()) {
-    std::string message;
-    // std::set<std::string>::iterator eit = users_[cs].engaged.begin();
-    // :WiZ!jto@tolsun.oulu.fi NICK Kilroy  ; Server telling that WiZ changed his nickname to Kilroy.
-    message.append(":" + legacyPrefix + " NICK " + nick);
-    announceToUser(cs, message);
-    // while (eit != users_[cs].engaged.end()) {
-    //   announceToChannel(*eit++, message);
-    // }
-  }
-  // announce to engaged channels [from nick to nick] ----------------------------------
+  // if (authStatus == AUTH_MASK) {
+  // if (AUTH_MASK == users_[cs].authenticated && users_[cs].authenticated == authStatus) {
+  //   // :WiZ!jto@tolsun.oulu.fi NICK Kilroy  ; Server telling that WiZ changed his nickname to Kilroy.
+  //   announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyPrefix()).append(" NICK ").append(nick), true);
+  // }
 }
 
 bool MessageManager::isUniqueNick(int cs, std::string &nick) {
   if (nickFdPair_.find(nick) == nickFdPair_.end()) {
-    User &user = users_[cs];
-    std::string current = user.nick;
     nickFdPair_[nick] = cs;
+
+    User &user = users_[cs];
+    user.pnik = user.nick;
     user.nick = nick;
-    nickFdPair_.erase(current);
+    nickFdPair_.erase(user.pnik);
     return true;
   }
   return false;

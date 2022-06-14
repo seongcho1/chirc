@@ -7,34 +7,36 @@ void MessageManager::KICK(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  if (channels_.find(*paramsVec.begin()) == channels_.end()) {
+// change to loop
+
+  if (channels_.find(paramsVec[0]) == channels_.end()) {
     reply(cs, ERR_NOSUCHCHANNEL, "KICK", paramsVec);
     return;
   }
 
-  if (users_[cs].engaged.find(*paramsVec.begin()) == users_[cs].engaged.end()) {
+  if (users_[cs].engaged.find(paramsVec[0]) == users_[cs].engaged.end()) {
     reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
     return;
   }
 
-  std::map<std::string, int>::iterator nfit = nickFdPair_.find(*(++paramsVec.begin()));
+  std::map<std::string, int>::iterator nfit = nickFdPair_.find(paramsVec[1]);
   if (nfit == nickFdPair_.end()) {
     reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
     return;
   }
 
-  if (channels_[*paramsVec.begin()].member.find(nfit->second) == channels_[*paramsVec.begin()].member.end()) {
+  if (channels_[paramsVec[0]].member.find(nfit->second) == channels_[paramsVec[0]].member.end()) {
     reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
     return;
   }
 
-  if (channels_[*paramsVec.begin()].channelOperators.find(cs) == channels_[*paramsVec.begin()].channelOperators.end()) {
+  if (channels_[paramsVec[0]].channelOperators.find(cs) == channels_[paramsVec[0]].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "KICK", paramsVec);
     return;
   }
 
-  users_[nfit->second].engaged.erase(*paramsVec.begin());
-  channels_[*paramsVec.begin()].member.erase(nfit->second);
+  users_[nfit->second].engaged.erase(paramsVec[0]);
+  channels_[paramsVec[0]].member.erase(nfit->second);
 
   reply(cs, RPL_AWAY, "KICK", paramsVec);
   reply(nfit->second, RPL_AWAY, "KICK", paramsVec);
