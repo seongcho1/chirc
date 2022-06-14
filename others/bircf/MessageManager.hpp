@@ -32,6 +32,7 @@ private:
   void  PASS(int cs, std::vector<std::string> paramsVec);
   void  NICK(int cs, std::vector<std::string> paramsVec);
   void  USER(int cs, std::vector<std::string> paramsVec);
+  void  PING(int cs, std::vector<std::string> paramsVec);
   void  PONG(int cs, std::vector<std::string> paramsVec);
 
   void  QUIT(int cs, std::vector<std::string> paramsVec);
@@ -50,16 +51,18 @@ private:
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec);
   void  TESTMSG(int cs, std::vector<std::string> paramsVec);
   void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec);
-  void  announceToChannel(int cs, std::string title, std::string message);
+  void  announceToChannel(int cs, std::string title, std::string message, bool all = false);
   // bool  announceToChannel(int cs, std::string title, Commands command, std::string message);
   void  announceToUser(int cs, std::string message);
   void  announceOneUser(int cs, std::string message);
   void  announceToSelf(int cs, std::string message);
   void  modeChannel(int cs, std::vector<std::string> paramsVec);
   void  modeUser(int cs, std::vector<std::string> paramsVec);
+  std::string channelMemberToString(std::string channel);
+  // std::string prettyModeFlags(std::string mode);
 
-  std::vector<std::string> namesVec(std::set<int> fds);
-  std::string namesVec_TEST(std::set<int> fds);
+  // std::vector<std::string> namesVec(std::set<int> fds);
+  // std::string namesVec_TEST(std::set<int> fds);
 
   MessageManager(MessageManager const &) 						{}
   MessageManager &operator=(MessageManager const &) { return *this; }

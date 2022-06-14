@@ -17,8 +17,8 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  std::string channel = *(++paramsVec.begin());
-  std::map<std::string, int>::iterator nickfdit = nickFdPair_.find(*paramsVec.begin());
+  std::string channel = paramsVec[1];
+  std::map<std::string, int>::iterator nickfdit = nickFdPair_.find(paramsVec[0]);
 
   if (nickfdit == nickFdPair_.end()) {
     reply(cs, ERR_NOSUCHNICK, "INVITE", paramsVec);
@@ -42,8 +42,8 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
   }
 
   users_[nickfdit->second].invited.insert(channel);
-  announceToSelf(cs, std::string().append("inviting ").append(nickfdit->first).append(" to #").append(channel));
-  announceToSelf(nickfdit->second, std::string().append(users_[cs].nick).append(" invite you to #").append(channel));
+  announceToSelf(cs, std::string().append("inviting ").append(nickfdit->first).append(" to ").append(channel));
+  announceToSelf(nickfdit->second, std::string().append(users_[cs].nick).append(" invite you to ").append(channel));
 }
 
 /*

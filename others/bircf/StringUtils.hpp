@@ -260,6 +260,23 @@ public:
     return result;
   }
 
+// CHANNEL_MODE_PARAM_FLAGS_STRING
+  static char   first(std::string &s, std::string const &cmp) {
+    for (int i = 0; i < (int)s.length(); ++i) {
+      if (compare(s[i], cmp))
+        return s[i];
+    }
+    return 0;
+  }
+
+  static bool compare(char const &s, std::string const &cmp) {
+    for (int i = 0; i < (int)cmp.length(); ++i) {
+      if (cmp[i] == s)
+        return true;
+    }
+    return false;
+  }
+
   static int    x_int(int err, int res, char *str, char *file, int line) {
     if (res == err) {
       fprintf(stderr, "%s error (%s, %d): %s\n",
@@ -281,6 +298,12 @@ public:
     return (res);
   }
 
+  static void charPrint(std::string &s) {
+    std::string::iterator si = s.begin();
+    while (si != s.end())
+      std::cout << "{" << (int)*si++ << "}";
+    std::cout << std::endl;
+  }
 };
 
 

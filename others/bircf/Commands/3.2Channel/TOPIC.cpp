@@ -15,13 +15,6 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  //check if channel exist first
-  // if ( paramsVec[0][0] != '#' ||
-  //      (channels_.find(paramsVec[0]) == channels_.end()) ) {
-  //   reply(cs, ERR_NOSUCHCHANNEL, "TOPIC", paramsVec); //403
-  //   return;
-  // }
-
   if (paramsVec[0][0] != '#' ||
       users_[cs].engaged.find(paramsVec[0]) == users_[cs].engaged.end()) {
     reply(cs, ERR_NOTONCHANNEL, "TOPIC", paramsVec); //442
@@ -31,6 +24,7 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
   if (channels_[paramsVec[0]].isMode('t') &&
       channels_[paramsVec[0]].channelOperators.find(cs) != channels_[paramsVec[0]].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec);
+    return;
   }
 
   std::string topic = paramsVec[1];

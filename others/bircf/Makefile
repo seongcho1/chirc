@@ -3,6 +3,7 @@ SRCS =	main.cpp MessageManager.cpp \
 				Commands/3.1ConnectionRegistration/NICK.cpp \
 				Commands/3.1ConnectionRegistration/USER.cpp \
 				Commands/3.1ConnectionRegistration/QUIT.cpp \
+				Commands/3.1ConnectionRegistration/PING.cpp \
 				Commands/3.1ConnectionRegistration/PONG.cpp \
 				Commands/3.2Channel/JOIN.cpp \
 				Commands/3.2Channel/PART.cpp \
@@ -29,7 +30,7 @@ CXX = c++
 RM = rm -f
 
 ${NAME}:	${OBJS}
-		${CXX} ${CXXFLAGS} -o ${NAME} ${OBJS} ${LDFLAGS}
+		@${CXX} ${CXXFLAGS} -o ${NAME} ${OBJS} ${LDFLAGS}
 
 all:		${NAME}
 

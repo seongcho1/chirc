@@ -1,6 +1,8 @@
 #ifndef __REPLY_H__
 #define __REPLY_H__
 
+#define TEST                                 000
+
 #define RPL_WELCOME                          001
 #define RPL_YOURHOST                         002
 #define RPL_CREATED                          003

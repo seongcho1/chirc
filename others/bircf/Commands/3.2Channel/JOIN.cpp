@@ -1,38 +1,65 @@
 #include "../../MessageManager.hpp"
 
 void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
+
   if (paramsVec.size() < 1) {
     reply(cs, ERR_NEEDMOREPARAMS, "JOIN", paramsVec); //461
     return;
   }
 
-  // if (!users_[cs].isAuthenticated()) {
-  //   reply(cs, ERR_NOTREGISTERED, "PART", paramsVec);
-  //   return;
-  // }
+  if (USER_ENGAGED_LIMIT <= users_[cs].engaged.size()) {
+    reply(cs, ERR_TOOMANYCHANNELS, "JOIN", paramsVec);
+    return;
+  }
 
-  std::vector<std::string>::iterator it = paramsVec.begin();
-  while (it != paramsVec.end()) {
+  std::vector<std::string> channels = SS::splitString(paramsVec[0], COMMA);
+  std::vector<std::string> keys;
+  std::vector<std::string>::iterator it = channels.begin();
 
+  if (1 < paramsVec.size())
+    keys = SS::splitString(paramsVec[1], COMMA);
+
+  for (int i = 0; i < (int)channels.size(); ++i) {
     if (channels_.find(*it) == channels_.end()) {
-      channels_[*it] = Channel(*paramsVec.begin());
-      // channels_[*it].title = *paramsVec.begin();
-      channels_[*it].channelOperators.insert(cs);
-    }
+      channels_[*it] = Channel(cs, *it);
+      users_[cs].engaged.insert(*it);
 
-    if (channels_[*it].member.find(cs) == channels_[*it].member.end()) {
-      users_[cs].invited.erase(*it);
-
-      std::set<int>::iterator mit = channels_[*it].member.begin();
-      while (mit != channels_[*it].member.end()) {
-        outMessages_[*mit++].append("join [" + users_[cs].nick + "]\n");
+      if (i < (int)keys.size() && keys[i] != "") {
+        channels_[*it].key = keys[i];
+        channels_[*it].setMode(true, 'k');
+        // std::string s = "+k";
+        // MODE(cs, SS::splitString(s, ""));
       }
 
-      channels_[*it].member.insert(cs);
-      users_[cs].engaged.insert(*it);
-    }
+SS::charPrint(*it);
 
-    ++it;
+    }
+    else {
+      if (channels_[*it].member.find(cs) == channels_[*it].member.end()) {
+        if (channels_[*it].isMode('k') && ((int)keys.size() <= i || channels_[*it].key != keys[i])) {
+          reply(cs, ERR_BADCHANNELKEY, "JOIN", paramsVec);
+          continue;
+        }
+
+        if (CHANNEL_MEMBER_LIMIT <= channels_[*it].member.size()) {
+          reply(cs, ERR_CHANNELISFULL, "JOIN", paramsVec);
+          continue;
+        }
+
+        if (channels_[*it].isMode('i') &&
+            users_[cs].invited.find(*it) == users_[cs].invited.end()) {
+          reply(cs, ERR_INVITEONLYCHAN, "JOIN", paramsVec);
+          continue;
+        }
+
+        channels_[*it].member.insert(cs);
+        users_[cs].engaged.insert(*it);
+        users_[cs].invited.erase(*it);
+      }
+    }
+    announceToChannel(cs, channels[i], std::string().append("join [").append(users_[cs].nick).append("]"));
+    reply(cs, TEST, "JOIN", channels); // display topic
+    reply(cs, TEST, "JOIN", channels); // display memberlist include me.
   }
 }
 

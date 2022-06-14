@@ -6,6 +6,7 @@ void MessageManager::registerFunctions() {
   functionCallMap_["NICK"] =        &MessageManager::NICK;
   functionCallMap_["USER"] =        &MessageManager::USER;
 
+  functionCallMap_["PING"] =        &MessageManager::PING;
   functionCallMap_["PONG"] =        &MessageManager::PONG;
 
   functionCallMap_["QUIT"] =        &MessageManager::QUIT;
@@ -132,6 +133,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
   // it can be done by checking CR and NUL
   // CR ctrl+V, ctrl+M can be checked
   // NUL ?? how can we check NUL ??
+  
   if (SS::containExceptChar(paramsVec, CR)) {
     reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Use nospcrlfcl Parameters"), paramsVec); //461 Use nospcrlfcl parameters
     return;
@@ -184,11 +186,12 @@ void MessageManager::ping(int cs) {
   users_[cs].alive = time(NULL) + TIMEOUT;
 }
 
-void MessageManager::announceToChannel(int cs, std::string title, std::string message) {
+void MessageManager::announceToChannel(int cs, std::string title, std::string message, bool all) {
   std::set<int>::iterator it = channels_[title].member.begin();
   while (it != channels_[title].member.end()) {
-    if (cs != *it)
-      outMessages_[*it++].append(message).append(NEWLINE);
+    if (all || cs != *it)
+      outMessages_[*it].append(message).append(NEWLINE);
+    ++it;
   }
 }
 
@@ -236,4 +239,17 @@ void MessageManager::announceToUser(int cs, std::string message) {
   for (std::set<int>::iterator it = friendly.begin(); it != friendly.end(); ++it) {
     outMessages_[*it].append(message).append(NEWLINE);
   }
+}
+
+std::string MessageManager::channelMemberToString(std::string channel) {
+  std::string memberString;
+
+  std::set<int>::iterator it = channels_[channel].member.begin();
+  while (it != channels_[channel].member.end()) {
+    if (channels_[channel].isOper(*it))
+      memberString.append("@");
+    memberString.append(users_[*it++].nick).append(" ");
+  }
+
+  return memberString;
 }

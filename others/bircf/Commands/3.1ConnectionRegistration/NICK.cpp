@@ -52,7 +52,7 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
     // std::set<std::string>::iterator eit = users_[cs].engaged.begin();
     // :WiZ!jto@tolsun.oulu.fi NICK Kilroy  ; Server telling that WiZ changed his nickname to Kilroy.
     message.append(":" + legacyPrefix + " NICK " + nick);
-    announceToUser(ircfd, message);
+    announceToUser(cs, message);
     // while (eit != users_[cs].engaged.end()) {
     //   announceToChannel(*eit++, message);
     // }
