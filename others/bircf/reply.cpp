@@ -48,13 +48,13 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
 
   switch (code) {
 
-    case 0                       :  sVec.push_back("<...>"); rVec.push_back(paramsVec[0]);
+    case TEST                     :  sVec.push_back("<...>"); rVec.push_back(paramsVec[0]);
                                     break; // TEST 0
 
     //001   = Welcome to the <network> Network, <nick>[!<user>@<host>]
     case  RPL_WELCOME             : sVec.push_back("<network>");   rVec.push_back("FT_IRC"); //server's property
-                                      sVec.push_back("<nick>[!<user>@<host>]");
-                                      rVec.push_back(std::string(users_[cs].nick + "!" + users_[cs].user + "@" + users_[cs].host));
+                                    sVec.push_back("<nick>[!<user>@<host>]");
+                                    rVec.push_back(std::string(users_[cs].nick + "!" + users_[cs].user + "@" + users_[cs].host));
                                     break;  //001
 
 

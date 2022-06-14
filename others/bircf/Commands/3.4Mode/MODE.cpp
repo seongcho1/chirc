@@ -20,7 +20,7 @@ void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
   }
 
   if (users_[cs].nick != paramsVec[0]) {
-    // O (server oper) only
+    // O (server oper.[privilion] only)
     return;
   }
 
@@ -32,13 +32,13 @@ void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
   if (paramsVec[1][0] == '-' && paramsVec[1][1] == 'i') {
     users_[cs].setMode(false, 'i');
     // RPL_UMODEIS
-    announceToSelf(cs, "i am visible");
+    announceOneUser(cs, "i am visible");
   }
 
   if (paramsVec[1][0] == '+' && paramsVec[1][1] == 'i') {
     users_[cs].setMode(true, 'i');
     // RPL_UMODEIS
-    announceToSelf(cs, "i am invisible");
+    announceOneUser(cs, "i am invisible");
   }
 }
 
@@ -94,7 +94,7 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
     }
     else if (!paramOnce && *mit == 'l' && 2 < (int)paramsVec.size()) {
       channels_[paramsVec[0]].setMode(add, *mit);
-      channels_[paramsVec[0]].limit = atoi(paramsVec[2].c_str());
+      channels_[paramsVec[0]].limit = MIN(atoi(paramsVec[2].c_str()), CHANNEL_MEMBER_LIMIT);
       // RPL_CHANNELMODEIS
       announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;

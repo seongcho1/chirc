@@ -2,22 +2,28 @@
 
 void MessageManager::LIST(int cs, std::vector<std::string> paramsVec) {
 
+  // ** RPL_LISTSTART
   if (paramsVec.size()) {
 
     //<channel> *( "," <channel> )
     //split paramsVec[0] with COMMA first
     std::vector<std::string>::iterator it = paramsVec.begin();
     while (it != paramsVec.end()) {
-      if (channels_.find(*it) != channels_.end())
-        //format to send to reply -> #42irc 1 :[+nt] :<topic>
-        // reply(cs, RPL_LIST, "LIST", paramsVec);
-        outMessages_[cs].append("[").append(channels_[*it].title).append("]:[").append(channels_[*it].topic).append("]\n");
+      if (channels_.find(*it) != channels_.end()) {
+        outMessages_[cs].append("[").append(channels_[*it].title).append("]");
+        if (!channels_[*it].isMode('p'))
+          outMessages_[cs].append(":[").append(channels_[*it].topic).append("]");
+        outMessages_[cs].append(NEWLINE);
+//        // reply(cs, RPL_LIST, "LIST", paramsVec);
+//        // outMessages_[cs].append("[").append(channels_[*it].title).append("]:[").append(channels_[*it].topic).append("]\n"); // ** RPL_LIST
+      }
       ++it;
     }
   }
   else {
     std::map<std::string, Channel>::iterator it = channels_.begin();
     while (it != channels_.end()) {
+      //322 RPL_LIST   string format "<channel> <# visible> :<topic>"
       //322 RPL_LIST string format "<channel> <# visible> :<topic>"
       //format to send to reply -> #42irc 1 :[+nt] :<topic>
       // reply(cs, RPL_LIST, "LIST", paramsVec);

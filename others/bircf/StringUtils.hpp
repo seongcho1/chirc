@@ -19,6 +19,7 @@
 #define NUL           "\0"
 #define CR            "\r"
 #define CR_NUL        "\r\0"
+#define SPECIAL       "-[]\\`^{}"
 
 class SS {
 public:
@@ -352,6 +353,22 @@ public:
     while (si != s.end())
       std::cout << "{" << (int)*si++ << "}";
     std::cout << std::endl;
+  }
+
+  static bool isNickChar(std::string &s) {
+    if (!isalpha(s[0]))
+      return false;
+
+    for (int i = 0; i < (int)s.length(); ++i) {
+      if (isalpha(s[i]))
+        continue;
+      if (isnumber(s[i]))
+        continue;
+      if (compare(s[i], SPECIAL))
+        continue;
+      return false;
+    }
+    return true;
   }
 };
 
