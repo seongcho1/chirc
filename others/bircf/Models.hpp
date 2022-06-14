@@ -184,8 +184,10 @@ public:
 
     read[r] = 0;
     buffer.append(read);
+
 std::cout << ">> " << buffer;
 SS::charPrint(buffer);
+
     return true;
   }
 
@@ -193,33 +195,42 @@ SS::charPrint(buffer);
     if (message.empty())
       return;
 
-    unsigned long endset, offset = 0;
-std::cout << "<< " << message;
-    while (offset < message.length()) {
-      endset = MIN(BUF_SIZE, message.length() - offset);
-      send(fd, message.c_str() + offset, endset, 0);
-      offset += endset;
-    }
-    message.clear();
+
+std::vector<std::string> msg = SS::splitString(message, NEWLINE);
+for (int i = 0; i < (int)msg.size(); ++i) {
+  msg[i].append(NEWLINE);
+  send(fd, msg[i].c_str(), msg[i].length(), 0);
+std::cout << "<< " << msg[i];
+SS::charPrint(msg[i]);
+}
+message.clear();
+
+    // unsigned long endset, offset = 0;
+
+    // while (offset < message.length()) {
+    //   endset = MIN(BUF_SIZE, message.length() - offset);
+    //   send(fd, message.c_str() + offset, endset, 0);
+    //   offset += endset;
+    // }
+    // message.clear();
   }
 
   bool isAuthenticated(void) { return authenticated == AUTH_MASK; }
   
   std::string prefix(void) {
     return std::string(nick + "!" + user + "@" + host);
-    // if (!isAuthenticated())
-    //   return std::string("");
-    // else if (user.length() && host.length())
-	  //   return std::string(nick + "!" + user + "@" + host);
-    // return nick;
+    // return std::string(nick + "!" + user + "@0");
   }
 
   std::string legacyPrefix(void) {
     return std::string(pnik + "!" + user + "@" + host);
+    // return std::string(pnik + "!" + user + "@0");
   }
 
   std::string systemPrefix(void) {
-    return std::string().append("FT_IRC ");
+    // return std::string().append("FT_IRC");
+    // return std::string().append("*.").append(host);
+    return host;
   }
 };
 

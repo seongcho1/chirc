@@ -155,7 +155,7 @@ void MessageManager::srvAccept(int s) {
   socklen_t csinLen;
 
   csinLen = sizeof(csin);
-  cs = accept(s, (struct sockaddr *)&csin, &csinLen);
+  cs = accept(s, (sockaddr *)&csin, &csinLen);
 
   fcntl(cs, F_SETFL, O_NONBLOCK);
 
