@@ -10,7 +10,7 @@
 #include <string>
 #include <cassert>
 
-#define NEWLINE       "\n"
+#define NEWLINE       "\r\n"
 #define SPACE         " "
 #define SPACE_COLON   " :"
 #define COMMA         ","
@@ -216,13 +216,11 @@ public:
       return result;
 
     while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+
       token = s.substr(pos_start, pos_end - pos_start); //+ delimiter.length());
       if ( (bCutOnce && i == 0 && token.empty()) ||
            (!token.empty()) ) {
 
-        //if token's last char is '\r' then drop it
-        if (token[token.length()-1] == '\r')
-          token.pop_back();
         result.push_back(token);  //in case of vector
         i++;
       }

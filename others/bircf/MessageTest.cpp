@@ -1,7 +1,7 @@
 #include "StringUtils.hpp"
 #include <map>
 
-#define NEWLINE		"\n"
+//#define NEWLINE		"\n"
 #define BUF_SIZE	10
 
 class MessageManager {
@@ -50,10 +50,10 @@ int clientWriteTest() {
 int splitSstringTest() {
 
   int i;
-  std::string a1 = "\n\n\naaa\nbbb\nccc\nddd";
+  std::string a1 = "NICK hello\r\nUSER 1 0 * 2\r\n";
   std::string a2 = "";
 
-/*
+
   std::vector<std::string> avec1 = SS::splitString(a1, NEWLINE, true, true);
 
   std::cout << "vec size=" << avec1.size() << std::endl;
@@ -64,7 +64,7 @@ int splitSstringTest() {
   }
   std::cout << std::endl << "a1=(" << a1 << ")" << std::endl;
 
-*/
+/*
   //std::vector<std::string> avec2 = SS::splitString(a2, SPACE_COLON, false, false, true);
 
   std::vector<std::string> avec2 = SS::splitString(a2, SPACE);
@@ -76,7 +76,7 @@ int splitSstringTest() {
     i++;
   }
   std::cout << std::endl << "a2=(" << a2 << ")" << std::endl;
-
+*/
   return 0;
 }
 
