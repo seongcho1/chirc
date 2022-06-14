@@ -94,6 +94,46 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
                                     sVec.push_back("<nick>");         rVec.push_back(users_[cs].nick);                 //??
                                     break;  // 341
 
+    //342   = <user> :Summoning user to IRC
+    //case RPL_SUMMONING           :  sVec.push_back("<user>");      rVec.push_back(paramsVec[0]);                    //??
+    //                                break;  // 342
+
+
+    //346   = <channel> <invitemask>
+    case RPL_INVITELIST          :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<invitemask>");   rVec.push_back("get it from the channel");   //??
+                                    break;  // 346
+
+    //347   = <channel> :End of channel invite list
+    case RPL_ENDOFINVITELIST     :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 347
+
+    //348   = <channel> <exceptionmask>
+    case RPL_EXCEPTLIST          :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<exceptionmask>");rVec.push_back("get it from the channel");   //??
+                                    break;  // 348
+
+    //349   = <channel> :End of channel exception list
+/*
+    case RPL_INVITELIST          :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 347
+
+
+
+       348    RPL_EXCEPTLIST
+              "<channel> <exceptionmask>"
+       349    RPL_ENDOFEXCEPTLIST
+              "<channel> :End of channel exception list"
+
+
+
+#         - When listing the 'exception masks' for a given channel,
+#           a server is required to send the list back using the
+#           RPL_EXCEPTLIST and RPL_ENDOFEXCEPTLIST messages.  A
+#           separate RPL_EXCEPTLIST is sent for each active mask.
+#           After the masks have been listed (or if none present)
+#           a RPL_ENDOFEXCEPTLIST MUST be sent.
+*/
 
 
 
