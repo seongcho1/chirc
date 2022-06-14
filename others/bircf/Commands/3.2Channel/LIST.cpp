@@ -2,26 +2,30 @@
 
 void MessageManager::LIST(int cs, std::vector<std::string> paramsVec) {
 
+  // ** RPL_LISTSTART
   if (paramsVec.size()) {
     std::vector<std::string>::iterator it = paramsVec.begin();
     while (it != paramsVec.end()) {
-      if (channels_.find(*it) != channels_.end())
-        // reply(cs, RPL_LIST, "LIST", paramsVec);
-        outMessages_[cs].append("[").append(channels_[*it].title).append("]:[").append(channels_[*it].topic).append("]\n");
+      if (channels_.find(*it) != channels_.end()) {
+        outMessages_[cs].append("[").append(channels_[*it].title).append("]");
+        if (!channels_[*it].isMode('p'))
+          outMessages_[cs].append(":[").append(channels_[*it].topic).append("]");
+        outMessages_[cs].append(NEWLINE);
+//        // reply(cs, RPL_LIST, "LIST", paramsVec);
+//        // outMessages_[cs].append("[").append(channels_[*it].title).append("]:[").append(channels_[*it].topic).append("]\n"); // ** RPL_LIST
+      }
       ++it;
     }
   }
   else {
     std::map<std::string, Channel>::iterator it = channels_.begin();
     while (it != channels_.end()) {
-      //322 RPL_LIST string format "<channel> <# visible> :<topic>"
-      outMessages_[cs].append(it->second.title).append(" <# visible> :").append(it->second.topic).append(NEWLINE);
+      //322 RPL_LIST   string format "<channel> <# visible> :<topic>"
+      outMessages_[cs].append(it->second.title).append(" <# visible> :").append(it->second.topic).append(NEWLINE); // ** RPL_LIST
       ++it;
     }
   }
-
-  // reply(cs, RPL_LISTEND, "LIST", paramsVec);
-  outMessages_[cs].append("[LIST END]\n");
+  reply(cs, RPL_LISTEND, "LIST", paramsVec);
 }
 
 

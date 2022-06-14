@@ -35,15 +35,19 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  if (channels_[channel].isMode('i') &&
-      channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
+  if (channels_[channel].unableFlag(cs, 'i')) {
+  // if (channels_[channel].isMode('i') &&
+  //     channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "INVITE", paramsVec);
     return;
   }
 
   users_[nickfdit->second].invited.insert(channel);
-  announceToSelf(cs, std::string().append("inviting ").append(nickfdit->first).append(" to ").append(channel));
-  announceToSelf(nickfdit->second, std::string().append(users_[cs].nick).append(" invite you to ").append(channel));
+  announceOneUser(cs, std::string().append("inviting ").append(nickfdit->first).append(" to ").append(channel)); // ** RPL_INVITING
+  announceOneUser(nickfdit->second, std::string().append(users_[cs].nick).append(" invite you to ").append(channel)); // ** RPL_INVITING
+  if (!users_[nickfdit->second].away.empty())
+    reply(cs, RPL_AWAY, "INVITE", paramsVec);
+    // announceToSelf(cs, users_[nickfdit->second].away);  // RPL_AWAY
 }
 
 /*

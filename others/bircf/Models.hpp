@@ -115,6 +115,7 @@ public:
     topic(),
     key() {
       BaseModel::mode = 0;
+      BaseModel::limit = CHANNEL_MEMBER_LIMIT;
       channelOperators.insert(cs);
       member.insert(cs);
     }
@@ -128,6 +129,10 @@ public:
   bool isOper(int fd) {
     return channelOperators.find(fd) != channelOperators.end();
   }
+
+  bool unableFlag(int fd, char flag) {
+    return !isOper(fd) && isMode(flag);
+  }
 };
 
 
@@ -139,6 +144,8 @@ public:
   std::string user;
   std::string real;
   std::string host;
+  std::string away;
+  std::string pnik;
   char authenticated;
   bool waitPong;
   bool quit;
@@ -150,11 +157,17 @@ public:
   User() {}
   User(int const &fd, std::string const &host, char auth) :
     fd(fd),
+    nick(),
     host(host),
+    away(),
+    pnik(),
     authenticated(auth),
     quit(false),
     dead(time(NULL) + WAIT_TIME),
-    alive(time(NULL) + TIMEOUT) { BaseModel::mode = 0; }
+    alive(time(NULL) + TIMEOUT) { 
+      BaseModel::mode = 0;
+      BaseModel::limit = USER_ENGAGED_LIMIT;
+    }
   bool isAlive(void)                { return time(NULL) < alive; }
   bool isDead(void)                 { return dead < time(NULL); }
   void toQuit(void)                 { quit = true; }
@@ -193,11 +206,20 @@ std::cout << "<< " << message;
   bool isAuthenticated(void) { return authenticated == AUTH_MASK; }
   
   std::string prefix(void) {
-    if (!isAuthenticated())
-      return std::string("");
-    else if (user.length() && host.length())
-	    return std::string(nick + "!" + user + "@" + host);
-    return nick;
+    return std::string(nick + "!" + user + "@" + host);
+    // if (!isAuthenticated())
+    //   return std::string("");
+    // else if (user.length() && host.length())
+	  //   return std::string(nick + "!" + user + "@" + host);
+    // return nick;
+  }
+
+  std::string legacyPrefix(void) {
+    return std::string(pnik + "!" + user + "@" + host);
+  }
+
+  std::string systemPrefix(void) {
+    return std::string().append("FT_IRC ");
   }
 };
 

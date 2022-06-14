@@ -50,10 +50,10 @@ private:
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec);
   void  TESTMSG(int cs, std::vector<std::string> paramsVec);
   void  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec);
-  void  announceToChannel(int cs, std::string title, std::string message, bool all = false);
-  void  announceToUser(int cs, std::string message);
+  void  announceToChannel(int cs, std::string title, std::string message, bool withMe = false);
+  void  announceToNeighbors(int cs, std::string message, bool withMe = false);
   void  announceOneUser(int cs, std::string message);
-  void  announceToSelf(int cs, std::string message);
+  // void  announceToSelf(int cs, std::string message);
   void  modeChannel(int cs, std::vector<std::string> paramsVec);
   void  modeUser(int cs, std::vector<std::string> paramsVec);
   std::string channelMemberToString(std::string channel);
