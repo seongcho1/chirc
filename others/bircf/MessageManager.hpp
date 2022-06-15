@@ -38,11 +38,12 @@ private:
   void  JOIN(int cs, std::vector<std::string> paramsVec);
   void  PART(int cs, std::vector<std::string> paramsVec);
   void  LIST(int cs, std::vector<std::string> paramsVec);
-  void  NAMES(int cs, std::vector<std::string> paramsVec);
+  void  AWAY(int cs, std::vector<std::string> paramsVec);
   void  KICK(int cs, std::vector<std::string> paramsVec);
   void  MODE(int cs, std::vector<std::string> paramsVec);
-  void  INVITE(int cs, std::vector<std::string> paramsVec);
+  void  NAMES(int cs, std::vector<std::string> paramsVec);
   void  TOPIC(int cs, std::vector<std::string> paramsVec);
+  void  INVITE(int cs, std::vector<std::string> paramsVec);
 
   void  PRIVMSG(int cs, std::vector<std::string> paramsVec);
   void  PRIVMSGHelper(int cs, const std::string& msgto, const std::string& msg);

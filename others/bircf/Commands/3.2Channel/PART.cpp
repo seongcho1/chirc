@@ -6,34 +6,29 @@ void MessageManager::PART(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  // if (!users_[cs].isAuthenticated()) {
-  //   reply(cs, ERR_NOTREGISTERED, "PART", paramsVec);
-  //   return;
-  // }
-
-  std::vector<std::string>::iterator it = paramsVec.begin();
-  while (it != paramsVec.end()) {
+// :gello2!~1@freenode-n9q.738.2oh04d.IP PART :#1irc
+  std::vector<std::string> chns = SS::splitString(paramsVec[0], COMMA);
+  std::vector<std::string>::iterator it = chns.begin();
+  while (it != chns.end()) {
     if (channels_.find(*it) == channels_.end()) {
-      reply(cs, ERR_NOSUCHCHANNEL, "PART", paramsVec);
+      chns[0] = *it;
+      reply(cs, ERR_NOSUCHCHANNEL, "PART", chns);
+      ++it;
+      continue;
     }
-    else if (!channels_[*it].leave(cs)) {
-      reply(cs, ERR_NOTONCHANNEL, "PART", paramsVec);
-    }
-    else {
-      outMessages_[cs].append("leaves room [" + *it + "]\n");
-      channels_[*it].leave(cs);
 
-      if (channels_[*it].member.size() == 0) {
-        channels_.erase(*it);
-      }
-      else {
-        std::set<int>::iterator mit = channels_[*it].member.begin();
-        while (mit != channels_[*it].member.end()) {
-          outMessages_[*mit++].append("leaves [" + users_[cs].nick + "]\n");
-        }
-      }
-
+    if (channels_[*it].member.find(cs) == channels_[*it].member.end()) {
+      chns[0] = *it;
+      reply(cs, ERR_NOTONCHANNEL, "PART", chns);
+      ++it;
+      continue;
     }
+    std::string msg(users_[cs].cmdPrefix("PART") + ":" + *it);
+    announceToChannel(cs, *it, msg, true);
+    channels_[*it].leave(cs);
+    if (channels_[*it].member.size() == 0)
+      channels_.erase(*it);
+    
     ++it;
   }
 }

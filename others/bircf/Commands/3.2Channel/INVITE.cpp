@@ -10,12 +10,17 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
 // :*.freenode.net 336 gello2 :#1i
 // :*.freenode.net 337 gello2 :End of INVITE list
   if (paramsVec.size() == 0) {
-    std::set<std::string>::iterator invited = users_[cs].invited.begin();
-    outMessages_[cs].append("invited: ");
-    while (invited != users_[cs].invited.end())
-      outMessages_[cs].append(*invited++).append(" ");
-    outMessages_[cs].append(NEWLINE);
-    outMessages_[cs].append("End of INVITE list\n");
+    
+    if (0 < users_[cs].invited.size()) {
+      std::string inv(users_[cs].srvPrefix() + users_[cs].nick);
+      std::set<std::string>::iterator invited = users_[cs].invited.begin();
+      while (invited != users_[cs].invited.end())
+        inv.append(*invited++).append(" ");
+      announceOneUser(cs, inv);
+    }
+
+    std::string end(users_[cs].srvPrefix() + users_[cs].nick + " :End of INVITE list");
+    announceOneUser(cs, end);
     return;
   }
 
@@ -24,6 +29,7 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
+  // std::string nick = paramsVec[0];
   std::string channel = paramsVec[1];
   std::map<std::string, int>::iterator nickfdit = nickFdPair_.find(paramsVec[0]);
 
@@ -32,27 +38,33 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  if (users_[cs].engaged.find(channel) == users_[cs].engaged.end()) {
+  if (users_[cs].engaged.find(paramsVec[1]) == users_[cs].engaged.end()) {
     reply(cs, ERR_NOTONCHANNEL, "INVITE", paramsVec);
     return;
   }
 
-  if (users_[nickfdit->second].engaged.find(channel) != users_[nickfdit->second].engaged.end()) {
+  if (users_[nickfdit->second].engaged.find(paramsVec[1]) != users_[nickfdit->second].engaged.end()) {
     reply(cs, ERR_USERONCHANNEL, "INVITE", paramsVec);
     return;
   }
 
-  if (channels_[channel].unableFlag(cs, 'i')) {
+  if (channels_[paramsVec[1]].unableFlag(cs, 'i')) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "INVITE", paramsVec);
     return;
   }
 
-  users_[nickfdit->second].invited.insert(channel);
-  announceOneUser(cs, std::string().append("inviting ").append(nickfdit->first).append(" to ").append(channel)); // ** RPL_INVITING
-  announceOneUser(nickfdit->second, std::string().append(users_[cs].nick).append(" invite you to ").append(channel)); // ** RPL_INVITING
-  if (!users_[nickfdit->second].away.empty())
-    reply(cs, RPL_AWAY, "INVITE", paramsVec);
-    // announceToSelf(cs, users_[nickfdit->second].away);  // RPL_AWAY
+// inv
+// :*.freenode.net 341 gello2 gello :#3irc
+// recv
+// :gello!~a@freenode-ca7.4sl.2765s3.IP INVITE gello2 :#1i
+
+  users_[nickfdit->second].invited.insert(paramsVec[1]);
+  reply(cs, RPL_INVITING, "INVITE", paramsVec);
+  announceOneUser(nickfdit->second, std::string(users_[cs].cmdPrefix("INVITE") + paramsVec[0] + " :" + paramsVec[1]));
+  if (!users_[nickfdit->second].away.empty()) {
+    paramsVec[1] = users_[nickfdit->second].away;
+    reply(cs, RPL_AWAY, "AWAY", paramsVec);
+  }
 }
 
 /*
