@@ -60,7 +60,8 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
   //to user
   if (msgto[0] != '#') {
     recipient = nickFdPair_[msgto];
-    outMessages_[recipient].append(message);
+    // outMessages_[recipient].append(message);
+    users_[recipient].wbuff.append(message);
   }
   //to channel
   //seongcho: need to check channel modes
@@ -68,18 +69,23 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
     std::string title = channels_.find(msgto)->first;
     Channel channel =  channels_[title];
     std::set<int> member = channel.member;
-    if (member.find(cs) == member.end() ||
-        (member.size() == 1 &&  *(member.begin()) == cs)) {
+    // if (member.find(cs) == member.end() ||
+    if (
+        (member.size() == 1 &&  *(member.begin()) == cs) ||
+        channel.isMode('n') ||
+        (channel.isMode('m') && channel.channelSpeaker.find(cs) == channel.channelSpeaker.end())) {
       reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec); //404
       return;
     }
 
-    for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
-      recipient = *it;
-      if (recipient == cs)
-        continue;
-      outMessages_[recipient].append(message);
-    }
+    announceToChannel(cs, channel.title, message);
+    // for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
+    //   recipient = *it;
+    //   if (recipient == cs)
+    //     continue;
+    //   // outMessages_[recipient].append(message);
+    //   users_[recipient].wbuff.append(message);
+    // }
   }
 
 

@@ -14,14 +14,16 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec) {
 
   if (paramsVec.size() != 4) {
     reply(cs, ERR_NEEDMOREPARAMS, "USER", paramsVec); //461
-    outMessages_[cs].append("** Usage: USER <user> <mode> <unused> <realname> **\n");
+    // outMessages_[cs].append("** Usage: USER <user> <mode> <unused> <realname> **\n");
+    users_[cs].wbuff.append("** Usage: USER <user> <mode> <unused> <realname> **\n");
     return;
   }
 
   //<mode> should be a numeric
   if (!SS::isNumber(paramsVec[1])) {
     reply(cs, ERR_NEEDMOREPARAMS, "USER :The <mode> parameter should be a numeric", paramsVec); //461
-    outMessages_[cs].append("** Usage: USER <user> <mode> <unused> <realname> **\n");
+    // outMessages_[cs].append("** Usage: USER <user> <mode> <unused> <realname> **\n");
+    users_[cs].wbuff.append("** Usage: USER <user> <mode> <unused> <realname> **\n");
     return;
   }
 

@@ -17,7 +17,7 @@
 // #define TIMEOUT 300
 #define TIMEOUT 300
 // #define WAIT_TIME 30
-#define WAIT_TIME 30
+#define WAIT_TIME 30000
 #define CHANNEL_MEMBER_LIMIT 32
 #define USER_ENGAGED_LIMIT 32
 #define PING_REQUEST "PING :"
@@ -149,6 +149,8 @@ public:
   std::string host;
   std::string away;
   std::string pnik;
+  std::string rbuff;
+  std::string wbuff;
   char authenticated;
   bool waitPong;
   bool quit;
@@ -180,29 +182,69 @@ public:
     return BaseModel::currentMode(USR_M_A_FLAGS);
   }
 
-  bool clientRead(std::string &buffer) {
+//   bool clientRead(std::string &buffer) {
+//     char read[BUF_SIZE + 1];
+//     int r = recv(fd, read, BUF_SIZE + 1, 0);
+
+//     if (r <= 0 ||
+//         BUF_SIZE < buffer.length() + r ||
+//         (r == BUF_SIZE && read[BUF_SIZE - 1] != '\n'))
+//       return false;
+
+//     read[r] = 0;
+//     buffer.append(read);
+
+// std::cout << ">> " << buffer;
+// // SS::charPrint(buffer);
+
+//     return true;
+//   }
+  bool clientRead(void) {
     char read[BUF_SIZE + 1];
     int r = recv(fd, read, BUF_SIZE + 1, 0);
 
     if (r <= 0 ||
-        BUF_SIZE < buffer.length() + r ||
+        BUF_SIZE < rbuff.length() + r ||
         (r == BUF_SIZE && read[BUF_SIZE - 1] != '\n'))
       return false;
 
     read[r] = 0;
-    buffer.append(read);
+    rbuff.append(read);
 
-std::cout << ">> " << buffer;
+std::cout << ">> " << rbuff;
 // SS::charPrint(buffer);
 
     return true;
   }
 
-  void clientWrite(std::string &message) {
-    if (message.empty())
+//   void clientWrite(std::string &message) {
+//     if (message.empty())
+//       return;
+
+// std::cout << "<< " << message << std::endl;
+// // std::vector<std::string> msg = SS::splitString(message, NEWLINE);
+// // for (int i = 0; i < (int)msg.size(); ++i) {
+// //   msg[i].append(NEWLINE);
+// //   send(fd, msg[i].c_str(), msg[i].length(), 0);
+// // std::cout << "<< " << msg[i];
+// // SS::charPrint(msg[i]);
+// // }
+// // message.clear();
+
+//     unsigned long endset, offset = 0;
+
+//     while (offset < message.length()) {
+//       endset = MIN(BUF_SIZE, message.length() - offset);
+//       send(fd, message.c_str() + offset, endset, 0);
+//       offset += endset;
+//     }
+//     message.clear();
+//   }
+  void clientWrite(void) {
+    if (wbuff.empty())
       return;
 
-std::cout << "<< " << message << std::endl;
+std::cout << "<< " << wbuff << std::endl;
 // std::vector<std::string> msg = SS::splitString(message, NEWLINE);
 // for (int i = 0; i < (int)msg.size(); ++i) {
 //   msg[i].append(NEWLINE);
@@ -214,12 +256,12 @@ std::cout << "<< " << message << std::endl;
 
     unsigned long endset, offset = 0;
 
-    while (offset < message.length()) {
-      endset = MIN(BUF_SIZE, message.length() - offset);
-      send(fd, message.c_str() + offset, endset, 0);
+    while (offset < wbuff.length()) {
+      endset = MIN(BUF_SIZE, wbuff.length() - offset);
+      send(fd, wbuff.c_str() + offset, endset, 0);
       offset += endset;
     }
-    message.clear();
+    wbuff.clear();
   }
 
   bool isAuthenticated(void) { return authenticated == AUTH_MASK; }

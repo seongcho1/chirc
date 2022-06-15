@@ -73,7 +73,8 @@ void	Ircserv::initFd() {
   for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
     FD_SET(uit->first, &fdRead);
 
-    if (messenger.outMessages()[uit->first].length() > 0) {
+    // if (messenger.outMessages()[uit->first].length() > 0) {
+    if (messenger.users()[uit->first].wbuff.length() > 0) {
       FD_SET(uit->first, &fdWrite);
     }
   }
@@ -128,7 +129,8 @@ void Ircserv::disposeCorpse() {
   while (timeout.size()) {
 
     if (!timeout.top().quit) {
-      messenger.outMessages()[timeout.top().fd].append("timeout\n");
+      // messenger.outMessages()[timeout.top().fd].append("timeout\n");
+      messenger.users()[timeout.top().fd].wbuff.append("timeout\n");
       messenger.clientWrite(timeout.top().fd);
     }
 
