@@ -78,6 +78,7 @@
     "numeric": "cpp",
     "random": "cpp",
     "fstream": "cpp",
-    "iomanip": "cpp"
+    "iomanip": "cpp",
+    "filesystem": "cpp"
   }
 }
