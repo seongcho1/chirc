@@ -10,15 +10,15 @@
 
 #define RPL_BOUNCE                           005
 
-#define RPL_USERHOST                         302
-#define RPL_ISON                             303
+#define RPL_USERHOST                         302 //coding in *.cpp directly
+#define RPL_ISON                             303 //coding in *.cpp directly
 
 #define RPL_AWAY                             301
 #define RPL_UNAWAY                           305
 #define RPL_NOWAWAY                          306
 
-#define RPL_WHOISUSER                        311
-#define RPL_WHOISSERVER                      312
+#define RPL_WHOISUSER                        311 //coding in *.cpp directly
+#define RPL_WHOISSERVER                      312 //coding in *.cpp directly
 #define RPL_WHOISOPERATOR                    313
 #define RPL_WHOISIDLE                        317
 #define RPL_ENDOFWHOIS                       318
@@ -55,7 +55,7 @@
 // #define RPL_LINKS                         364 //not in the scope <-server to server
 // #define RPL_ENDOFLINKS                    365 //not in the scope <-server to server
 
-#define RPL_BANLIST                          367 //coding in **.cpp directly
+#define RPL_BANLIST                          367 //coding in *.cpp directly
 #define RPL_ENDOFBANLIST                     368
 
 #define RPL_INFO                             371

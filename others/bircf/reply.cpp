@@ -52,12 +52,12 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
                                     break; // TEST 0
 
     //001   = Welcome to the <network> Network, <nick>[!<user>@<host>]
-    case  RPL_WELCOME             : sVec.push_back("<network>");              rVec.push_back(users_[cs].serverHostmask()); //server's property
+    case  RPL_WELCOME             : sVec.push_back("<network>");              rVec.push_back(users_[cs].serverHostmask()); //server's property ???
                                     sVec.push_back("<nick>[!<user>@<host>]"); rVec.push_back(users_[cs].hostmask());
                                     break;  // 001
 
     //002   = Your host is <servername>, running version <version>
-    case RPL_YOURHOST             : sVec.push_back("<servername>");   rVec.push_back(users_[cs].serverHostmask());        //server's property
+    case RPL_YOURHOST             : sVec.push_back("<servername>");   rVec.push_back(users_[cs].serverHostmask());        //server's property ???
                                     sVec.push_back("<version>");      rVec.push_back("1.001");                            //server's property ???
                                     break;  // 002
 
@@ -67,62 +67,70 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
 
 
     //004   = <servername> <version> <available user modes> <available channel modes>
-    case RPL_MYINFO               : sVec.push_back("<servername>");              rVec.push_back(users_[cs].serverHostmask());   //server's property
+    case RPL_MYINFO               : sVec.push_back("<servername>");              rVec.push_back(users_[cs].serverHostmask());   //server's property ???
                                     sVec.push_back("<version>");                 rVec.push_back("1.001");                       //server's property ???
                                     sVec.push_back("<available user modes>");    rVec.push_back("io");                          //user's property ???
                                     sVec.push_back("<available channel modes>"); rVec.push_back("iklmnpt");                     //channel's property ???
                                     break;  // 004
 
-
-    /*
-
-
     //005   = Try server <server name>, port <port number>
-    case RPL_BOUNCE                           005
+    case RPL_BOUNCE               : sVec.push_back("<server name>");             rVec.push_back(users_[cs].serverHostmask());   //server's property ???
+                                    sVec.push_back("<port number>");             rVec.push_back("6667");                        //server's property ???
+                                    break;  // 005
 
 
     //302   = :<reply list>
-    case RPL_USERHOST                         302
+    case RPL_USERHOST             : break;  // 302 coding in *.cpp directly
 
     //303   = :<nick list>
-    case RPL_ISON                             303
-
+    case RPL_ISON                 : break;  // 303 coding in *.cpp directly
 
     //301   = <nick> :<away message>
-    case RPL_AWAY                             301
+    case RPL_AWAY                 : sVec.push_back("<nick>");           rVec.push_back(users_[cs].nick);
+                                    sVec.push_back("<away message>");   rVec.push_back(paramsVec[0]);
+                                    break;  // 301
 
     //305   = :You are no longer marked as being away
-    case RPL_UNAWAY                           305
+    case RPL_UNAWAY               : break;  // 305
 
     //306   = :You have been marked as being away
-    case RPL_NOWAWAY                          306
+    case RPL_NOWAWAY              : break;  // 306
+
 
     //311   = <nick> <user> <host> * :<real name>
-    case RPL_WHOISUSER                        311
+    case RPL_WHOISUSER            : sVec.push_back("<nick> <user> <host> * :<real name>"); rVec.push_back(paramsVec[0]);
+                                    break;  // 311 not in the scope or coding in *.cpp directly
+
 
     //312   = <nick> <server> :<server info>
-    case RPL_WHOISSERVER                      312
+    case RPL_WHOISSERVER          : sVec.push_back("<nick> <server> :<server info>"); rVec.push_back(paramsVec[0]);
+                                    break;  // 312 not in the scope or coding in *.cpp directly
+
 
     //313   = <nick> :is an IRC operator
-    case RPL_WHOISOPERATOR                    313
+    case RPL_WHOISOPERATOR        : sVec.push_back("<nick>");    rVec.push_back(paramsVec[0]);
+                                    break;  // 313 not in the scope or coding in *.cpp directly
+
 
     //317   = <nick> <integer> :seconds idle
-    case RPL_WHOISIDLE                        317
+    case RPL_WHOISIDLE            : sVec.push_back("<nick>");    rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<integer>"); rVec.push_back(paramsVec[1]);
+                                    break;  // 317
 
     //318   = <nick> :End of WHOIS list
-    case RPL_ENDOFWHOIS                       318
+    case RPL_ENDOFWHOIS           : sVec.push_back("<nick>");    rVec.push_back(paramsVec[0]);
+                                    break;  // 318
 
     //319   = <nick> :*  <@/+> <channel>
-    case RPL_WHOISCHANNELS                    319
+    case RPL_WHOISCHANNELS        : sVec.push_back("<nick>");             rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("*  <@/+> <channel>"); rVec.push_back(paramsVec[1]);
+                                    break;  // 319 not in the scope or coding in *.cpp directly
 
     //314   = <nick> <user> <host> * :<real name>
-    case RPL_WHOWASUSER                       314
+    case RPL_WHOWASUSER            : break;  // 314 not in the scope or coding in *.cpp directly
 
     //369   = <nick> :End of WHOWAS
-    case RPL_ENDOFWHOWAS                      369
-
-    */
-
+    case RPL_ENDOFWHOWAS           : break;  // 369 not in the scope or coding in *.cpp directly
 
     //321   = Obsolete. Not used.
     // case RPL_LISTSTART        :  break;  // 321
@@ -207,7 +215,7 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
     // case RPL_ENDOFLINKS       :  break  //365 not in the scope <-server to server
 
     //367   = <channel> <banmask>
-    // case RPL_BANLIST          :  break  //367 coding in **.cpp directly
+    // case RPL_BANLIST          :  break  //367 coding in *.cpp directly
 
     //368   = <channel> :End of channel ban list
     case RPL_ENDOFBANLIST        :  sVec.push_back("<string>");      rVec.push_back(paramsVec[0]);
