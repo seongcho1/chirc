@@ -34,7 +34,6 @@ void	Ircserv::srvCreate(int port) {
   int                 yes = 1;
 
   pe = (struct protoent*)Xv(NULL, getprotobyname("tcp"), (char *)"getprotobyname");
-  // s = X(-1, socket(PF_INET, SOCK_STREAM, pe->p_proto), (char *)"socket");
   s = X(-1, socket(AF_INET, SOCK_STREAM, pe->p_proto), (char *)"socket");
 
   X(-1, setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)), (char *)"setsockopt");
@@ -43,7 +42,6 @@ void	Ircserv::srvCreate(int port) {
   sin.sin_family = AF_INET;
   sin.sin_addr.s_addr = INADDR_ANY;
   sin.sin_port = htons(port);
-  // X(-1, bind(s, (struct sockaddr*)&sin, sizeof(sin)), (char *)"bind");
   X(-1, bind(s, (sockaddr*)&sin, sizeof(sin)), (char *)"bind");
   X(-1, listen(s, 42), (char *)"listen");
 
@@ -89,13 +87,11 @@ void	Ircserv::doSelect() {
     max = urit->first;
   }
 
-  // r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&loopInterval); //NULL, 0
-  // r = select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
   r = select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
 }
 
 void	Ircserv::checkFd() {
-  if (r <= 0) return;
+  if (r < 0) return;
 
   //server
   if (FD_ISSET(ircFd, &fdRead)) {
@@ -109,8 +105,9 @@ void	Ircserv::checkFd() {
   std::map<int, User>::iterator uit = messenger.users().begin();
   time_t now = time(NULL);
   for (; uit != messenger.users().end(); ++uit) {
-    if (uit->second.dead < now || uit->second.quit)
+    if (uit->second.dead < now || uit->second.quit) {
       timeout.push(uit->second);
+    }
     else {
       if (uit->second.alive < now)
         messenger.ping(uit->first);
