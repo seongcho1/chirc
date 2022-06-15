@@ -27,7 +27,7 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
       if (i < (int)keys.size() && keys[i] != "") {
         channels_[chn[i]].key = keys[i];
         channels_[chn[i]].setMode(true, 'k');
-        announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].prefix()).append(" has changed mode : +k"));
+        announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].hostmask()).append(" has changed mode : +k"));
         // std::string s = "+k";
         // MODE(cs, SS::splitString(s, ""));
       }

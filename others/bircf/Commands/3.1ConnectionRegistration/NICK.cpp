@@ -37,7 +37,7 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
     }
 
     if (authStatus == AUTH_MASK)
-      announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyPrefix()).append(" NICK ").append(nick), true);
+      announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyHostmask()).append(" NICK ").append(nick), true);
   }
   else {
     reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec); //433
@@ -50,7 +50,7 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
   // if (authStatus == AUTH_MASK) {
   // if (AUTH_MASK == users_[cs].authenticated && users_[cs].authenticated == authStatus) {
   //   // :WiZ!jto@tolsun.oulu.fi NICK Kilroy  ; Server telling that WiZ changed his nickname to Kilroy.
-  //   announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyPrefix()).append(" NICK ").append(nick), true);
+  //   announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyHostmask()).append(" NICK ").append(nick), true);
   // }
 }
 

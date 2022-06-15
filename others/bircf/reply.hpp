@@ -56,6 +56,8 @@
 
 
 
+#define RPL_INFO                             371
+#define RPL_ENDOFINFO                        374
 
 
 

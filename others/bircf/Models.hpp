@@ -218,28 +218,28 @@ message.clear();
   bool isAuthenticated(void) { return authenticated == AUTH_MASK; }
 
   //https://datatracker.ietf.org/doc/html/rfc2813#section-5.9.1
-  std::string prefix(void) {
+  std::string hostmask(void) {
     return std::string(nick + "!~" + user + "@" + host);
     // return std::string(nick + "!" + user + "@0");
   }
 
-  std::string legacyPrefix(void) {
+  std::string legacyHostmask(void) {
     return std::string(pnik + "!~" + user + "@" + host);
     // return std::string(pnik + "!" + user + "@0");
   }
 
-  std::string systemPrefix(void) {
+  std::string serverHostmask(void) {
     return std::string().append("FT_IRC!FT_IRC@42.net");
     // return std::string().append("*.").append(host);
     //return host;
   }
 
   std::string cmdPrefix(std::string cmd) {
-    return std::string (":" + prefix() + " " + cmd + " ");
+    return std::string (":" + hostmask() + " " + cmd + " ");
   }
 
   std::string nPrefix(void) {
-    return std::string (":" + prefix() + " ");
+    return std::string (":" + hostmask() + " ");
   }
 
   // std::string aPrefix(void) {

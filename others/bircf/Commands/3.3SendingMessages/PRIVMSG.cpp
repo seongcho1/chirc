@@ -55,7 +55,7 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
   //SS::matchStringVector(usersVec, pattern) then, usersVec only keeps memebers matched the pattern
 
   int recipient;
-  std::string message = std::string(":" + prefix(cs) + " PRIVMSG " + msgto  + " :").append(msg).append(NEWLINE);
+  std::string message = std::string(":" + hostmask(cs) + " PRIVMSG " + msgto  + " :").append(msg).append(NEWLINE);
 
   //to user
   if (msgto[0] != '#') {

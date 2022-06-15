@@ -194,6 +194,19 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
 
 
 
+    //////////////////////
+
+
+
+
+    //371   = :<string>
+    case RPL_INFO                :  sVec.push_back("<string>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 371
+    //374   = :End of INFO list
+    case RPL_ENDOFINFO           :  break;  // 374
+
+
+
 
     //working here
 
@@ -374,7 +387,7 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
   }
 
   SS::replaceString(msg, sVec, rVec);
-  msg = std::string(":FT_IRC " + SS::toString(code, 3) + " " + users_[cs].nick + " ").append(msg).append(NEWLINE);
+  msg = std::string(":" + users_[cs].serverHostmask() + " " + SS::toString(code, 3) + " " + users_[cs].nick + " ").append(msg).append(NEWLINE);
 
   if (bDirectDelivery)
     outMessages_[cs].append(msg);

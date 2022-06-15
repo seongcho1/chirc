@@ -4,7 +4,7 @@ void MessageManager::NAMES(int cs, std::vector<std::string> paramsVec) {
   // reply(cs, RPL_NAMREPLY, "NAMES", paramsVec);
 
   if (paramsVec.size()) {
-    
+
     std::vector<std::string> chn = SS::splitString(paramsVec[0], COMMA);
 
 
@@ -14,11 +14,11 @@ void MessageManager::NAMES(int cs, std::vector<std::string> paramsVec) {
       // std::map<std::string, Channel>::iterator cit = channels_.find(*it);
       // if (cit != channels_.end()) {
       if (channels_.find(*it) != channels_.end()) {
-        announceOneUser(cs, std::string(":" + users_[cs].systemPrefix() + " " + SS::toString(RPL_NAMREPLY) + " " + users_[cs].nick + " = " + *it + " :" + channelMemberToString(*it)));
-        announceOneUser(cs, std::string(":" + users_[cs].systemPrefix() + " " + SS::toString(RPL_ENDOFNAMES) + " " + users_[cs].nick + " " + *it + " :End of NAMES list"));
+        announceOneUser(cs, std::string(":" + users_[cs].serverHostmask() + " " + SS::toString(RPL_NAMREPLY) + " " + users_[cs].nick + " = " + *it + " :" + channelMemberToString(*it)));
+        announceOneUser(cs, std::string(":" + users_[cs].serverHostmask() + " " + SS::toString(RPL_ENDOFNAMES) + " " + users_[cs].nick + " " + *it + " :End of NAMES list"));
       }
 
-        // outMessages_[cs].append("[").append(channelMemberToString(paramsVec[0])).append("]\n"); 
+        // outMessages_[cs].append("[").append(channelMemberToString(paramsVec[0])).append("]\n");
         reply(cs, RPL_NAMREPLY, "NAMES", paramsVec);
       ++it;
     }
@@ -35,8 +35,8 @@ void MessageManager::NAMES(int cs, std::vector<std::string> paramsVec) {
 }
 
 
-    // announceOneUser(cs, std::string(":" + users_[cs].systemPrefix() + " " + SS::toString(RPL_NAMREPLY) + " " + users_[cs].nick + " = " + chn[i] + " :" + channelMemberToString(chn[i])));
-    // announceOneUser(cs, std::string(":" + users_[cs].systemPrefix() + " " + SS::toString(RPL_ENDOFNAMES) + " " + users_[cs].nick + " " + chn[i] + " :End of NAMES list"));
+    // announceOneUser(cs, std::string(":" + users_[cs].serverHostmask() + " " + SS::toString(RPL_NAMREPLY) + " " + users_[cs].nick + " = " + chn[i] + " :" + channelMemberToString(chn[i])));
+    // announceOneUser(cs, std::string(":" + users_[cs].serverHostmask() + " " + SS::toString(RPL_ENDOFNAMES) + " " + users_[cs].nick + " " + chn[i] + " :End of NAMES list"));
 
 
 // std::vector<std::string> MessageManager::namesVec(std::set<int> fds) {

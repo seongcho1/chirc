@@ -74,7 +74,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
   //For a client, the only valid prefix is the registered nickname associated with the client.
   //If the case, delete the prefix to make it easy to split
   if ( users_[cs].authenticated == AUTH_MASK )
-    SS::eraseFirstWord(message, std::string(":" + users_[cs].prefix()), std::string(":" + users_[cs].nick));
+    SS::eraseFirstWord(message, std::string(":" + users_[cs].hostmask()), std::string(":" + users_[cs].nick));
 
 
   //trailing can be a empty string, so if a string have a colon, it will have two elements, second one is empty one

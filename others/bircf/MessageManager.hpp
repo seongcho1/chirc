@@ -87,7 +87,7 @@ public:
   void                        kickUser(int cs);
   bool                        isUniqueNick(int cs, std::string &nick);
   void                        ping(int cs);
-  std::string                 prefix(int cs) { return users_[cs].prefix(); }
+  std::string                 hostmask(int cs) { return users_[cs].hostmask(); }
 };
 
 /*
