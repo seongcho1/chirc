@@ -2,13 +2,13 @@
 
   void sigIntHandler(int signum) {
     std::cout << "call sigIntHandler: " << signum << std::endl;
-    (void)signum;
+    //(void)signum;
   }
 
-  // void sigQuitHandler(int signum) {
-  //   std::cout << "call sigQuitHandler: " << signum << std::endl;
-  //   (void)signum;
-  // }
+   void sigQuitHandler(int signum) {
+    std::cout << "call sigQuitHandler: " << signum << std::endl;
+    //(void)signum;
+  }
 
 void  Ircserv::getOpt(int ac, char **av) {
   switch (ac) {
@@ -24,7 +24,7 @@ void  Ircserv::getOpt(int ac, char **av) {
   }
 
   signal(SIGINT, sigIntHandler);
-  // signal(SIGQUIT, sigQuitHandler);
+  signal(SIGQUIT, sigQuitHandler);
 }
 
 void	Ircserv::srvCreate(int port) {
