@@ -1,14 +1,14 @@
 #include "Ircserv.hpp"
 
-// void sigIntHandler(int signum) {
-//   std::cout << "call sigIntHandler: " << signum << std::endl;
-//   (void)signum;
-// }
+  void sigIntHandler(int signum) {
+    std::cout << "call sigIntHandler: " << signum << std::endl;
+    (void)signum;
+  }
 
-// void sigQuitHandler(int signum) {
-//   std::cout << "call sigQuitHandler: " << signum << std::endl;
-//   (void)signum;
-// }
+  // void sigQuitHandler(int signum) {
+  //   std::cout << "call sigQuitHandler: " << signum << std::endl;
+  //   (void)signum;
+  // }
 
 void  Ircserv::getOpt(int ac, char **av) {
   switch (ac) {
@@ -23,7 +23,7 @@ void  Ircserv::getOpt(int ac, char **av) {
       exit(1);
   }
 
-  // signal(SIGINT, sigIntHandler);
+  signal(SIGINT, sigIntHandler);
   // signal(SIGQUIT, sigQuitHandler);
 }
 
@@ -91,11 +91,11 @@ void	Ircserv::doSelect() {
 
   // r = select(max + 1, &fdRead, &fdWrite, NULL, NULL); //&loopInterval); //NULL, 0
   // r = select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
-  select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
+  r = select(max + 1, &fdRead, &fdWrite, NULL, &selectInterval); //&loopInterval); //NULL, 0
 }
 
 void	Ircserv::checkFd() {
-  // if (r <= 0) return;
+  if (r <= 0) return;
 
   //server
   if (FD_ISSET(ircFd, &fdRead)) {
@@ -135,7 +135,7 @@ void Ircserv::disposeCorpse() {
       messenger.clientWrite(timeout.top().fd);
     }
 
-    messenger.kickUser(timeout.top().fd);
+    //messenger.kickUser(timeout.top().fd);
     timeout.pop();
   }
 }

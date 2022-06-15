@@ -11,7 +11,7 @@
 class Ircserv {
 public:
   int              port;
-  // int              r;
+  int              r;
   int              ircFd;
   fd_set           fdRead;
   fd_set           fdWrite;
