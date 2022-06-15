@@ -192,12 +192,18 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
                                     break;  // 366
 
 
+    //364   = <mask> <server> :<hopcount> <server info>
+    // case RPL_LINKS            :  break  //364 not in the scope <-server to server
 
+    //365   = <mask> :End of LINKS list
+    // case RPL_ENDOFLINKS       :  break  //365 not in the scope <-server to server
 
-    //////////////////////
+    //367   = <channel> <banmask>
+    // case RPL_BANLIST          :  break  //367 coding in **.cpp directly
 
-
-
+    //368   = <channel> :End of channel ban list
+    case RPL_ENDOFBANLIST        :  sVec.push_back("<string>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 368
 
     //371   = :<string>
     case RPL_INFO                :  sVec.push_back("<string>");      rVec.push_back(paramsVec[0]);
@@ -205,8 +211,25 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
     //374   = :End of INFO list
     case RPL_ENDOFINFO           :  break;  // 374
 
+    //375   = :- <server> Message of the day -
+    case RPL_MOTDSTART           :  sVec.push_back("<server>");      rVec.push_back(users_[cs].serverHostmask());
+                                    break;  // 375
+    //372   = :- <text>
+    case RPL_MOTD                :  sVec.push_back("<text>");        rVec.push_back("Life is 42. This is the only message for you.");
+                                    break;  // 372
+    //376   = :End of MOTD command
+    case RPL_ENDOFMOTD           :  break;  // 376
 
 
+    //381   = :You are now an IRC operator
+    // case RPL_YOUREOPER        :  break;  // 381 not in the scope <- operator
+    //382   = <config file> :Rehashing
+    // case RPL_REHASHING        :  break;  // 382 not in the scope <- operator
+    //383   = You are service <servicename>
+    // case RPL_YOURESERVICE     :  break;  // 383 not in the scope <- service
+
+
+    //////////////////////////////
 
     //working here
 

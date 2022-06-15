@@ -47,18 +47,35 @@
 
 #define RPL_VERSION                          351
 #define RPL_WHOREPLY                         352
-
 #define RPL_ENDOFWHO                         315
 
 #define RPL_NAMREPLY                         353
-
 #define RPL_ENDOFNAMES                       366
 
+// #define RPL_LINKS                         364 //not in the scope <-server to server
+// #define RPL_ENDOFLINKS                    365 //not in the scope <-server to server
 
+#define RPL_BANLIST                          367 //coding in **.cpp directly
+#define RPL_ENDOFBANLIST                     368
 
 #define RPL_INFO                             371
 #define RPL_ENDOFINFO                        374
 
+#define RPL_MOTDSTART                        375
+#define RPL_MOTD                             372
+#define RPL_ENDOFMOTD                        376
+
+// #define RPL_YOUREOPER                     381 //not in the scope <-server to server
+// #define RPL_REHASHING                     382 //not in the scope <-server to server
+// #define RPL_YOURESERVICE                  383 //not in the scope <-server to server
+
+
+
+
+
+
+
+/////////////////////////////////
 
 
 #define ERR_NOSUCHNICK                       401
