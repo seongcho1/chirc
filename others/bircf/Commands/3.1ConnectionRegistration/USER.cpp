@@ -31,7 +31,7 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec) {
   //if (AUTH_LEVEL1 <= user.authenticated) {
     user.authenticated |= AUTH_LEVEL3;
     user.user = *it++;
-    it++;
+    it++;// user.setMode(true, atoi((*it++).c_str()));
     it++;
     user.real = *it;
 

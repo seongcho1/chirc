@@ -87,8 +87,8 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
     case RPL_ISON                 : break;  // 303 coding in *.cpp directly
 
     //301   = <nick> :<away message>
-    case RPL_AWAY                 : sVec.push_back("<nick>");           rVec.push_back(users_[cs].nick);
-                                    sVec.push_back("<away message>");   rVec.push_back(paramsVec[0]);
+    case RPL_AWAY                 : sVec.push_back("<nick>");           rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<away message>");   rVec.push_back(paramsVec[1]);
                                     break;  // 301
 
     //305   = :You are no longer marked as being away
@@ -135,8 +135,11 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
 
     //321   = Obsolete. Not used.
     // case RPL_LISTSTART        :  break;  // 321
-    //322   = <channel> <# visible> :<topic>
-    // case RPL_LIST             :  break;  // 322
+    // 322   = <channel> <# visible> :<topic>
+    case RPL_LIST                :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
+                                    sVec.push_back("<visible>");      rVec.push_back(paramsVec[1]);
+                                    sVec.push_back("<topic>");        rVec.push_back(paramsVec[2]);
+                                    break;  // 322
     //323   = :End of LIST
     case RPL_LISTEND             :  break;  // 323
 
@@ -159,8 +162,8 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
                                     break;  // 332
 
     //341   = <channel> <nick>
-    case RPL_INVITING            :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
-                                    sVec.push_back("<nick>");         rVec.push_back(users_[cs].nick);                 //??
+    case RPL_INVITING            :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[1]);
+                                    sVec.push_back("<nick>");         rVec.push_back(paramsVec[0]);                 //??
                                     break;  // 341
 
     //342   = <user> :Summoning user to IRC

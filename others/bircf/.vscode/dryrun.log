@@ -1,28 +1,5 @@
-make --dry-run --always-make --keep-going --print-directory
+make --dry-run --keep-going --print-directory
 make: Entering directory `/Users/kyuhokim/Cadet/chirc/others/bircf'
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o main.o main.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o MessageManager.o MessageManager.cpp
- 
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.1ConnectionRegistration/PASS.o Commands/3.1ConnectionRegistration/PASS.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.1ConnectionRegistration/NICK.o Commands/3.1ConnectionRegistration/NICK.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.1ConnectionRegistration/USER.o Commands/3.1ConnectionRegistration/USER.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.1ConnectionRegistration/QUIT.o Commands/3.1ConnectionRegistration/QUIT.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.1ConnectionRegistration/PING.o Commands/3.1ConnectionRegistration/PING.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.1ConnectionRegistration/PONG.o Commands/3.1ConnectionRegistration/PONG.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.2Channel/JOIN.o Commands/3.2Channel/JOIN.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.2Channel/PART.o Commands/3.2Channel/PART.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.2Channel/LIST.o Commands/3.2Channel/LIST.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.2Channel/KICK.o Commands/3.2Channel/KICK.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.2Channel/NAMES.o Commands/3.2Channel/NAMES.cpp
- 
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.2Channel/TOPIC.o Commands/3.2Channel/TOPIC.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.2Channel/INVITE.o Commands/3.2Channel/INVITE.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.3SendingMessages/PRIVMSG.o Commands/3.3SendingMessages/PRIVMSG.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.4Mode/MODE.o Commands/3.4Mode/MODE.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.9Test/TESTMSG.o Commands/3.9Test/TESTMSG.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.9Test/PUBLICMSG.o Commands/3.9Test/PUBLICMSG.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o Commands/3.9Test/SELFMSG.o Commands/3.9Test/SELFMSG.cpp
-c++ -I. -g3 -Wall -Wextra -Werror    -c -o reply.o reply.cpp
-c++ -I. -g3 -Wall -Wextra -Werror  -o ircserv main.o MessageManager.o Commands/3.1ConnectionRegistration/PASS.o Commands/3.1ConnectionRegistration/NICK.o Commands/3.1ConnectionRegistration/USER.o Commands/3.1ConnectionRegistration/QUIT.o Commands/3.1ConnectionRegistration/PING.o Commands/3.1ConnectionRegistration/PONG.o Commands/3.2Channel/JOIN.o Commands/3.2Channel/PART.o Commands/3.2Channel/LIST.o Commands/3.2Channel/KICK.o Commands/3.2Channel/NAMES.o Commands/3.2Channel/TOPIC.o Commands/3.2Channel/INVITE.o Commands/3.3SendingMessages/PRIVMSG.o Commands/3.4Mode/MODE.o Commands/3.9Test/TESTMSG.o Commands/3.9Test/PUBLICMSG.o Commands/3.9Test/SELFMSG.o reply.o 
+make: `ircserv' is up to date.
 make: Leaving directory `/Users/kyuhokim/Cadet/chirc/others/bircf'
  

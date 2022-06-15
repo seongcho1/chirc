@@ -7,39 +7,93 @@ void MessageManager::KICK(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-// change to loop
+  std::vector<std::string>chns = SS::splitString(paramsVec[0], COMMA);
+  std::vector<std::string>niks = SS::splitString(paramsVec[1], COMMA);
+  std::vector<std::string>::iterator chn = chns.begin();
+  std::vector<std::string>::iterator nik = niks.begin();
 
-  if (channels_.find(paramsVec[0]) == channels_.end()) {
-    reply(cs, ERR_NOSUCHCHANNEL, "KICK", paramsVec);
-    return;
+  while (chn != chns.end() && nik != niks.end()) {
+    if (channels_.find(*chn) == channels_.end()) {
+      paramsVec[0] = *chn;
+      reply(cs, ERR_NOSUCHCHANNEL, "KICK", paramsVec);
+      ++chn;
+      ++nik;
+      continue;
+    }
+
+    if (users_[cs].engaged.find(*chn) == users_[cs].engaged.end()) {
+      paramsVec[0] = *chn;
+      reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
+      ++chn;
+      ++nik;
+      continue;
+    }
+
+    std::map<std::string, int>::iterator nfit = nickFdPair_.find(*nik);
+    if (nfit == nickFdPair_.end() || channels_[*chn].member.find(nfit->second) == channels_[*chn].member.end()) {
+      paramsVec[0] = *chn;
+      reply(cs, ERR_BADCHANMASK, "KICK", paramsVec);
+      ++chn;
+      ++nik;
+      continue;
+    }
+
+    if (channels_[*chn].channelOperators.find(cs) == channels_[*chn].channelOperators.end()) {
+      paramsVec[0] = *chn;
+      reply(cs, ERR_CHANOPRIVSNEEDED, "KICK", paramsVec);
+      ++chn;
+      ++nik;
+      continue;
+    }
+
+    std::string reason = SS::makeOneString(++(++paramsVec.begin()), paramsVec.end());
+    announceToChannel(cs, *chn, std::string(users_[cs].cmdPrefix("KICK") + *chn + " " + *nik + " :" + reason), true);
+
+    users_[nfit->second].engaged.erase(*chn);
+    channels_[*chn].member.erase(nfit->second);
+
+    if (!channels_[*chn].member.size())  { channels_.erase(*chn); }
+
+    ++chn;
+    ++nik;
   }
 
-  if (users_[cs].engaged.find(paramsVec[0]) == users_[cs].engaged.end()) {
-    reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
-    return;
-  }
 
-  std::map<std::string, int>::iterator nfit = nickFdPair_.find(paramsVec[1]);
-  if (nfit == nickFdPair_.end()) {
-    reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
-    return;
-  }
+  // if (channels_.find(paramsVec[0]) == channels_.end()) {
+  //   reply(cs, ERR_NOSUCHCHANNEL, "KICK", paramsVec);
+  //   return;
+  // }
 
-  if (channels_[paramsVec[0]].member.find(nfit->second) == channels_[paramsVec[0]].member.end()) {
-    reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
-    return;
-  }
+  // if (users_[cs].engaged.find(paramsVec[0]) == users_[cs].engaged.end()) {
+  //   reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
+  //   return;
+  // }
 
-  if (channels_[paramsVec[0]].channelOperators.find(cs) == channels_[paramsVec[0]].channelOperators.end()) {
-    reply(cs, ERR_CHANOPRIVSNEEDED, "KICK", paramsVec);
-    return;
-  }
+  // std::map<std::string, int>::iterator nfit = nickFdPair_.find(paramsVec[1]);
+  // if (nfit == nickFdPair_.end()) {
+  //   reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
+  //   return;
+  // }
 
-  users_[nfit->second].engaged.erase(paramsVec[0]);
-  channels_[paramsVec[0]].member.erase(nfit->second);
+  // if (channels_[paramsVec[0]].member.find(nfit->second) == channels_[paramsVec[0]].member.end()) {
+  //   reply(cs, ERR_NOTONCHANNEL, "KICK", paramsVec);
+  //   return;
+  // }
 
-  reply(cs, RPL_AWAY, "KICK", paramsVec);
-  reply(nfit->second, RPL_AWAY, "KICK", paramsVec);
+  // if (channels_[paramsVec[0]].channelOperators.find(cs) == channels_[paramsVec[0]].channelOperators.end()) {
+  //   reply(cs, ERR_CHANOPRIVSNEEDED, "KICK", paramsVec);
+  //   return;
+  // }
+
+
+// // kick #1irc gello
+// // :gello2!~1@freenode-ca7.4sl.2765s3.IP KICK #1irc gello :gello2
+//   announceOneUser(cs, std::string(users_[cs].cmdPrefix("KICK") + paramsVec[0] + " " + paramsVec[1] + " :" + users_[cs].nick));
+// // kicked by gello
+// // :gello!~a@freenode-ca7.4sl.2765s3.IP KICK #2irc gello2 :
+//   std::string reason = SS::makeOneString(++(++paramsVec.begin()), paramsVec.end());
+//   announceOneUser(nfit->second, std::string(users_[cs].cmdPrefix("KICK") + paramsVec[0] + " " + paramsVec[1] + " :" + reason));
+
 }
 
 

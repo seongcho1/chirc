@@ -7,6 +7,11 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
+  if (paramsVec[0][0] != '#') {
+    reply(cs, ERR_BADCHANMASK, "JOIN", paramsVec);
+    return;
+  }
+
   if (users_[cs].limit <= (int)users_[cs].engaged.size()) {
     reply(cs, ERR_TOOMANYCHANNELS, "JOIN", paramsVec);
     return;
@@ -27,7 +32,7 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
       if (i < (int)keys.size() && keys[i] != "") {
         channels_[chn[i]].key = keys[i];
         channels_[chn[i]].setMode(true, 'k');
-        announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].hostmask()).append(" has changed mode : +k"));
+        announceToChannel(cs, chn[i], std::string().append(":").append(users_[cs].hostmask()).append(" has changed mode : +k ").append(keys[i]));
       }
 
     }
@@ -54,16 +59,18 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
         users_[cs].engaged.insert(chn[i]);
         users_[cs].invited.erase(chn[i]);
       }
+      else
+        continue;
     }
 
 // You have joined the channel
 // kello has joined (~kello@freenode-ca7.4sl.2765s3.IP)
 // kello has changed mode: +s
     announceToChannel(cs, chn[i], std::string(users_[cs].cmdPrefix("JOIN") + chn[i]), true);
-
-    std::vector<std::string> names;
-    names.push_back(chn[i]);
-    NAMES(cs, names);
+    NAMES(cs, paramsVec);
+    // std::vector<std::string> names;
+    // names.push_back(chn[i]);
+    // NAMES(cs, names);
   }
 }
 

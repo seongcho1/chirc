@@ -9,15 +9,16 @@ void MessageManager::registerFunctions() {
   functionCallMap_["PING"] =        &MessageManager::PING;
   functionCallMap_["PONG"] =        &MessageManager::PONG;
 
+  functionCallMap_["AWAY"] =        &MessageManager::AWAY;
   functionCallMap_["QUIT"] =        &MessageManager::QUIT;
   functionCallMap_["JOIN"] =        &MessageManager::JOIN;
   functionCallMap_["PART"] =        &MessageManager::PART;
   functionCallMap_["LIST"] =        &MessageManager::LIST;
-  functionCallMap_["NAMES"] =       &MessageManager::NAMES;
   functionCallMap_["KICK"] =        &MessageManager::KICK;
   functionCallMap_["MODE"] =        &MessageManager::MODE;
-  functionCallMap_["INVITE"] =      &MessageManager::INVITE;
   functionCallMap_["TOPIC"] =       &MessageManager::TOPIC;
+  functionCallMap_["NAMES"] =       &MessageManager::NAMES;
+  functionCallMap_["INVITE"] =      &MessageManager::INVITE;
 
   functionCallMap_["PRIVMSG"] =     &MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =     &MessageManager::SELFMSG;

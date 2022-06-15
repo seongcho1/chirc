@@ -78,41 +78,61 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
     std::string msg;
     
 // :gello2!~1@freenode-ca7.4sl.2765s3.IP MODE #2irc :+i
-    msg.append(users_[cs].cmdPrefix("MODE")).append(paramsVec[0]).append(" :");
-    msg += "-+"[add];
-    msg += *mit;
+    msg.append(users_[cs].cmdPrefix("MODE")).append(paramsVec[0]).append(" ");
     if (SS::compare(*mit, CHN_M_FLAGS)) {
       channels_[paramsVec[0]].setMode(add, *mit);
+      msg.append(":");
+      msg += "-+"[add];
+      msg += *mit;
       announceToChannel(cs, paramsVec[0], msg, true);
     }
+    
     else if (!paramOnce && *mit == 'k' && 2 < (int)paramsVec.size()) {
       channels_[paramsVec[0]].setMode(add, *mit);
       channels_[paramsVec[0]].key = paramsVec[2];
-      announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
+      msg += "-+"[add];
+      msg += *mit;
+      announceToChannel(cs, paramsVec[0], msg.append(" :").append(paramsVec[2]), true);
       paramOnce = true;
     }
+    
     else if (!paramOnce && *mit == 'l' && 2 < (int)paramsVec.size()) {
       channels_[paramsVec[0]].setMode(add, *mit);
       channels_[paramsVec[0]].limit = MIN(atoi(paramsVec[2].c_str()), CHANNEL_MEMBER_LIMIT);
-      announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
+      msg += "-+"[add];
+      msg += *mit;
+      announceToChannel(cs, paramsVec[0], msg.append(" :").append(paramsVec[2]), true);
       paramOnce = true;
     }
+
+// get
+// :gello!~a@freenode-ca7.4sl.2765s3.IP MODE #1irc +v :gello2
+// :noname!~lna@127.0.0.1 MODE #1 +o :gello
     else if (!paramOnce && *mit == 'v' && 2 < (int)paramsVec.size()) {
       channels_[paramsVec[0]].setMode(add, *mit);
       if (add)
         channels_[paramsVec[0]].channelSpeaker.insert(nickFdPair_.find(paramsVec[2])->second);
       else
         channels_[paramsVec[0]].channelSpeaker.erase(nickFdPair_.find(paramsVec[2])->second);
-      announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
+      msg += "-+"[add];
+      msg += *mit;
+      announceToChannel(cs, paramsVec[0], msg.append(" :").append(paramsVec[2]), true);
       paramOnce = true;
     }
+
+//give
+// :gello2!~1@freenode-ca7.4sl.2765s3.IP MODE #2irc +o :gello
+// get
+// :gello!~a@freenode-ca7.4sl.2765s3.IP MODE #1irc +o :gello2
     else if (!paramOnce && *mit == 'o' && 2 < (int)paramsVec.size()) {
       channels_[paramsVec[0]].setMode(add, *mit);
       if (add)
         channels_[paramsVec[0]].channelOperators.insert(nickFdPair_.find(paramsVec[2])->second);
       else
         channels_[paramsVec[0]].channelOperators.erase(nickFdPair_.find(paramsVec[2])->second);
-      announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
+      msg += "-+"[add];
+      msg += *mit;
+      announceToChannel(cs, paramsVec[0], msg.append(" :").append(paramsVec[2]), true);
       paramOnce = true;
     }
 
@@ -120,19 +140,3 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
       break;
   }
 }
-
-
-
-// std::string MessageManager::prettyModeFlags(std::string mode) {
-//   std::string result;
-
-//   for (std::string::iterator it = mode.begin(); it != mode.end(); ++it) {
-//     if (0 < (int)result.size() && (*it == '+' || *it == '-') && (result.back() == '+' || result.back() == '-'))
-//       result.pop_back();
-//     if (*it == '+' || *it == '-')
-//       result.push_back(*it);
-//     // if (SS::first())
-//   }
-
-//   return result;
-// }

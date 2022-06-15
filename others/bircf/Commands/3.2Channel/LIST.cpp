@@ -1,21 +1,27 @@
 #include "../../MessageManager.hpp"
 
 void MessageManager::LIST(int cs, std::vector<std::string> paramsVec) {
+  paramsVec.push_back(std::string());
+  paramsVec.push_back(std::string());
+  paramsVec.push_back(std::string());
 
   // ** RPL_LISTSTART
-  if (paramsVec.size()) {
+  if (3 < (int)paramsVec.size()) {
 
+// list #1irc
+// :*.freenode.net 321 gello2 Channel :Users Name
+// :*.freenode.net 322 gello2 #1irc 1 :[+k <key>] 
+// :*.freenode.net 323 gello2 :End of channel list.
     //<channel> *( "," <channel> )
     //split paramsVec[0] with COMMA first
-    std::vector<std::string>::iterator it = paramsVec.begin();
-    while (it != paramsVec.end()) {
+    std::vector<std::string> chns = SS::splitString(paramsVec[0], COMMA);
+    std::vector<std::string>::iterator it = chns.begin();
+    while (it != chns.end()) {
       if (channels_.find(*it) != channels_.end()) {
-        outMessages_[cs].append("[").append(channels_[*it].title).append("]");
-        if (!channels_[*it].isMode('p'))
-          outMessages_[cs].append(":[").append(channels_[*it].topic).append("]");
-        outMessages_[cs].append(NEWLINE);
-//        // reply(cs, RPL_LIST, "LIST", paramsVec);
-//        // outMessages_[cs].append("[").append(channels_[*it].title).append("]:[").append(channels_[*it].topic).append("]\n"); // ** RPL_LIST
+        paramsVec[0] = *it;
+        paramsVec[1] = channels_[*it].member.size();
+        paramsVec[2] = channels_[*it].isMode('p') ? "" : channels_[*it].topic;
+        reply(cs, RPL_LIST, "LIST", paramsVec);
       }
       ++it;
     }
@@ -23,11 +29,10 @@ void MessageManager::LIST(int cs, std::vector<std::string> paramsVec) {
   else {
     std::map<std::string, Channel>::iterator it = channels_.begin();
     while (it != channels_.end()) {
-      //322 RPL_LIST   string format "<channel> <# visible> :<topic>"
-      //322 RPL_LIST string format "<channel> <# visible> :<topic>"
-      //format to send to reply -> #42irc 1 :[+nt] :<topic>
-      // reply(cs, RPL_LIST, "LIST", paramsVec);
-      outMessages_[cs].append(it->second.title).append(" <# visible> :").append(it->second.topic).append(NEWLINE);
+      paramsVec[0] = it->second.title;
+      paramsVec[1] = SS::toString(channels_[paramsVec[0]].member.size());
+      paramsVec[2] = channels_[paramsVec[0]].isMode('p') ? "" : channels_[paramsVec[0]].topic;
+      reply(cs, RPL_LIST, "LIST", paramsVec);
       ++it;
     }
   }

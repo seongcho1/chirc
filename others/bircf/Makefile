@@ -5,6 +5,7 @@ SRCS =	main.cpp Ircserv.cpp MessageManager.cpp StringUtils.cpp reply.cpp \
 				Commands/3.1ConnectionRegistration/QUIT.cpp \
 				Commands/3.1ConnectionRegistration/PING.cpp \
 				Commands/3.1ConnectionRegistration/PONG.cpp \
+				Commands/3.2Channel/AWAY.cpp \
 				Commands/3.2Channel/JOIN.cpp \
 				Commands/3.2Channel/PART.cpp \
 				Commands/3.2Channel/LIST.cpp \

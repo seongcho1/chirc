@@ -29,8 +29,8 @@
 #define RPL_ENDOFWHOWAS                      369
 
 
-// #define RPL_LISTSTART                     321  //Obsolete. Not used.
-// #define RPL_LIST                          322  //coding in LIST.cpp directly
+// #define RPL_LISTSTART                        321  //Obsolete. Not used.
+#define RPL_LIST                             322  //coding in LIST.cpp directly
 #define RPL_LISTEND                          323
 #define RPL_UNIQOPIS                         325
 #define RPL_CHANNELMODEIS                    324
