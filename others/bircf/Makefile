@@ -1,4 +1,4 @@
-SRCS =	main.cpp MessageManager.cpp \
+SRCS =	main.cpp Ircserv.cpp MessageManager.cpp StringUtils.cpp reply.cpp \
 				Commands/3.1ConnectionRegistration/PASS.cpp \
 				Commands/3.1ConnectionRegistration/NICK.cpp \
 				Commands/3.1ConnectionRegistration/USER.cpp \
@@ -17,7 +17,7 @@ SRCS =	main.cpp MessageManager.cpp \
 				Commands/3.9Test/TESTMSG.cpp \
 				Commands/3.9Test/PUBLICMSG.cpp \
 				Commands/3.9Test/SELFMSG.cpp \
-				reply.cpp \
+
 
 OBJS = ${SRCS:.cpp=.o}
 

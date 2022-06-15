@@ -1,5 +1,6 @@
 #include "StringUtils.hpp"
 #include <map>
+#include<unistd.h>
 
 //#define NEWLINE		"\n"
 #define BUF_SIZE	10
@@ -133,6 +134,26 @@ int trimStringTest() {
   return 0;
 }
 
+
+
+bool stop = false;
+
+
+//signal handling function that will except ctrl-\ and ctrl-c
+void sig_handler(int signo) {
+    //looks for ctrl-c which has a value of 2
+    if (signo == SIGINT) {
+        printf("\nreceived SIGINT\n");
+        //stop = true;
+    }
+    //looks for ctrl-\ which has a value of 9
+    else if (signo == SIGQUIT) {
+        printf("\nreceived SIGQUIT\n");
+        //stop = true;
+    }
+}
+
+
 int main() {
 
   //MessageManager c;
@@ -142,6 +163,26 @@ int main() {
   //toUpperTest();
   //matchStringTest();
   //trimStringTest();
+
+  signal(SIGINT, sig_handler);
+  signal(SIGQUIT, sig_handler);
+
+    // //these if statement catch errors
+    // if (signal(SIGINT, sig_handler) == SIG_ERR)
+    //     printf("\ncan't catch SIGINT\n");
+    // if (signal(SIGQUIT, sig_handler) == SIG_ERR)
+    //     printf("\ncan't catch SIGQUIT\n");
+
+    //Runs the program infinitely so we can continue to input signals
+    while(!stop) {
+      std::cout << "running!!!" << std::endl;
+      sleep(1);
+    }
+
+    printf("exiting safely\n");
+    return 0;
+
+
 
   return 0;
 }
