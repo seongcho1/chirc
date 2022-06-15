@@ -10,6 +10,8 @@
 
 #define RPL_BOUNCE                           005
 
+#define RPL_UMODEIS                          221
+
 #define RPL_USERHOST                         302
 #define RPL_ISON                             303
 

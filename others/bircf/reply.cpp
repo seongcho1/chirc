@@ -57,6 +57,8 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
                                     rVec.push_back(std::string(users_[cs].nick + "!" + users_[cs].user + "@" + users_[cs].host));
                                     break;  //001
 
+    case  RPL_UMODEIS             :  sVec.push_back("<user mode string>");      rVec.push_back(paramsVec[0]);
+                                    break;  // 221
 
     /*
 
@@ -130,15 +132,15 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
 
     //324   = <channel> <mode> <mode params>
     case RPL_CHANNELMODEIS       :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
-                                    sVec.push_back("<mode>");         rVec.push_back(channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS));   //??
-                                    sVec.push_back("<mode params>");  rVec.push_back("get it from the channel");   //??
+                                    sVec.push_back("<mode>");         rVec.push_back(paramsVec[1]);   //??
+                                    sVec.push_back("<mode params>");  rVec.push_back(paramsVec[2]);   //??
                                     break;  // 324
 
     //331   = <channel> :No topic is set
     case RPL_NOTOPIC             :  break;  // 331
     //332   = <channel> :<topic>
     case RPL_TOPIC               :  sVec.push_back("<channel>");      rVec.push_back(paramsVec[0]);
-                                    sVec.push_back("<topic>");        rVec.push_back(channels_[paramsVec[0]].topic);   //??
+                                    sVec.push_back("<topic>");        rVec.push_back(paramsVec[1]);   //??
                                     break;  // 332
 
     //341   = <channel> <nick>

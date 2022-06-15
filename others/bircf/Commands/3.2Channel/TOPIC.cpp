@@ -2,16 +2,17 @@
 
 void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
 
-  std::cout << "params.size=" << paramsVec.size() << std::endl;
-
   if (paramsVec.size() < 1) {
     reply(cs, ERR_NEEDMOREPARAMS, "TOPIC", paramsVec); //461
     return;
   }
 
+// topic #1irc
+// :*.freenode.net 332 gello2 #1irc :hello world~
+// :*.freenode.net 333 gello2 #1irc gello2!~1@freenode-ca7.4sl.2765s3.IP :1655288888
   if (paramsVec.size() < 2) {
-    //reply(cs, RPL_TOPIC, "TOPIC", paramsVec); //332
-    outMessages_[cs].append("TOPIC: ").append(channels_[paramsVec[0]].topic).append("\n");
+    paramsVec.push_back(channels_[paramsVec[0]].topic);
+    reply(cs, RPL_TOPIC, "TOPIC", paramsVec);
     return;
   }
 
@@ -21,18 +22,20 @@ void MessageManager::TOPIC(int cs, std::vector<std::string> paramsVec) {
     return;
   }
 
-  // if (channels_[paramsVec[0]].isMode('t') &&
-  //     channels_[paramsVec[0]].channelOperators.find(cs) != channels_[paramsVec[0]].channelOperators.end()) {
   if (channels_[paramsVec[0]].unableFlag(cs, 't')) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "TOPIC", paramsVec);
     return;
   }
 
-  std::string topic = paramsVec[1];
-  channels_[paramsVec[0]].topic = topic;
+// topic #1irc hello world~
+// :gello2!~1@freenode-ca7.4sl.2765s3.IP TOPIC #1irc :hello world~
 
-  topic = users_[cs].nick + " has set topic: " + topic;
-  announceToChannel(ircfd, paramsVec[0], topic);  // RPL_TOPIC // RPL_NOTOPIC
+// :gello!~a@freenode-ca7.4sl.2765s3.IP TOPIC #1irc :hello haha~2
+  std::string topic = SS::makeOneString(++paramsVec.begin(), paramsVec.end());
+  channels_[paramsVec[0]].topic = topic;
+  
+  topic = users_[cs].cmdPrefix("TOPIC") + paramsVec[0] + " :" + topic;
+  announceToChannel(cs, paramsVec[0], topic, true);
 }
 
 

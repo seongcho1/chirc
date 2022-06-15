@@ -370,6 +370,18 @@ public:
     }
     return true;
   }
+
+  static std::string makeOneString(std::vector<std::string>::iterator const &begin, std::vector<std::string>::iterator const &end) {
+    std::string result;
+    std::vector<std::string>::iterator ti = begin;
+    while (ti != end)
+      result.append(*ti++).append(" ");
+
+    if (*result.end() == ' ')
+      result.pop_back();
+
+    return result;
+  }
 };
 
 

@@ -14,57 +14,53 @@ void MessageManager::MODE(int cs, std::vector<std::string> paramsVec) {
 }
 
 void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
-  if (paramsVec.size() < 2) {
-    reply(cs, ERR_NEEDMOREPARAMS, "MODE", paramsVec);
-    return;
-  }
 
   if (users_[cs].nick != paramsVec[0]) {
-    // O (server oper.[privilion] only)
+    reply(cs, ERR_USERSDONTMATCH, "MODE", paramsVec);
     return;
   }
 
-  if (paramsVec[1][0] == '-' || paramsVec[1][0] == '+') {
-    // not match param
+  if (paramsVec.size() < 2 || (paramsVec[1][0] != '-' && paramsVec[1][0] != '+')) {
+    paramsVec[0] = ":" + users_[cs].currentMode();
+    reply(cs, RPL_UMODEIS, "MODE", paramsVec);
     return;
   }
+
 
   if (paramsVec[1][0] == '-' && paramsVec[1][1] == 'i') {
+// :gello2!~1@freenode-ca7.4sl.2765s3.IP MODE gello2 :-i
     users_[cs].setMode(false, 'i');
-    // RPL_UMODEIS
-    announceOneUser(cs, std::string().append(users_[cs].cmdPrefix("MODE")).append(":I am visible"));
-    // announceOneUser(cs, "i am visible");
+    announceOneUser(cs, std::string(users_[cs].cmdPrefix("MODE") + users_[cs].nick + " :-i"));
+    return;
   }
 
   if (paramsVec[1][0] == '+' && paramsVec[1][1] == 'i') {
+// :gello2!~1@freenode-ca7.4sl.2765s3.IP MODE gello2 :+i
     users_[cs].setMode(true, 'i');
-    // RPL_UMODEIS
-    announceOneUser(cs, std::string().append(users_[cs].cmdPrefix("MODE")).append(":I am invisible"));
-    // announceOneUser(cs, "i am invisible");
+    announceOneUser(cs, std::string(users_[cs].cmdPrefix("MODE") + users_[cs].nick + " :+i"));
+    return;
   }
 }
 
 void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
-  // std::string channel = paramsVec[0];
 
   if (channels_.find(paramsVec[0]) == channels_.end()) {
     reply(cs, ERR_NOSUCHCHANNEL, "MODE", paramsVec);
     return;
   }
 
-  if (paramsVec.size() < 2) {
-    announceOneUser(cs, std::string(users_[cs].nPrefix() + "Mode: " + (channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS))));
-    // outMessages_[cs].append("Mode: ").append(channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS)).append("\n");
+  if (paramsVec.size() < 2 || (paramsVec[1][0] != '+' && paramsVec[1][0] != '-')) {
+    paramsVec.push_back(":" + channels_[paramsVec[0]].currentMode());
+    paramsVec.push_back("");
+    if (channels_[paramsVec[0]].isMode('l')) paramsVec[2] += " limit=" + SS::toString(channels_[paramsVec[0]].limit);
+    if (channels_[paramsVec[0]].isMode('k')) paramsVec[2] += " key=<" + channels_[paramsVec[0]].key + "> exclude outter <>";
+
+    reply(cs, RPL_CHANNELMODEIS, "MODE", paramsVec);
     return;
   }
 
   if (channels_[paramsVec[0]].channelOperators.find(cs) == channels_[paramsVec[0]].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "MODE", paramsVec);
-    return;
-  }
-
-  if (paramsVec[1][0] != '+' && paramsVec[1][0] != '-') {
-    // mode flag error
     return;
   }
 
@@ -81,25 +77,23 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
 
     std::string msg;
     
-    msg.append(users_[cs].nick).append(" has changed mode: ");
+// :gello2!~1@freenode-ca7.4sl.2765s3.IP MODE #2irc :+i
+    msg.append(users_[cs].cmdPrefix("MODE")).append(paramsVec[0]).append(" :");
     msg += "-+"[add];
     msg += *mit;
     if (SS::compare(*mit, CHN_M_FLAGS)) {
       channels_[paramsVec[0]].setMode(add, *mit);
-      // RPL_CHANNELMODEIS
       announceToChannel(cs, paramsVec[0], msg, true);
     }
     else if (!paramOnce && *mit == 'k' && 2 < (int)paramsVec.size()) {
       channels_[paramsVec[0]].setMode(add, *mit);
       channels_[paramsVec[0]].key = paramsVec[2];
-      // RPL_CHANNELMODEIS
       announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;
     }
     else if (!paramOnce && *mit == 'l' && 2 < (int)paramsVec.size()) {
       channels_[paramsVec[0]].setMode(add, *mit);
       channels_[paramsVec[0]].limit = MIN(atoi(paramsVec[2].c_str()), CHANNEL_MEMBER_LIMIT);
-      // RPL_CHANNELMODEIS
       announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;
     }
@@ -109,7 +103,6 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
         channels_[paramsVec[0]].channelSpeaker.insert(nickFdPair_.find(paramsVec[2])->second);
       else
         channels_[paramsVec[0]].channelSpeaker.erase(nickFdPair_.find(paramsVec[2])->second);
-      // RPL_CHANNELMODEIS
       announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;
     }
@@ -119,7 +112,6 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
         channels_[paramsVec[0]].channelOperators.insert(nickFdPair_.find(paramsVec[2])->second);
       else
         channels_[paramsVec[0]].channelOperators.erase(nickFdPair_.find(paramsVec[2])->second);
-      // RPL_CHANNELMODEIS
       announceToChannel(cs, paramsVec[0], msg.append(" ").append(paramsVec[2]), true);
       paramOnce = true;
     }
