@@ -49,7 +49,7 @@ private:
   void  SELFMSG(int cs, std::vector<std::string> paramsVec);
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec);
   void  TESTMSG(int cs, std::vector<std::string> paramsVec);
-  std::string  reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, bool bDirectDelivery = true);
+  std::string  reply(int cs, int code, std::string command, std::vector<std::string>& paramsVec, bool bDirectDelivery = true);
   void  announceToChannel(int cs, std::string title, std::string message, bool withMe = false);
   void  announceToNeighbors(int cs, std::string message, bool withMe = false);
   void  announceOneUser(int cs, std::string message);

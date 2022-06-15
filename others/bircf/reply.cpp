@@ -35,7 +35,7 @@ int    MessageManager::initReplies(std::string configFile) {
   return 0;
 }
 
-std::string  MessageManager::reply(int cs, int code, std::string command, std::vector<std::string> paramsVec, bool bDirectDelivery) {
+std::string  MessageManager::reply(int cs, int code, std::string command, std::vector<std::string>& paramsVec, bool bDirectDelivery) {
 
   std::map<int, std::string>::iterator it = replies_.find(code);
   if (it == replies_.end()) {
