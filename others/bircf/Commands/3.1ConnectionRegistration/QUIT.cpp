@@ -5,8 +5,7 @@ void MessageManager::QUIT(int cs, std::vector<std::string> paramsVec) {
   if (paramsVec.size()) {
     std::string lastMessage;
     lastMessage.append(":" + users_[cs].hostmask() + " QUIT ").append(" :");
-    for (int i = 0; i < (int)paramsVec.size(); ++i)
-      lastMessage.append(paramsVec[i]).append(" ");
+    lastMessage.append(SS::makeOneString(paramsVec.begin(), paramsVec.end()));
     announceToNeighbors(cs, lastMessage);
   }
   users_[cs].toQuit();

@@ -64,7 +64,6 @@ public:
 
   std::string currentMode(std::string filter) {
 
-std::cout << "filter = " << filter << std::endl;
     std::string result;
     for (int i = 0; i < MODE_FLAGS_MAP_SIZE; ++i) {
       if (((mode >> i) & 1))
@@ -133,6 +132,10 @@ public:
   bool unableFlag(int fd, char flag) {
     return !isOper(fd) && isMode(flag);
   }
+
+  std::string currentMode(void) {
+    return BaseModel::currentMode(CHN_M_A_FLAGS);
+  }
 };
 
 
@@ -173,6 +176,10 @@ public:
   void toQuit(void)                 { quit = true; }
   void keepAlive(void)              { alive = time(NULL) + TIMEOUT; dead = alive + WAIT_TIME; }
 
+  std::string currentMode(void) {
+    return BaseModel::currentMode(USR_M_A_FLAGS);
+  }
+
   bool clientRead(std::string &buffer) {
     char read[BUF_SIZE + 1];
     int r = recv(fd, read, BUF_SIZE + 1, 0);
@@ -186,7 +193,7 @@ public:
     buffer.append(read);
 
 std::cout << ">> " << buffer;
-SS::charPrint(buffer);
+// SS::charPrint(buffer);
 
     return true;
   }
@@ -195,24 +202,24 @@ SS::charPrint(buffer);
     if (message.empty())
       return;
 
+std::cout << "<< " << message << std::endl;
+// std::vector<std::string> msg = SS::splitString(message, NEWLINE);
+// for (int i = 0; i < (int)msg.size(); ++i) {
+//   msg[i].append(NEWLINE);
+//   send(fd, msg[i].c_str(), msg[i].length(), 0);
+// std::cout << "<< " << msg[i];
+// SS::charPrint(msg[i]);
+// }
+// message.clear();
 
-std::vector<std::string> msg = SS::splitString(message, NEWLINE);
-for (int i = 0; i < (int)msg.size(); ++i) {
-  msg[i].append(NEWLINE);
-  send(fd, msg[i].c_str(), msg[i].length(), 0);
-std::cout << "<< " << msg[i];
-SS::charPrint(msg[i]);
-}
-message.clear();
+    unsigned long endset, offset = 0;
 
-    // unsigned long endset, offset = 0;
-
-    // while (offset < message.length()) {
-    //   endset = MIN(BUF_SIZE, message.length() - offset);
-    //   send(fd, message.c_str() + offset, endset, 0);
-    //   offset += endset;
-    // }
-    // message.clear();
+    while (offset < message.length()) {
+      endset = MIN(BUF_SIZE, message.length() - offset);
+      send(fd, message.c_str() + offset, endset, 0);
+      offset += endset;
+    }
+    message.clear();
   }
 
   bool isAuthenticated(void) { return authenticated == AUTH_MASK; }
@@ -238,10 +245,13 @@ message.clear();
     return std::string (":" + hostmask() + " " + cmd + " ");
   }
 
-  std::string nPrefix(void) {
+  std::string ncmdPrefix(void) {
     return std::string (":" + hostmask() + " ");
   }
 
+  std::string srvPrefix(void) {
+    return std::string (":" + serverHostmask() + " ");
+  }
   // std::string aPrefix(void) {
   //   return std::string (":FR_IRC " + INF);
   // }

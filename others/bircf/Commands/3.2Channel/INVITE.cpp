@@ -1,7 +1,14 @@
 #include "../../MessageManager.hpp"
 
 void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
-
+// join #1i
+// :*.freenode.net 473 gello2 #1i :Cannot join channel (invite only)
+// invite
+// :*.freenode.net 337 gello2 :End of INVITE list
+// :gello!~a@freenode-ca7.4sl.2765s3.IP INVITE gello2 :#1i
+// invite
+// :*.freenode.net 336 gello2 :#1i
+// :*.freenode.net 337 gello2 :End of INVITE list
   if (paramsVec.size() == 0) {
     std::set<std::string>::iterator invited = users_[cs].invited.begin();
     outMessages_[cs].append("invited: ");
@@ -36,8 +43,6 @@ void MessageManager::INVITE(int cs, std::vector<std::string> paramsVec) {
   }
 
   if (channels_[channel].unableFlag(cs, 'i')) {
-  // if (channels_[channel].isMode('i') &&
-  //     channels_[channel].channelOperators.find(cs) == channels_[channel].channelOperators.end()) {
     reply(cs, ERR_CHANOPRIVSNEEDED, "INVITE", paramsVec);
     return;
   }
