@@ -61,7 +61,7 @@ class BaseModel {
 public:
   unsigned int mode;
   int limit;
-  
+
   std::string currentMode(std::string filter) {
 
 std::cout << "filter = " << filter << std::endl;
@@ -110,7 +110,7 @@ public:
   std::set<int> member;
 
   Channel() {}
-  Channel(int cs, std::string &title) : 
+  Channel(int cs, std::string &title) :
     title(title),
     topic(),
     key() {
@@ -123,7 +123,7 @@ public:
   bool leave(int fd) {
     channelOperators.erase(fd);
     channelSpeaker.erase(fd);
-    return member.erase(fd); 
+    return member.erase(fd);
   }
 
   bool isOper(int fd) {
@@ -164,7 +164,7 @@ public:
     authenticated(auth),
     quit(false),
     dead(time(NULL) + WAIT_TIME),
-    alive(time(NULL) + TIMEOUT) { 
+    alive(time(NULL) + TIMEOUT) {
       BaseModel::mode = 0;
       BaseModel::limit = USER_ENGAGED_LIMIT;
     }
@@ -216,21 +216,22 @@ message.clear();
   }
 
   bool isAuthenticated(void) { return authenticated == AUTH_MASK; }
-  
+
+  //https://datatracker.ietf.org/doc/html/rfc2813#section-5.9.1
   std::string prefix(void) {
-    return std::string(nick + "!" + user + "@" + host);
+    return std::string(nick + "!~" + user + "@" + host);
     // return std::string(nick + "!" + user + "@0");
   }
 
   std::string legacyPrefix(void) {
-    return std::string(pnik + "!" + user + "@" + host);
+    return std::string(pnik + "!~" + user + "@" + host);
     // return std::string(pnik + "!" + user + "@0");
   }
 
   std::string systemPrefix(void) {
-    // return std::string().append("FT_IRC");
+    return std::string().append("FT_IRC!FT_IRC@42.net");
     // return std::string().append("*.").append(host);
-    return host;
+    //return host;
   }
 };
 

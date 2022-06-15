@@ -1,7 +1,13 @@
 #include "../../MessageManager.hpp"
 
 void MessageManager::USER(int cs, std::vector<std::string> paramsVec) {
-  if (users_[cs].authenticated & AUTH_LEVEL3) {
+
+  if (!(users_[cs].authenticated & AUTH_LEVEL1)) {
+    reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec); //451
+    return;
+  }
+
+  if ((users_[cs].authenticated & AUTH_LEVEL3)) {
     reply(cs, ERR_ALREADYREGISTRED, "USER", paramsVec); //462
     return;
   }

@@ -2,6 +2,11 @@
 
 void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
 
+  if (!(users_[cs].authenticated & AUTH_LEVEL1)) {
+    reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec); //451
+    return;
+  }
+
   if (paramsVec.size() != 1) {
     reply(cs, ERR_NONICKNAMEGIVEN, "NICK", paramsVec); //431
     return;
@@ -33,7 +38,7 @@ void MessageManager::NICK(int cs, std::vector<std::string> paramsVec) {
 
     if (authStatus == AUTH_MASK)
       announceToNeighbors(cs, std::string().append (":").append(users_[cs].legacyPrefix()).append(" NICK ").append(nick), true);
-  } 
+  }
   else {
     reply(cs, ERR_NICKNAMEINUSE, "NICK", paramsVec); //433
     return;

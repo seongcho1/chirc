@@ -116,8 +116,6 @@ void MessageManager::executeMessage(int cs, std::string message) {
         command.compare("QUIT") != 0) {
 
       reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec); //451
-      paramsVec.insert(paramsVec.begin(), command);
-      reply(cs, ERR_UNKNOWNCOMMAND, "executeMessage", paramsVec); //421
       return;
     }
   }
@@ -133,7 +131,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
   // it can be done by checking CR and NUL
   // CR ctrl+V, ctrl+M can be checked
   // NUL ?? how can we check NUL ??
-  
+
   if (SS::containExceptChar(paramsVec, CR)) {
     reply(cs, ERR_NEEDMOREPARAMS, command.append(" :Use nospcrlfcl Parameters"), paramsVec); //461 Use nospcrlfcl parameters
     return;
