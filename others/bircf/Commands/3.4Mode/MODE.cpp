@@ -32,13 +32,15 @@ void MessageManager::modeUser(int cs, std::vector<std::string> paramsVec) {
   if (paramsVec[1][0] == '-' && paramsVec[1][1] == 'i') {
     users_[cs].setMode(false, 'i');
     // RPL_UMODEIS
-    announceOneUser(cs, "i am visible");
+    announceOneUser(cs, std::string().append(users_[cs].cmdPrefix("MODE")).append(":I am visible"));
+    // announceOneUser(cs, "i am visible");
   }
 
   if (paramsVec[1][0] == '+' && paramsVec[1][1] == 'i') {
     users_[cs].setMode(true, 'i');
     // RPL_UMODEIS
-    announceOneUser(cs, "i am invisible");
+    announceOneUser(cs, std::string().append(users_[cs].cmdPrefix("MODE")).append(":I am invisible"));
+    // announceOneUser(cs, "i am invisible");
   }
 }
 
@@ -51,7 +53,8 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
   }
 
   if (paramsVec.size() < 2) {
-    outMessages_[cs].append("Mode: ").append(channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS)).append("\n");
+    announceOneUser(cs, std::string(users_[cs].nPrefix() + "Mode: " + (channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS))));
+    // outMessages_[cs].append("Mode: ").append(channels_[paramsVec[0]].currentMode(CHN_M_A_FLAGS)).append("\n");
     return;
   }
 
@@ -77,6 +80,7 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
       break;
 
     std::string msg;
+    
     msg.append(users_[cs].nick).append(" has changed mode: ");
     msg += "-+"[add];
     msg += *mit;
