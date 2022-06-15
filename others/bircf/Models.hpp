@@ -17,7 +17,7 @@
 // #define TIMEOUT 300
 #define TIMEOUT 300
 // #define WAIT_TIME 30
-#define WAIT_TIME 3000
+#define WAIT_TIME 30
 #define CHANNEL_MEMBER_LIMIT 32
 #define USER_ENGAGED_LIMIT 32
 #define PING_REQUEST "PING :"
