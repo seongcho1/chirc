@@ -135,7 +135,7 @@ void Ircserv::disposeCorpse() {
       messenger.clientWrite(timeout.top().fd);
     }
 
-    //messenger.kickUser(timeout.top().fd);
+    messenger.kickUser(timeout.top().fd);
     timeout.pop();
   }
 }

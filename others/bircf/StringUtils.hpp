@@ -40,7 +40,7 @@ public:
   static bool containExceptChar(std::string& subject, const std::string& exceptChars);
   static bool containExceptChar(std::vector<std::string> stringVec, const std::string& exceptChars);
 
-  static std::string join(const std::string_view& separator, const std::list<std::string>& c);
+  static std::string join(const std::string& separator, const std::list<std::string>& c);
   static std::list<std::string> duplicateWordList(const std::vector<std::string>& words);
   static std::string  duplicateWordString(const std::vector<std::string>& words);
   static std::string& eraseFirstWord(std::string& subject, const std::string& longWord, const std::string& shortWord);

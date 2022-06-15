@@ -105,7 +105,7 @@ bool SS::containExceptChar(std::vector<std::string> stringVec, const std::string
   return false;
 }
 
-std::string SS::join(const std::string_view& separator, const std::list<std::string>& c) {
+std::string SS::join(const std::string& separator, const std::list<std::string>& c) {
   std::stringstream ss;
 
   bool add_separator = false;
