@@ -52,22 +52,30 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
                                     break; // TEST 0
 
     //001   = Welcome to the <network> Network, <nick>[!<user>@<host>]
-    case  RPL_WELCOME             : sVec.push_back("<network>");   rVec.push_back("FT_IRC"); //server's property
-                                    sVec.push_back("<nick>[!<user>@<host>]");
-                                    rVec.push_back(std::string(users_[cs].nick + "!" + users_[cs].user + "@" + users_[cs].host));
-                                    break;  //001
+    case  RPL_WELCOME             : sVec.push_back("<network>");              rVec.push_back(users_[cs].serverHostmask()); //server's property
+                                    sVec.push_back("<nick>[!<user>@<host>]"); rVec.push_back(users_[cs].hostmask());
+                                    break;  // 001
+
+    //002   = Your host is <servername>, running version <version>
+    case RPL_YOURHOST             : sVec.push_back("<servername>");   rVec.push_back(users_[cs].serverHostmask());        //server's property
+                                    sVec.push_back("<version>");      rVec.push_back("1.001");                            //server's property ???
+                                    break;  // 002
+
+    //003   = This server was created <datetime>
+    case RPL_CREATED              : sVec.push_back("<datetime>");      rVec.push_back("<datetime>");                      //server's property ???
+                                    break;  // 003
+
+
+    //004   = <servername> <version> <available user modes> <available channel modes>
+    case RPL_MYINFO               : sVec.push_back("<servername>");              rVec.push_back(users_[cs].serverHostmask());   //server's property
+                                    sVec.push_back("<version>");                 rVec.push_back("1.001");                       //server's property ???
+                                    sVec.push_back("<available user modes>");    rVec.push_back("io");                          //user's property ???
+                                    sVec.push_back("<available channel modes>"); rVec.push_back("iklmnpt");                     //channel's property ???
+                                    break;  // 004
 
 
     /*
 
-    //002   = Your host is <servername>, running version <version>
-    case RPL_YOURHOST                         002
-
-    //003   = This server was created <datetime>
-    case RPL_CREATED                          003
-
-    //004   = <servername> <version> <available user modes> <available channel modes>
-    case RPL_MYINFO                           004
 
     //005   = Try server <server name>, port <port number>
     case RPL_BOUNCE                           005
@@ -228,13 +236,106 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
     //383   = You are service <servicename>
     // case RPL_YOURESERVICE     :  break;  // 383 not in the scope <- service
 
+    //391   = <server> :<string showing local time of the server>
+    case RPL_TIME                :  sVec.push_back("<server>");      rVec.push_back(users_[cs].serverHostmask());
+                                    sVec.push_back("<string showing local time of the server>");
+                                    rVec.push_back("need server starting time info somewhere");                //??
+                                    break;  // 375
+
+    //392   = :UserID   Terminal  Host
+    case RPL_USERSSTART          :  break;  // 392
+    //393   = :<username> <ttyline> <hostname>
+    // case RPL_USERS            :  break;  // 393 coding in **.cpp directly
+    //394   = :End of users
+    case RPL_ENDOFUSERS          :  break;  // 394
+    //395   = :Nobody logged in
+    case RPL_NOUSERS             :  break;  // 395
+
+
+    //200   = Link <version & debug level> <destination> <next server> V<protocol version> <link uptime in seconds> <backstream sendq> <upstream sendq>
+    // case RPL_TRACELINK        :  break;  // 200 not in the scope <- trace
+    //201   = Try. <class> <server>
+    // case RPL_TRACECONNECTING  :  break;  // 201 not in the scope <- trace
+    //202   = H.S. <class> <server>
+    // case RPL_TRACEHANDSHAKE   :  break;  // 202 not in the scope <- trace
+    //203   = ???? <class> [<client IP address in dot form>]
+    // case RPL_TRACEUNKNOWN     :  break;  // 203 not in the scope <- trace
+    //204   = Oper <class> <nick>
+    // case RPL_TRACEOPERATOR    :  break;  // 204 not in the scope <- trace
+    //205   = User <class> <nick>
+    // case RPL_TRACEUSER        :  break;  // 205 not in the scope <- trace
+    //206   = Serv <class> <int>S <int>C <server> <nick!user|*!*>@<host|server> V<protocol version>
+    // case RPL_TRACESERVER      :  break;  // 206 not in the scope <- trace
+    //207   = Service <class> <name> <type> <active type>
+    // case RPL_TRACESERVICE     :  break;  // 207 not in the scope <- trace
+    //208   = <newtype> 0 <client name>
+    // case RPL_TRACENEWTYPE     :  break;  // 208 not in the scope <- trace
+    //209   = Class <class> <count>
+    // case RPL_TRACECLASS       :  break;  // 209 not in the scope <- trace
+    //210   = Unused.
+    // case RPL_TRACERECONNECT   :  break;  // 210 not in the scope <- trace
+
+    //261   = File <logfile> <debug level>
+    // case RPL_TRACELOG        :  break;  // 261 not in the scope <- trace
+    //262   = <server name> <version & debug level> :End of TRACE
+    // case RPL_TRACEEND        :  break;  // 262 not in the scope <- trace
+
+
+    //211   = <linkname> <sendq> <sent messages> <sent Kbytes> <received messages> <received Kbytes> <time open>
+    // case RPL_STATSLINKINFO   :  break;  // 211 not in the scope <- stats
+    //212   = <command> <count> <byte count> <remote count>
+    // case RPL_STATSCOMMANDS   :  break;  // 212 not in the scope <- stats
+    //219   = <stats letter> :End of STATS report
+    // case RPL_ENDOFSTATS      :  break;  // 219 not in the scope <- stats
+
+    //242   = :Server Up %d days %d:%02d:%02d
+    // case RPL_STATSUPTIME     :  break;  // 242 not in the scope <- stats
+    //243   = O <hostmask> * <name>
+    // case RPL_STATSOLINE      :  break;  // 243 not in the scope <- stats
+
+    //221   = <user mode string>
+    case  RPL_UMODEIS            :  sVec.push_back("<user mode string>"); rVec.push_back(paramsVec[0]);
+                                    break;  //221
+
+    //234   = <name> <server> <mask> <type> <hopcount> <info>
+    // case RPL_SERVLIST         :  break;  // 234 not in the scope <- servlist
+    //235   = <mask> <type> :End of service listing
+    // case RPL_SERVLISTEND      :  break;  // 235 not in the scope <- servlist
+
+
+    //251   = :There are <integer> users and <integer> services on <integer> servers
+    // case RPL_LUSERCLIENT      :  break;  // 251 not in the scope <- lusers
+
+    //252   = <integer> :operator(s) online
+    // case RPL_LUSEROP          :  break;  // 252 not in the scope <- lusers
+
+    //253   = <integer> :unknown connection(s)
+    // case RPL_LUSERUNKNOWN     :  break;  // 253 not in the scope <- lusers
+
+    //254   = <integer> :channels formed
+    // case RPL_LUSERCHANNELS    :  break;  // 254 not in the scope <- lusers
+
+    //255   = :I have <integer> clients and <integer> servers
+    // case RPL_LUSERME          :  break;  // 255 not in the scope <- lusers
+
+
+    //256   = <server> :Administrative info
+    // case RPL_ADMINME          :  break;  // 256 not in the scope <- admin
+    //257   = :<admin info>
+    // case RPL_ADMINLOC1        :  break;  // 257 not in the scope <- admin
+    //258   = :<admin info>
+    // case RPL_ADMINLOC2        :  break;  // 258 not in the scope <- admin
+    //259   = :<admin info>
+    // case RPL_ADMINEMAIL       :  break;  // 259 not in the scope <- admin
+
+
+    //263   = <command> :Please wait a while and try again.
+    case  RPL_TRYAGAIN           :  sVec.push_back("<command>");      rVec.push_back(command);
+                                    break;  // 263
+
 
     //////////////////////////////
 
-    //working here
-
-
-    // not defined end
 
 
     //401    =  <nickname> :No such nick/channel
