@@ -10,17 +10,15 @@
 
 #define RPL_BOUNCE                           005
 
-#define RPL_UMODEIS                          221
-
-#define RPL_USERHOST                         302
-#define RPL_ISON                             303
+#define RPL_USERHOST                         302 //coding in *.cpp directly
+#define RPL_ISON                             303 //coding in *.cpp directly
 
 #define RPL_AWAY                             301
 #define RPL_UNAWAY                           305
 #define RPL_NOWAWAY                          306
 
-#define RPL_WHOISUSER                        311
-#define RPL_WHOISSERVER                      312
+#define RPL_WHOISUSER                        311 //coding in *.cpp directly
+#define RPL_WHOISSERVER                      312 //coding in *.cpp directly
 #define RPL_WHOISOPERATOR                    313
 #define RPL_WHOISIDLE                        317
 #define RPL_ENDOFWHOIS                       318
@@ -49,18 +47,76 @@
 
 #define RPL_VERSION                          351
 #define RPL_WHOREPLY                         352
-
 #define RPL_ENDOFWHO                         315
 
 #define RPL_NAMREPLY                         353
-
 #define RPL_ENDOFNAMES                       366
 
+// #define RPL_LINKS                         364 //not in the scope <-server to server
+// #define RPL_ENDOFLINKS                    365 //not in the scope <-server to server
 
+#define RPL_BANLIST                          367 //coding in *.cpp directly
+#define RPL_ENDOFBANLIST                     368
 
 #define RPL_INFO                             371
 #define RPL_ENDOFINFO                        374
 
+#define RPL_MOTDSTART                        375
+#define RPL_MOTD                             372
+#define RPL_ENDOFMOTD                        376
+
+// #define RPL_YOUREOPER                     381 //not in the scope <-server to server
+// #define RPL_REHASHING                     382 //not in the scope <-server to server
+// #define RPL_YOURESERVICE                  383 //not in the scope <-server to server
+
+#define RPL_TIME                             391
+
+#define RPL_USERSSTART                       392
+#define RPL_USERS                            393
+#define RPL_ENDOFUSERS                       394
+#define RPL_NOUSERS                          395
+
+// #define RPL_TRACELINK                     200 //not in the scope <-trace
+// #define RPL_TRACECONNECTING               201 //not in the scope <-trace
+// #define RPL_TRACEHANDSHAKE                202 //not in the scope <-trace
+// #define RPL_TRACEUNKNOWN                  203 //not in the scope <-trace
+// #define RPL_TRACEOPERATOR                 204 //not in the scope <-trace
+// #define RPL_TRACEUSER                     205 //not in the scope <-trace
+// #define RPL_TRACESERVER                   206 //not in the scope <-trace
+// #define RPL_TRACESERVICE                  207 //not in the scope <-trace
+// #define RPL_TRACENEWTYPE                  208 //not in the scope <-trace
+// #define RPL_TRACECLASS                    209 //not in the scope <-trace
+// #define RPL_TRACERECONNECT                210 //not in the scope <-trace
+// #define RPL_TRACELOG                      261 //not in the scope <-trace
+// #define RPL_TRACEEND                      262 //not in the scope <-trace
+
+// #define RPL_STATSLINKINFO                 211 //not in the scope <-stats
+// #define RPL_STATSCOMMANDS                 212 //not in the scope <-stats
+// #define RPL_ENDOFSTATS                    219 //not in the scope <-stats
+// #define RPL_STATSUPTIME                   242 //not in the scope <-stats
+// #define RPL_STATSOLINE                    243 //not in the scope <-stats
+
+#define RPL_UMODEIS                          221
+
+// #define RPL_SERVLIST                      234 //not in the scope <-servlist
+// #define RPL_SERVLISTEND                   235 //not in the scope <-servlist
+
+
+// #define RPL_LUSERCLIENT                   251 //not in the scope <-server to server
+// #define RPL_LUSEROP                       252 //not in the scope <-server to server
+// #define RPL_LUSERUNKNOWN                  253 //not in the scope <-server to server
+// #define RPL_LUSERCHANNELS                 254 //not in the scope <-server to server
+// #define RPL_LUSERME                       255 //not in the scope <-server to server
+
+// #define RPL_ADMINME                       256 //not in the scope <-admin
+// #define RPL_ADMINLOC1                     257 //not in the scope <-admin
+// #define RPL_ADMINLOC2                     258 //not in the scope <-admin
+// #define RPL_ADMINEMAIL                    259 //not in the scope <-admin
+
+#define RPL_TRYAGAIN                         263
+
+
+/////////////////////////////////
 
 
 #define ERR_NOSUCHNICK                       401

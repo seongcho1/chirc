@@ -56,8 +56,19 @@ public:
     return false;
   }
 
-  static bool matchString(std::string source, std::string pattern) {
+  static bool matchString(const std::string& source, const std::string& pattern) {
     return matchString(source.c_str(), pattern.c_str());
+  }
+
+  static bool matchString(const std::string& source, const std::vector<std::string>& patternVec) {
+    std::vector<std::string>::const_iterator it;
+    bool result = false;
+
+    for (it = patternVec.begin(); it != patternVec.end(); ++it) {
+      result = matchString(source, *it);
+      if (result) return result;
+    }
+    return false;
   }
 
   static std::vector<std::string>& matchStringVector(std::vector<std::string>& sourceVec, std::string pattern) {

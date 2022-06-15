@@ -115,7 +115,7 @@ void MessageManager::executeMessage(int cs, std::string message) {
         command.compare("USER") != 0 &&
         command.compare("QUIT") != 0) {
 
-      reply(cs, ERR_NOTREGISTERED, "executeMessage", paramsVec); //451
+      reply(cs, ERR_NOTREGISTERED,"executeMessage", paramsVec); //451
       return;
     }
   }
