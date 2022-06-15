@@ -232,6 +232,18 @@ message.clear();
     // return std::string().append("*.").append(host);
     return host;
   }
+
+  std::string cmdPrefix(std::string cmd) {
+    return std::string (":" + prefix() + " " + cmd + " ");
+  }
+
+  std::string nPrefix(void) {
+    return std::string (":" + prefix() + " ");
+  }
+
+  // std::string aPrefix(void) {
+  //   return std::string (":FR_IRC " + INF);
+  // }
 };
 
 #endif

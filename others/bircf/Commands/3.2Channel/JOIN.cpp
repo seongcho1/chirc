@@ -61,7 +61,7 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
 // You have joined the channel
 // kello has joined (~kello@freenode-ca7.4sl.2765s3.IP)
 // kello has changed mode: +s
-    announceToChannel(cs, chn[i], std::string(":" + users_[cs].prefix() + " JOIN " + chn[i]), true);
+    announceToChannel(cs, chn[i], std::string(users_[cs].cmdPrefix("JOIN") + chn[i]), true);
 
     std::vector<std::string> names;
     names.push_back(chn[i]);
