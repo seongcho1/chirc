@@ -38,6 +38,7 @@ void  MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec) {
 void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std::string& msg) {
   std::vector<std::string> paramsVec;
   paramsVec.push_back(msgto);
+  paramsVec.push_back("");
 
   if (msgto[0] != '#' &&
     nickFdPair_.find(msgto) == nickFdPair_.end()) {
@@ -60,8 +61,17 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
   //to user
   if (msgto[0] != '#') {
     recipient = nickFdPair_[msgto];
-    // outMessages_[recipient].append(message);
     users_[recipient].wbuff.append(message);
+
+    if (!users_[recipient].away.empty()) {
+      paramsVec[1] = users_[recipient].away;
+      reply(cs, RPL_AWAY, "AWAY", paramsVec);
+    }
+    // if (!users_[nickfdit->second].away.empty()) {
+    //   paramsVec[1] = users_[nickfdit->second].away;
+    //   reply(cs, RPL_AWAY, "AWAY", paramsVec);
+    // }
+
   }
   //to channel
   //seongcho: need to check channel modes
@@ -69,9 +79,7 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
     std::string title = channels_.find(msgto)->first;
     Channel channel =  channels_[title];
     std::set<int> member = channel.member;
-    // if (member.find(cs) == member.end() ||
-    if (
-        (member.size() == 1 &&  *(member.begin()) == cs) ||
+    if ((member.size() == 1 &&  *(member.begin()) == cs) ||
         (channel.isMode('n') && member.find(cs) == member.end()) ||
         (channel.isMode('m') && channel.channelSpeaker.find(cs) == channel.channelSpeaker.end())) {
       reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec); //404
@@ -79,13 +87,6 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
     }
 
     announceToChannel(cs, channel.title, message);
-    // for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
-    //   recipient = *it;
-    //   if (recipient == cs)
-    //     continue;
-    //   // outMessages_[recipient].append(message);
-    //   users_[recipient].wbuff.append(message);
-    // }
   }
 
 

@@ -17,6 +17,5 @@ void MessageManager::TESTMSG(int cs, std::vector<std::string> paramsVec) {
   }
 
   std::string message = std::string("[from myself, " + SS::toString(cs) + "]").append(paramsVec[0]).append(NEWLINE);
-  // outMessages_[cs].append(message);
   users_[cs].wbuff.append(message);
 }

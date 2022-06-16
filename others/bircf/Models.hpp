@@ -43,15 +43,6 @@
 #define MAX(a,b)					((a > b) ? a : b)
 #define MIN(a,b)					((a > b) ? b : a)
 
-
-// // following CHANNEL_PREFIX sequence (MUST)
-// enum CreateOption {
-//   NORMAL,   // #
-//   LOCAL,    // &
-//   NO_MODES,  // +
-//   AS_CREATOR,  // !
-// };
-
 /*
 The user creating a channel automatically becomes channel operator
    with the notable exception of channels which name is prefixed by the
@@ -182,23 +173,6 @@ public:
     return BaseModel::currentMode(USR_M_A_FLAGS);
   }
 
-//   bool clientRead(std::string &buffer) {
-//     char read[BUF_SIZE + 1];
-//     int r = recv(fd, read, BUF_SIZE + 1, 0);
-
-//     if (r <= 0 ||
-//         BUF_SIZE < buffer.length() + r ||
-//         (r == BUF_SIZE && read[BUF_SIZE - 1] != '\n'))
-//       return false;
-
-//     read[r] = 0;
-//     buffer.append(read);
-
-// std::cout << ">> " << buffer;
-// // SS::charPrint(buffer);
-
-//     return true;
-//   }
   bool clientRead(void) {
     char read[BUF_SIZE + 1];
     int r = recv(fd, read, BUF_SIZE + 1, 0);
@@ -211,49 +185,15 @@ public:
     read[r] = 0;
     rbuff.append(read);
 
-std::cout << ">> " << rbuff;
-// SS::charPrint(buffer);
-
+// std::cout << ">> " << rbuff;
     return true;
   }
 
-//   void clientWrite(std::string &message) {
-//     if (message.empty())
-//       return;
-
-// std::cout << "<< " << message << std::endl;
-// // std::vector<std::string> msg = SS::splitString(message, NEWLINE);
-// // for (int i = 0; i < (int)msg.size(); ++i) {
-// //   msg[i].append(NEWLINE);
-// //   send(fd, msg[i].c_str(), msg[i].length(), 0);
-// // std::cout << "<< " << msg[i];
-// // SS::charPrint(msg[i]);
-// // }
-// // message.clear();
-
-//     unsigned long endset, offset = 0;
-
-//     while (offset < message.length()) {
-//       endset = MIN(BUF_SIZE, message.length() - offset);
-//       send(fd, message.c_str() + offset, endset, 0);
-//       offset += endset;
-//     }
-//     message.clear();
-//   }
   void clientWrite(void) {
     if (wbuff.empty())
       return;
 
-std::cout << "<< " << wbuff << std::endl;
-// std::vector<std::string> msg = SS::splitString(message, NEWLINE);
-// for (int i = 0; i < (int)msg.size(); ++i) {
-//   msg[i].append(NEWLINE);
-//   send(fd, msg[i].c_str(), msg[i].length(), 0);
-// std::cout << "<< " << msg[i];
-// SS::charPrint(msg[i]);
-// }
-// message.clear();
-
+// std::cout << "<< " << wbuff << std::endl;
     unsigned long endset, offset = 0;
 
     while (offset < wbuff.length()) {
@@ -269,18 +209,14 @@ std::cout << "<< " << wbuff << std::endl;
   //https://datatracker.ietf.org/doc/html/rfc2813#section-5.9.1
   std::string hostmask(void) {
     return std::string(nick + "!~" + user + "@" + host);
-    // return std::string(nick + "!" + user + "@0");
   }
 
   std::string legacyHostmask(void) {
     return std::string(pnik + "!~" + user + "@" + host);
-    // return std::string(pnik + "!" + user + "@0");
   }
 
   std::string serverHostmask(void) {
     return std::string().append("FT_IRC!FT_IRC@42.net");
-    // return std::string().append("*.").append(host);
-    //return host;
   }
 
   std::string cmdPrefix(std::string cmd) {
@@ -294,9 +230,6 @@ std::cout << "<< " << wbuff << std::endl;
   std::string srvPrefix(void) {
     return std::string (":" + serverHostmask() + " ");
   }
-  // std::string aPrefix(void) {
-  //   return std::string (":FR_IRC " + INF);
-  // }
 };
 
 #endif

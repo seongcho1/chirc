@@ -2,12 +2,10 @@
 
   void sigIntHandler(int signum) {
     std::cout << "call sigIntHandler: " << signum << std::endl;
-    //(void)signum;
   }
 
-   void sigQuitHandler(int signum) {
+  void sigQuitHandler(int signum) {
     std::cout << "call sigQuitHandler: " << signum << std::endl;
-    //(void)signum;
   }
 
 void  Ircserv::getOpt(int ac, char **av) {
@@ -73,7 +71,6 @@ void	Ircserv::initFd() {
   for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
     FD_SET(uit->first, &fdRead);
 
-    // if (messenger.outMessages()[uit->first].length() > 0) {
     if (messenger.users()[uit->first].wbuff.length() > 0) {
       FD_SET(uit->first, &fdWrite);
     }
@@ -97,7 +94,6 @@ void	Ircserv::checkFd() {
   //server
   if (FD_ISSET(ircFd, &fdRead)) {
     messenger.srvAccept(ircFd);
-    // r--;
   }
   //else if (FD_ISSET(e->ircFd, &e->fdWrite))
     //server-to-server
@@ -119,9 +115,6 @@ void	Ircserv::checkFd() {
       if (FD_ISSET(uit->first, &fdWrite))
         messenger.clientWrite(uit->first);
     }
-    // if (FD_ISSET(uit->first, &fdRead) || FD_ISSET(uit->first, &fdWrite))
-    //   r--;
-    // if (r == 0) break;
   }
 }
 
@@ -129,7 +122,6 @@ void Ircserv::disposeCorpse() {
   while (timeout.size()) {
 
     if (!timeout.top().quit) {
-      // messenger.outMessages()[timeout.top().fd].append("timeout\n");
       messenger.users()[timeout.top().fd].wbuff.append("timeout\n");
       messenger.clientWrite(timeout.top().fd);
     }

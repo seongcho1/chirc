@@ -17,8 +17,6 @@ class MessageManager {
 
 private:
   std::map<int, User>             users_;
-  // std::map<int, std::string>      inMessages_;
-  // std::map<int, std::string>      outMessages_;
   std::map<std::string, Channel>  channels_;
   std::map<std::string, int>      nickFdPair_;
   std::map<int, std::string>      replies_;
@@ -74,17 +72,11 @@ public:
   int                         ircfd;
 
   std::map<int, User>         &users()            { return users_; }
-  // std::map<int, std::string>  &inMessages()       { return inMessages_; }
-  // std::map<int, std::string>  &outMessages()      { return outMessages_; }
-  // std::size_t                 inSize() const      { return inMessages_.size(); }
-  // std::size_t                 outSize() const     { return outMessages_.size(); }
-
   void                        executeMessages(int cs);
   std::vector<std::string>    splitMessages(int cs, bool bSkipLast = true, bool bClearMessages = true);
   void                        executeMessage(int cs, std::string message);
   void                        srvAccept(int s);
   void                        clientRead(int cs);
-  // void                        clientWrite(int cs)	{ users_[cs].clientWrite(outMessages_[cs]); }
   void                        clientWrite(int cs)	{ users_[cs].clientWrite(); }
   void                        kickUser(int cs);
   bool                        isUniqueNick(int cs, std::string &nick);

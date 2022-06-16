@@ -26,6 +26,7 @@ void MessageManager::PART(int cs, std::vector<std::string> paramsVec) {
     std::string msg(users_[cs].cmdPrefix("PART") + ":" + *it);
     announceToChannel(cs, *it, msg, true);
     channels_[*it].leave(cs);
+    users_[cs].engaged.erase(*it);
     if (channels_[*it].member.size() == 0)
       channels_.erase(*it);
     
