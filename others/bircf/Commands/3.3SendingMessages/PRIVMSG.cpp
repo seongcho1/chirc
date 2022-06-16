@@ -72,7 +72,7 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
     // if (member.find(cs) == member.end() ||
     if (
         (member.size() == 1 &&  *(member.begin()) == cs) ||
-        channel.isMode('n') ||
+        (channel.isMode('n') && member.find(cs) == member.end()) ||
         (channel.isMode('m') && channel.channelSpeaker.find(cs) == channel.channelSpeaker.end())) {
       reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec); //404
       return;
