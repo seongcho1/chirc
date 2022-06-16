@@ -28,14 +28,6 @@ MessageManager::~MessageManager() {
   users_.clear();
 }
 
-void MessageManager::fdClean(int cs) {
-  if (users_.find(cs) != users_.end()) {
-    PART(cs, std::vector<std::string>(users_[cs].engaged.begin(), users_[cs].engaged.end()));
-    nickFdPair_.erase(users_[cs].nick);
-    users_.erase(cs);
-  }
-}
-
 void MessageManager::executeMessages(int cs) {
   std::vector<std::string> messageVec = splitMessages(cs);
   std::string message;
@@ -150,18 +142,26 @@ void MessageManager::srvAccept(int s) {
 }
 
 void MessageManager::clientRead(int cs) {
-  users_[cs].clientRead() ?
-    executeMessages(cs) : users_[cs].toQuit(); /*kickUser(cs);*/
+  users_[cs].clientRead() ? executeMessages(cs) : users_[cs].toQuit();
+}
+
+void MessageManager::fdClean(int cs) {
+  if (users_.find(cs) != users_.end()) {
+    std::vector<std::string> params;
+    params.push_back(SS::makeOneString(users_[cs].engaged.begin(), users_[cs].engaged.end(), ','));
+std::cout << params[0] << std::endl;
+    PART(cs, std::vector<std::string>(params));
+  }
 }
 
 void MessageManager::kickUser(int cs) {
   fdClean(cs); // del User *, inMessages_, out_commands
-  close(cs);    // cleaning the table first, and then the table will be ready for another client
+  // close(cs);    // cleaning the table first, and then the table will be ready for another client // TEST
   std::cout << "client #" << cs << " gone away" << std::endl;
 }
 
 void MessageManager::ping(int cs) {
-  users_[cs].wbuff.append(PING_REQUEST).append(PONG_RESULT).append(NEWLINE);
+  users_[cs].appendWbuff(std::string().append(PING_REQUEST).append(PONG_RESULT).append(NEWLINE));
   users_[cs].alive = time(NULL) + TIMEOUT;
 }
 
@@ -169,13 +169,13 @@ void MessageManager::announceToChannel(int cs, std::string title, std::string me
   std::set<int>::iterator it = channels_[title].member.begin();
   while (it != channels_[title].member.end()) {
     if (withMe || cs != *it)
-      users_[*it].wbuff.append(message).append(NEWLINE);
+      users_[*it].appendWbuff(std::string().append(message).append(NEWLINE));
     ++it;
   }
 }
 
 void MessageManager::announceOneUser(int cs, std::string message) {
-  users_[cs].wbuff.append(message).append(NEWLINE);
+  users_[cs].appendWbuff(std::string().append(message).append(NEWLINE));
 }
 
 void MessageManager::announceToNeighbors(int cs, std::string message, bool withMe) {
@@ -191,7 +191,7 @@ void MessageManager::announceToNeighbors(int cs, std::string message, bool withM
     friendly.insert(cs);
 
   for (std::set<int>::iterator it = friendly.begin(); it != friendly.end(); ++it) {
-    users_[*it].wbuff.append(message).append(NEWLINE);
+    users_[*it].appendWbuff(std::string().append(message).append(NEWLINE));
   }
 }
 

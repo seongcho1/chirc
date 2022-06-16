@@ -325,14 +325,28 @@ bool SS::isNickChar(std::string &s) {
   return true;
 }
 
-std::string SS::makeOneString(std::vector<std::string>::iterator const &begin, std::vector<std::string>::iterator const &end) {
+std::string SS::makeOneString(std::vector<std::string>::iterator const &begin, std::vector<std::string>::iterator const &end, char seperator) {
   std::string result;
   std::vector<std::string>::iterator it = begin;
-  while (it != end)
-    result.append(*it++).append(" ");
+  
+  while (it != end) {
+    result.append(*it);
+    if (++it != end)
+      result += seperator;
+  }
 
-  if (*result.end() == ' ')
-    result.pop_back();
+  return result;
+}
+
+std::string SS::makeOneString(std::set<std::string>::iterator const &begin, std::set<std::string>::iterator const &end, char seperator) {
+  std::string result;
+  std::set<std::string>::iterator it = begin;
+
+  while (it != end) {
+    result.append(*it);
+    if (++it != end)
+      result += seperator;
+  }
 
   return result;
 }

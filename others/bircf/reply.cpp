@@ -526,7 +526,7 @@ std::string  MessageManager::reply(int cs, int code, std::string command, std::v
   msg = std::string(":" + users_[cs].serverHostmask() + " " + SS::toString(code, 3) + " " + users_[cs].nick + " ").append(msg).append(NEWLINE);
 
   if (bDirectDelivery)
-    users_[cs].wbuff.append(msg);
+    users_[cs].appendWbuff(std::string(msg));
 
   return msg;
 }

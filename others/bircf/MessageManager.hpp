@@ -72,6 +72,7 @@ public:
   int                         ircfd;
 
   std::map<int, User>         &users()            { return users_; }
+  std::map<std::string, int>  &nickFdPairs()      { return nickFdPair_; }
   void                        executeMessages(int cs);
   std::vector<std::string>    splitMessages(int cs, bool bSkipLast = true, bool bClearMessages = true);
   void                        executeMessage(int cs, std::string message);

@@ -1,6 +1,10 @@
 #include "../../MessageManager.hpp"
 
 void MessageManager::PART(int cs, std::vector<std::string> paramsVec) {
+
+std::cout << "part cs = " << cs << std::endl;
+std::cout << paramsVec.size() << " :param = " << paramsVec[0] << std::endl;
+
   if (paramsVec.size() < 1) {
     reply(cs, ERR_NEEDMOREPARAMS, "PART", paramsVec); //461
     return;
@@ -23,6 +27,7 @@ void MessageManager::PART(int cs, std::vector<std::string> paramsVec) {
       ++it;
       continue;
     }
+    
     std::string msg(users_[cs].cmdPrefix("PART") + ":" + *it);
     announceToChannel(cs, *it, msg, true);
     channels_[*it].leave(cs);

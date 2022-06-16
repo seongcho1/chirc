@@ -15,9 +15,9 @@
 // #define CHANNEL_NOT_ALLOW "^G ," // ^G is ascii(7), blank, comma
 #define MESSAGE_PREFIX ":" // not allow blank
 // #define TIMEOUT 300
-#define TIMEOUT 60
+#define TIMEOUT 15
 // #define WAIT_TIME 60
-#define WAIT_TIME 60
+#define WAIT_TIME 10
 #define CHANNEL_MEMBER_LIMIT 32
 #define USER_ENGAGED_LIMIT 32
 #define PING_REQUEST "PING :"
@@ -187,6 +187,13 @@ public:
 
 // std::cout << ">> " << rbuff;
     return true;
+  }
+
+  void appendWbuff(std::string msg) {
+    if (!quit)
+      wbuff.append(msg);
+    else
+      wbuff.clear();
   }
 
   void clientWrite(void) {

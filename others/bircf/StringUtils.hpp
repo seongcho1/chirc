@@ -8,6 +8,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <set>
 #include <algorithm>
 #include <string>
 #include <cassert>
@@ -82,8 +83,8 @@ public:
 
   static void         charPrint(std::string &s);
   static bool         isNickChar(std::string &s);
-  static std::string  makeOneString(std::vector<std::string>::iterator const &begin, std::vector<std::string>::iterator const &end);
-
+  static std::string  makeOneString(std::vector<std::string>::iterator const &begin, std::vector<std::string>::iterator const &end, char seperator = ' ');
+  static std::string  makeOneString(std::set<std::string>::iterator const &begin, std::set<std::string>::iterator const &end, char seperator = ' ');
 };
 
 #endif

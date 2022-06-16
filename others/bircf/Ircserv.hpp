@@ -5,7 +5,7 @@
 #include <sys/select.h>
 #include <fcntl.h>
 #include <netdb.h>
-#include <stack>
+// #include <queue>
 #include <csignal>
 
 class Ircserv {
@@ -17,7 +17,8 @@ public:
   fd_set           fdWrite;
   struct timeval    selectInterval;
   MessageManager    messenger;
-  std::stack<User>  timeout;
+  // std::queue<User>  timeout;
+  std::vector<User> timeout;
   // std::stack<User>  quit;
   //std::stack<User>  passed;
 
@@ -27,6 +28,7 @@ public:
   void              initFd();
   void              doSelect();
   void              checkFd();
+  void              flushCorpse();
   void              disposeCorpse();
 };
 

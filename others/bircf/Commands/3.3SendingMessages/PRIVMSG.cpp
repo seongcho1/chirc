@@ -80,7 +80,6 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
   if (msgto[0] != '#') {
     recipient = nickFdPair_[msgto];
     announceOneUser(recipient, message);
-    // users_[recipient].wbuff.append(message);
 
     if (!users_[recipient].away.empty()) {
       paramsVec[1] = users_[recipient].away;

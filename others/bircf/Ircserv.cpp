@@ -21,7 +21,7 @@ void  Ircserv::getOpt(int ac, char **av) {
       exit(1);
   }
 
-  // signal(SIGINT, sigIntHandler);
+  signal(SIGINT, sigIntHandler);
   signal(SIGQUIT, sigQuitHandler);
 }
 
@@ -52,10 +52,23 @@ void	Ircserv::srvCreate(int port) {
 
 void	Ircserv::mainLoop() {
   while (42) {
+    disposeCorpse();
     initFd();
     doSelect();
     checkFd();
-    disposeCorpse();
+    flushCorpse();
+  }
+}
+
+void Ircserv::disposeCorpse(void) {
+
+  while (!timeout.empty()) {
+    int fd = timeout.back().fd;
+    std::string nick = timeout.back().nick;
+    messenger.users().erase(fd);
+    messenger.nickFdPairs().erase(nick);
+    close(fd);
+    timeout.pop_back();
   }
 }
 
@@ -90,7 +103,6 @@ void	Ircserv::doSelect() {
 
 void	Ircserv::checkFd() {
   if (r < 0) return;
-
   //server
   if (FD_ISSET(ircFd, &fdRead)) {
     messenger.srvAccept(ircFd);
@@ -101,43 +113,29 @@ void	Ircserv::checkFd() {
   //clients
   std::map<int, User>::iterator uit = messenger.users().begin();
   time_t now = time(NULL);
+
   for (; uit != messenger.users().end(); ++uit) {
     if (uit->second.dead < now || uit->second.quit) {
-      timeout.push(uit->second);
-std::cout << "r = " << r << std::endl;
-std::cout << "size = " << messenger.users().size() << std::endl;
-std::cout << "add timeout* = " << uit->second.fd << std::endl;
-std::cout << "add timeout& = " << &(uit->second) << std::endl;
-std::map<int, User>::iterator us = messenger.users().begin();
-std::cout << "mem& = ";
-for (; us != messenger.users().end(); ++us)
-std::cout << &(us->second) << " ";
-std::cout << std::endl;
-
+      uit->second.quit = true;
+      timeout.push_back(uit->second);
     }
     else {
       if (uit->second.alive < now)
         messenger.ping(uit->first);
-
       if (FD_ISSET(uit->first, &fdRead))
-        messenger.clientRead(uit->first);
-
+        messenger.clientRead(uit->first); // << 문제 지점;;;
       if (FD_ISSET(uit->first, &fdWrite))
         messenger.clientWrite(uit->first);
     }
   }
 }
 
-void Ircserv::disposeCorpse() {
-  while (timeout.size()) {
-
-    if (!timeout.top().quit) {
-      messenger.users()[timeout.top().fd].wbuff.append("timeout\n");
-      messenger.clientWrite(timeout.top().fd);
+void Ircserv::flushCorpse(void) {
+  for (int i = 0; i < (int)timeout.size(); ++i) {
+    if (!timeout[i].quit) {
+      messenger.users()[timeout[i].fd].appendWbuff(std::string().append("timeout").append(NEWLINE));
+      messenger.clientWrite(timeout[i].fd);
     }
-
-    messenger.kickUser(timeout.top().fd);
-    timeout.pop();
+    messenger.kickUser(timeout[i].fd);
   }
 }
-
