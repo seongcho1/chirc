@@ -16,5 +16,6 @@ void MessageManager::SELFMSG(int cs, std::vector<std::string> paramsVec) {
   }
 
   std::string message = std::string("[from myself, " + SS::toString(cs) + "(" + users_[cs].nick + ")]").append(paramsVec[0]).append(NEWLINE);
-  outMessages_[cs].append(message);
+  // outMessages_[cs].append(message);
+  users_[cs].wbuff.append(message);
 }
