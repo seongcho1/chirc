@@ -98,7 +98,10 @@ void MessageManager::modeChannel(int cs, std::vector<std::string> paramsVec) {
     
     else if (!paramOnce && *mit == 'l' && 2 < (int)paramsVec.size()) {
       channels_[paramsVec[0]].setMode(add, *mit);
-      channels_[paramsVec[0]].limit = MIN(atoi(paramsVec[2].c_str()), CHANNEL_MEMBER_LIMIT);
+      if (add)
+        channels_[paramsVec[0]].limit = MIN(atoi(paramsVec[2].c_str()), CHANNEL_MEMBER_LIMIT);
+      else
+        channels_[paramsVec[0]].limit = CHANNEL_MEMBER_LIMIT;
       msg += "-+"[add];
       msg += *mit;
       announceToChannel(cs, paramsVec[0], msg.append(" :").append(paramsVec[2]), true);
