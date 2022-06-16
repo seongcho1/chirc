@@ -25,6 +25,7 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
     keys = SS::splitString(paramsVec[1], COMMA);
 
   for (int i = 0; i < (int)chn.size(); ++i) {
+
     if (channels_.find(chn[i]) == channels_.end()) {
       channels_[chn[i]] = Channel(cs, chn[i]);
       users_[cs].engaged.insert(chn[i]);
@@ -67,6 +68,7 @@ void MessageManager::JOIN(int cs, std::vector<std::string> paramsVec) {
 // kello has joined (~kello@freenode-ca7.4sl.2765s3.IP)
 // kello has changed mode: +s
     announceToChannel(cs, chn[i], std::string(users_[cs].cmdPrefix("JOIN") + chn[i]), true);
+    paramsVec[0] = chn[i];
     NAMES(cs, paramsVec);
     // std::vector<std::string> names;
     // names.push_back(chn[i]);

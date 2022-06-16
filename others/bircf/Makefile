@@ -15,9 +15,6 @@ SRCS =	main.cpp Ircserv.cpp MessageManager.cpp StringUtils.cpp reply.cpp \
 				Commands/3.2Channel/INVITE.cpp \
 				Commands/3.3SendingMessages/PRIVMSG.cpp \
 				Commands/3.4Mode/MODE.cpp \
-				Commands/3.9Test/TESTMSG.cpp \
-				Commands/3.9Test/PUBLICMSG.cpp \
-				Commands/3.9Test/SELFMSG.cpp \
 
 
 OBJS = ${SRCS:.cpp=.o}

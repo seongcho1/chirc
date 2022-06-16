@@ -14,7 +14,6 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec) {
 
   if (paramsVec.size() != 4) {
     reply(cs, ERR_NEEDMOREPARAMS, "USER", paramsVec); //461
-    // outMessages_[cs].append("** Usage: USER <user> <mode> <unused> <realname> **\n");
     users_[cs].wbuff.append("** Usage: USER <user> <mode> <unused> <realname> **\n");
     return;
   }
@@ -22,7 +21,6 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec) {
   //<mode> should be a numeric
   if (!SS::isNumber(paramsVec[1])) {
     reply(cs, ERR_NEEDMOREPARAMS, "USER :The <mode> parameter should be a numeric", paramsVec); //461
-    // outMessages_[cs].append("** Usage: USER <user> <mode> <unused> <realname> **\n");
     users_[cs].wbuff.append("** Usage: USER <user> <mode> <unused> <realname> **\n");
     return;
   }
@@ -33,7 +31,6 @@ void MessageManager::USER(int cs, std::vector<std::string> paramsVec) {
   //if (AUTH_LEVEL1 <= user.authenticated) {
     user.authenticated |= AUTH_LEVEL3;
     user.user = *it++;
-    // it++;// user.setMode(true, atoi((*it++).c_str()));
     user.setMode(true, ((atoi((*it++).c_str()) & 8) ? 'i' : ('a' + 26)));
     it++;
     user.real = *it;

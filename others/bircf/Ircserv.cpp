@@ -2,13 +2,11 @@
 
   void sigIntHandler(int signum) {
     std::cout << "call sigIntHandler: " << signum << std::endl;
-    (void)signum;
   }
 
-  // void sigQuitHandler(int signum) {
-  //   std::cout << "call sigQuitHandler: " << signum << std::endl;
-  //   (void)signum;
-  // }
+  void sigQuitHandler(int signum) {
+    std::cout << "call sigQuitHandler: " << signum << std::endl;
+  }
 
 void  Ircserv::getOpt(int ac, char **av) {
   switch (ac) {
@@ -23,8 +21,8 @@ void  Ircserv::getOpt(int ac, char **av) {
       exit(1);
   }
 
-  signal(SIGINT, sigIntHandler);
-  // signal(SIGQUIT, sigQuitHandler);
+  // signal(SIGINT, sigIntHandler);
+  signal(SIGQUIT, sigQuitHandler);
 }
 
 void	Ircserv::srvCreate(int port) {
@@ -73,7 +71,6 @@ void	Ircserv::initFd() {
   for (uit = messenger.users().begin(); uit != messenger.users().end(); ++uit) {
     FD_SET(uit->first, &fdRead);
 
-    // if (messenger.outMessages()[uit->first].length() > 0) {
     if (messenger.users()[uit->first].wbuff.length() > 0) {
       FD_SET(uit->first, &fdWrite);
     }
@@ -97,7 +94,6 @@ void	Ircserv::checkFd() {
   //server
   if (FD_ISSET(ircFd, &fdRead)) {
     messenger.srvAccept(ircFd);
-    // r--;
   }
   //else if (FD_ISSET(e->ircFd, &e->fdWrite))
     //server-to-server
@@ -108,6 +104,16 @@ void	Ircserv::checkFd() {
   for (; uit != messenger.users().end(); ++uit) {
     if (uit->second.dead < now || uit->second.quit) {
       timeout.push(uit->second);
+std::cout << "r = " << r << std::endl;
+std::cout << "size = " << messenger.users().size() << std::endl;
+std::cout << "add timeout* = " << uit->second.fd << std::endl;
+std::cout << "add timeout& = " << &(uit->second) << std::endl;
+std::map<int, User>::iterator us = messenger.users().begin();
+std::cout << "mem& = ";
+for (; us != messenger.users().end(); ++us)
+std::cout << &(us->second) << " ";
+std::cout << std::endl;
+
     }
     else {
       if (uit->second.alive < now)
@@ -119,9 +125,6 @@ void	Ircserv::checkFd() {
       if (FD_ISSET(uit->first, &fdWrite))
         messenger.clientWrite(uit->first);
     }
-    // if (FD_ISSET(uit->first, &fdRead) || FD_ISSET(uit->first, &fdWrite))
-    //   r--;
-    // if (r == 0) break;
   }
 }
 
@@ -129,7 +132,6 @@ void Ircserv::disposeCorpse() {
   while (timeout.size()) {
 
     if (!timeout.top().quit) {
-      // messenger.outMessages()[timeout.top().fd].append("timeout\n");
       messenger.users()[timeout.top().fd].wbuff.append("timeout\n");
       messenger.clientWrite(timeout.top().fd);
     }

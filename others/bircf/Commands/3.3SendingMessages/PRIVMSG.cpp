@@ -1,17 +1,28 @@
 #include "../../MessageManager.hpp"
 #include <cassert>
 
+void  MessageManager::NOTICE(int cs, std::vector<std::string> paramsVec) {
+  SENDMSG(cs, paramsVec, true);
+}
+
 void  MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec) {
+  SENDMSG(cs, paramsVec, false);
+}
+
+
+void  MessageManager::SENDMSG(int cs, std::vector<std::string> paramsVec, bool isNotice) {
 
   if ( paramsVec.size() == 1 ||
        (paramsVec.size() == 2 && paramsVec[1].empty()) ) {
-    reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec); //412
+    if (!isNotice)
+      reply(cs, ERR_NOTEXTTOSEND, "PRIVMSG", paramsVec); //412
     return;
   }
 
   if ( paramsVec.size() == 0 ||
        (paramsVec.size() == 1 && paramsVec[0].empty()) ) {
-    reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec); //411
+    if (!isNotice)
+      reply(cs, ERR_NORECIPIENT, "PRIVMSG", paramsVec); //411
     return;
   }
   std::string msgtarget = paramsVec[0];
@@ -23,30 +34,34 @@ void  MessageManager::PRIVMSG(int cs, std::vector<std::string> paramsVec) {
   if (duplicatedMsgtos.length()) {
     paramsVec[0] = duplicatedMsgtos;
     paramsVec[1] = "Duplicate recipients. No message delivered";
-    reply(cs, ERR_TOOMANYTARGETS, "PRIVMSG", paramsVec); //407
+    if (!isNotice)
+      reply(cs, ERR_TOOMANYTARGETS, "PRIVMSG", paramsVec); //407
     return;
   }
 
   std::vector<std::string>::iterator it;
   for(it = msgtoVec.begin(); it != msgtoVec.end(); ++it) {
     std::string msgto = *it;
-    PRIVMSGHelper(cs, msgto, msg);
+    PRIVMSGHelper(cs, msgto, msg, isNotice);
   }
 
 }
 
-void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std::string& msg) {
+void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std::string& msg, bool isNotice) {
   std::vector<std::string> paramsVec;
   paramsVec.push_back(msgto);
+  paramsVec.push_back("");
 
   if (msgto[0] != '#' &&
     nickFdPair_.find(msgto) == nickFdPair_.end()) {
-    reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec); //401
+    if (!isNotice)
+      reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec); //401
     return;
   }
   if (msgto[0]  == '#' &&
     ( msgto.length() == 1 || channels_.find(msgto) == channels_.end()) ) {
-    reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec); //401
+    if (!isNotice)
+      reply(cs, ERR_NOSUCHNICK, "PRIVMSG", paramsVec); //401
     return;
   }
 
@@ -55,13 +70,28 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
   //SS::matchStringVector(usersVec, pattern) then, usersVec only keeps memebers matched the pattern
 
   int recipient;
-  std::string message = std::string(":" + hostmask(cs) + " PRIVMSG " + msgto  + " :").append(msg).append(NEWLINE);
+  std::string message;
+  if (isNotice)
+    message = std::string(":" + hostmask(cs) + " NOTICE " + msgto  + " :").append(msg);
+  else
+    message = std::string(":" + hostmask(cs) + " PRIVMSG " + msgto  + " :").append(msg);
 
   //to user
   if (msgto[0] != '#') {
     recipient = nickFdPair_[msgto];
-    // outMessages_[recipient].append(message);
-    users_[recipient].wbuff.append(message);
+    announceOneUser(recipient, message);
+    // users_[recipient].wbuff.append(message);
+
+    if (!users_[recipient].away.empty()) {
+      paramsVec[1] = users_[recipient].away;
+      if (!isNotice)
+        reply(cs, RPL_AWAY, "AWAY", paramsVec);
+    }
+    // if (!users_[nickfdit->second].away.empty()) {
+    //   paramsVec[1] = users_[nickfdit->second].away;
+    //   reply(cs, RPL_AWAY, "AWAY", paramsVec);
+    // }
+
   }
   //to channel
   //seongcho: need to check channel modes
@@ -69,23 +99,15 @@ void  MessageManager::PRIVMSGHelper(int cs, const std::string& msgto, const std:
     std::string title = channels_.find(msgto)->first;
     Channel channel =  channels_[title];
     std::set<int> member = channel.member;
-    // if (member.find(cs) == member.end() ||
-    if (
-        (member.size() == 1 &&  *(member.begin()) == cs) ||
-        channel.isMode('n') ||
+    if ((member.size() == 1 &&  *(member.begin()) == cs) ||
+        (channel.isMode('n') && member.find(cs) == member.end()) ||
         (channel.isMode('m') && channel.channelSpeaker.find(cs) == channel.channelSpeaker.end())) {
-      reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec); //404
+      if (!isNotice)
+        reply(cs, ERR_CANNOTSENDTOCHAN, "PRIVMSG", paramsVec); //404
       return;
     }
 
     announceToChannel(cs, channel.title, message);
-    // for (std::set<int>::iterator it = member.begin(); it != member.end(); ++it) {
-    //   recipient = *it;
-    //   if (recipient == cs)
-    //     continue;
-    //   // outMessages_[recipient].append(message);
-    //   users_[recipient].wbuff.append(message);
-    // }
   }
 
 
