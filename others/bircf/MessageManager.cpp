@@ -20,6 +20,7 @@ void MessageManager::registerFunctions() {
   functionCallMap_["NAMES"] =       &MessageManager::NAMES;
   functionCallMap_["INVITE"] =      &MessageManager::INVITE;
 
+  functionCallMap_["NOTICE"] =      &MessageManager::NOTICE;
   functionCallMap_["PRIVMSG"] =     &MessageManager::PRIVMSG;
   functionCallMap_["SELFMSG"] =     &MessageManager::SELFMSG;
   functionCallMap_["PUBLICMSG"] =   &MessageManager::PUBLICMSG;

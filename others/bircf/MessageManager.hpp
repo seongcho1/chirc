@@ -43,8 +43,10 @@ private:
   void  TOPIC(int cs, std::vector<std::string> paramsVec);
   void  INVITE(int cs, std::vector<std::string> paramsVec);
 
+  void  NOTICE(int cs, std::vector<std::string> paramsVec);
   void  PRIVMSG(int cs, std::vector<std::string> paramsVec);
-  void  PRIVMSGHelper(int cs, const std::string& msgto, const std::string& msg);
+  void  SENDMSG(int cs, std::vector<std::string> paramsVec, bool isNotice = false);
+  void  PRIVMSGHelper(int cs, const std::string& msgto, const std::string& msg, bool isNotice);
   void  SELFMSG(int cs, std::vector<std::string> paramsVec);
   void  PUBLICMSG(int cs, std::vector<std::string> paramsVec);
   void  TESTMSG(int cs, std::vector<std::string> paramsVec);
